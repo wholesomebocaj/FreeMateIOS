@@ -24,23 +24,29 @@ struct ChessboardView: View {
     private var boardGrid: some View {
         let ranks: [Int] = board.orientation == "white" ? Array(stride(from: 8, through: 1, by: -1)) : Array(1...8)
         let files: [Character] = board.orientation == "white" ? Array("abcdefgh") : Array(Array("abcdefgh").reversed())
-        return GeometryReader { geo in
-            let side = min(geo.size.width, geo.size.height)
-            let square = side / 8
-            VStack(spacing: 0) {
-                ForEach(ranks, id: \.self) { rank in
-                    HStack(spacing: 0) {
-                        ForEach(files, id: \.self) { file in
-                            squareCell(file: file, rank: rank, size: square)
+        return Color.clear
+            .aspectRatio(1, contentMode: .fit)
+            .frame(maxWidth: .infinity)
+            .overlay {
+                GeometryReader { geo in
+                    let side = min(geo.size.width, geo.size.height)
+                    let square = side / 8
+                    VStack(spacing: 0) {
+                        ForEach(ranks, id: \.self) { rank in
+                            HStack(spacing: 0) {
+                                ForEach(files, id: \.self) { file in
+                                    squareCell(file: file, rank: rank, size: square)
+                                }
+                            }
                         }
                     }
+                    .frame(width: side, height: side)
+                    .position(x: geo.size.width / 2, y: geo.size.height / 2)
                 }
             }
-            .frame(width: side, height: side)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .background(FreeMateTheme.panelDeep)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-        }
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .padding(.horizontal, 4)
     }
 
     private func squareCell(file: Character, rank: Int, size: CGFloat) -> some View {
@@ -79,7 +85,7 @@ struct ChessboardView: View {
                 }
                 if rank == (board.orientation == "white" ? 1 : 8) && file == (board.orientation == "white" ? "a" : "h") {
                     Text(String(file))
-                        .font(.system(size: 9, weight: .bold))
+                        .font(.system(size: max(8, size * 0.18), weight: .bold))
                         .foregroundStyle(light ? FreeMateTheme.darkSquare : FreeMateTheme.lightSquare)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                         .padding(2)
@@ -104,18 +110,31 @@ struct ChessboardView: View {
         VStack(spacing: 10) {
             Text("Promote to")
                 .font(.headline)
-            HStack {
-                ForEach(prompt.choices, id: \.self) { choice in
-                    Button(PromotionLabel.name(choice)) { board.choosePromotion(choice) }
-                        .buttonStyle(.borderedProminent)
-                        .tint(FreeMateTheme.green)
+            ViewThatFits(in: .horizontal) {
+                HStack {
+                    promotionChoices(prompt)
+                }
+                VStack {
+                    promotionChoices(prompt)
                 }
             }
             Button("Cancel") { board.cancelPromotion() }
                 .foregroundStyle(FreeMateTheme.muted)
         }
-        .padding()
-        .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
+        .padding(12)
+        .frame(maxWidth: .infinity)
+        .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .padding(8)
+    }
+
+    private func promotionChoices(_ prompt: PromotionPrompt) -> some View {
+        ForEach(prompt.choices, id: \.self) { choice in
+            Button(PromotionLabel.name(choice)) { board.choosePromotion(choice) }
+                .buttonStyle(.borderedProminent)
+                .tint(FreeMateTheme.green)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
     }
 }
 
@@ -153,6 +172,7 @@ struct FreeMateScreen<Content: View>: View {
         ZStack {
             FreeMateTheme.bg.ignoresSafeArea()
             content()
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
@@ -184,4 +204,30 @@ struct ProgressMeter: View {
             .frame(height: 8)
         }
     }
+}
+
+private struct ChessboardPreviewHost: View {
+    @StateObject private var board = PracticeBoard()
+
+    var body: some View {
+        ZStack {
+            FreeMateTheme.bg.ignoresSafeArea()
+            ChessboardView(board: board)
+                .padding(.horizontal)
+                .safeAreaPadding(.horizontal)
+                .safeAreaPadding(.bottom)
+        }
+    }
+}
+
+#Preview("iPhone SE", traits: .fixedLayout(width: 375, height: 667)) {
+    ChessboardPreviewHost()
+}
+
+#Preview("iPhone 16 Pro", traits: .fixedLayout(width: 402, height: 874)) {
+    ChessboardPreviewHost()
+}
+
+#Preview("iPhone 16 Pro Max", traits: .fixedLayout(width: 440, height: 956)) {
+    ChessboardPreviewHost()
 }
