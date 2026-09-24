@@ -1,0 +1,731 @@
+{
+  "id": "italian-game",
+  "name": "Italian Game",
+  "eco": "C50",
+  "difficulty": "Beginner",
+  "bracket": "beginner",
+  "side": "White",
+  "description": "A practical 1.e4 course that teaches the Italian Game first, then shows what to do when Black avoids it.",
+  "sections": [
+    {
+      "id": "main-line",
+      "title": "Main Line",
+      "branches": [
+        {
+          "id": "main-line",
+          "title": "Main Line: Quiet Italian Setup",
+          "description": "Learn a sound beginner Italian Game setup: develop, castle, then prepare a central break.",
+          "moves": [
+            {
+              "uci": "e2e4",
+              "san": "e4",
+              "title": "Claim the center",
+              "explanation": "Controls d5 and f5, opens lines for the bishop and queen, and starts the game with direct central space."
+            },
+            {
+              "uci": "e7e5",
+              "san": "e5",
+              "title": "Black mirrors the center",
+              "explanation": "Black also takes central space, creating an open game where quick development matters."
+            },
+            {
+              "uci": "g1f3",
+              "san": "Nf3",
+              "title": "Develop with a threat",
+              "explanation": "Nf3 develops a knight, attacks e5, and prepares castling without bringing the queen out too early."
+            },
+            {
+              "uci": "b8c6",
+              "san": "Nc6",
+              "title": "Black defends e5",
+              "explanation": "Nc6 develops while defending the e5 pawn. White should keep improving pieces instead of chasing pawns."
+            },
+            {
+              "uci": "f1c4",
+              "san": "Bc4",
+              "title": "Enter the Italian Game",
+              "explanation": "Bc4 develops to an active diagonal and points at f7, the most sensitive square near Black's king."
+            },
+            {
+              "uci": "f8c5",
+              "san": "Bc5",
+              "title": "Black chooses the classical setup",
+              "explanation": "Bc5 develops naturally and mirrors White's pressure. Both sides are racing to castle and finish development."
+            },
+            {
+              "uci": "c2c3",
+              "san": "c3",
+              "title": "Prepare d4",
+              "explanation": "c3 supports a later d4 break. This is the key Italian idea: build the center before opening it."
+            },
+            {
+              "uci": "g8f6",
+              "san": "Nf6",
+              "title": "Black develops and attacks e4",
+              "explanation": "Nf6 adds pressure to e4 and gets Black closer to castling."
+            },
+            {
+              "uci": "d2d3",
+              "san": "d3",
+              "title": "Support the center calmly",
+              "explanation": "d3 keeps e4 protected and opens the c1 bishop. Beginners can choose this quiet setup before learning sharper d4 lines."
+            },
+            {
+              "uci": "d7d6",
+              "san": "d6",
+              "title": "Black supports e5",
+              "explanation": "d6 protects e5 and opens the c8 bishop, keeping the position solid."
+            },
+            {
+              "uci": "e1g1",
+              "san": "O-O",
+              "title": "Castle first",
+              "explanation": "White gets the king safe before starting central or kingside plans."
+            },
+            {
+              "uci": "e8g8",
+              "san": "O-O",
+              "title": "Black castles too",
+              "explanation": "Both kings are safe. The opening is complete enough to start asking: which piece improves next?"
+            },
+            {
+              "uci": "f1e1",
+              "san": "Re1",
+              "title": "Put the rook on e1",
+              "explanation": "Re1 supports e4 and prepares the center break d4 under better conditions."
+            },
+            {
+              "uci": "a7a6",
+              "san": "a6",
+              "title": "Black asks the bishop a question later",
+              "explanation": "a6 prepares Ba7 and gives Black luft on the queenside without changing the main plan."
+            },
+            {
+              "uci": "b1d2",
+              "san": "Nbd2",
+              "title": "Finish development",
+              "explanation": "Nbd2 connects pieces and supports f1, c4, and e4. White is ready for Nf1-g3 or d4 ideas."
+            },
+            {
+              "uci": "c5a7",
+              "san": "Ba7",
+              "title": "Black preserves the bishop",
+              "explanation": "Ba7 keeps pressure on f2 and avoids a future b4 tempo. The position is a normal Italian middlegame."
+            }
+          ],
+          "hints": [
+            "Follow the highlighted move and say the idea out loud.",
+            "After each move, check king safety, center control, and piece activity.",
+            "When a trade appears, ask what file opens and which piece improves next."
+          ],
+          "coachingNotes": [
+            "This is a real Italian Game: e4 e5, Nf3 Nc6, Bc4.",
+            "For beginners, the quiet plan is c3, d3, castle, Re1, then improve pieces before opening the center.",
+            "Only push d4 when your king is safe and your pieces are ready to handle trades.",
+            "Your middlegame plan is simple: safe king, active minor pieces, pressure on e5/f7, and one central break."
+          ],
+          "completion": {
+            "attempts": 0,
+            "completed": false,
+            "mistakes": 0
+          },
+          "isMainLine": true
+        }
+      ]
+    },
+    {
+      "id": "if-c5",
+      "title": "If Black Plays c5",
+      "branches": [
+        {
+          "id": "vs-sicilian",
+          "title": "If Black Plays c5: Simple Sicilian Response",
+          "description": "Black has avoided the Italian Game and entered the Sicilian. Use a calm open-center setup.",
+          "moves": [
+            {
+              "uci": "e2e4",
+              "san": "e4",
+              "title": "Start with e4",
+              "explanation": "White takes central space and invites Black to show their defense."
+            },
+            {
+              "uci": "c7c5",
+              "san": "c5",
+              "title": "Black chooses the Sicilian",
+              "explanation": "c5 attacks d4 from the side. This is not an Italian Game, so switch plans calmly."
+            },
+            {
+              "uci": "g1f3",
+              "san": "Nf3",
+              "title": "Develop first",
+              "explanation": "Nf3 develops, controls d4/e5, and prepares the central break."
+            },
+            {
+              "uci": "d7d6",
+              "san": "d6",
+              "title": "Black supports the center",
+              "explanation": "d6 controls e5 and prepares Nf6, a very common Sicilian setup."
+            },
+            {
+              "uci": "d2d4",
+              "san": "d4",
+              "title": "Open the center",
+              "explanation": "d4 challenges Black immediately. This is the clean beginner way to avoid drifting with slow moves."
+            },
+            {
+              "uci": "c5d4",
+              "san": "cxd4",
+              "title": "Black trades in the center",
+              "explanation": "Black captures on d4, opening the c-file and changing the pawn structure."
+            },
+            {
+              "uci": "f3d4",
+              "san": "Nxd4",
+              "title": "Recapture with the knight",
+              "explanation": "Nxd4 develops a piece into the center. After this trade, White has active pieces and clear development."
+            },
+            {
+              "uci": "g8f6",
+              "san": "Nf6",
+              "title": "Black attacks e4",
+              "explanation": "Nf6 develops and asks White to defend the e4 pawn."
+            },
+            {
+              "uci": "b1c3",
+              "san": "Nc3",
+              "title": "Defend e4 naturally",
+              "explanation": "Nc3 protects e4 and completes the central knight setup."
+            },
+            {
+              "uci": "a7a6",
+              "san": "a6",
+              "title": "Black prepares queenside play",
+              "explanation": "a6 is common in Sicilian structures. Do not panic; continue development and castle."
+            },
+            {
+              "uci": "f1e2",
+              "san": "Be2",
+              "title": "Prepare to castle",
+              "explanation": "Be2 is a calm square that keeps the king safe and avoids unnecessary early attacks."
+            },
+            {
+              "uci": "e7e6",
+              "san": "e6",
+              "title": "Black prepares development",
+              "explanation": "e6 opens the f8 bishop and supports central control."
+            },
+            {
+              "uci": "e1g1",
+              "san": "O-O",
+              "title": "Castle",
+              "explanation": "White gets safe before choosing a plan like Be3, Qd2, or f4 later."
+            },
+            {
+              "uci": "f8e7",
+              "san": "Be7",
+              "title": "Black develops",
+              "explanation": "Be7 prepares castling. The opening has become a normal Sicilian middlegame, not an Italian attack."
+            }
+          ],
+          "hints": [
+            "Follow the highlighted move and say the idea out loud.",
+            "After each move, check king safety, center control, and piece activity.",
+            "When a trade appears, ask what file opens and which piece improves next."
+          ],
+          "coachingNotes": [
+            "Black avoided the Italian with 1...c5, so this branch is a Sicilian response, not an Italian continuation.",
+            "The beginner plan is Nf3, d4, recapture with the knight, develop, and castle.",
+            "Do not use Italian ideas like Bc4 pressure on f7 automatically here; the pawn structure is different.",
+            "After the opening, watch the d-file/c-file and keep your e4 pawn supported."
+          ],
+          "completion": {
+            "attempts": 0,
+            "completed": false,
+            "mistakes": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "if-c6",
+      "title": "If Black Plays c6",
+      "branches": [
+        {
+          "id": "vs-caro-kann",
+          "title": "If Black Plays c6: Caro-Kann Response",
+          "description": "Black prepares d5. Build the center and choose a clear Advance-style plan.",
+          "moves": [
+            {
+              "uci": "e2e4",
+              "san": "e4",
+              "title": "Start with e4",
+              "explanation": "White controls the center and opens lines for the bishop and queen."
+            },
+            {
+              "uci": "c7c6",
+              "san": "c6",
+              "title": "Black chooses the Caro-Kann",
+              "explanation": "c6 prepares d5 with support. This is solid and not part of the Italian Game."
+            },
+            {
+              "uci": "d2d4",
+              "san": "d4",
+              "title": "Build the pawn center",
+              "explanation": "d4 creates a strong center before Black challenges it."
+            },
+            {
+              "uci": "d7d5",
+              "san": "d5",
+              "title": "Black challenges e4",
+              "explanation": "d5 is the Caro-Kann idea: attack the center with a supported pawn."
+            },
+            {
+              "uci": "e4e5",
+              "san": "e5",
+              "title": "Advance with space",
+              "explanation": "e5 gains space and creates a clear beginner plan: develop behind the pawn chain."
+            },
+            {
+              "uci": "c8f5",
+              "san": "Bf5",
+              "title": "Black develops the light bishop",
+              "explanation": "Bf5 gets the bishop outside the pawn chain before e6."
+            },
+            {
+              "uci": "g1f3",
+              "san": "Nf3",
+              "title": "Develop calmly",
+              "explanation": "Nf3 supports the center and prepares castling."
+            },
+            {
+              "uci": "e7e6",
+              "san": "e6",
+              "title": "Black supports d5",
+              "explanation": "e6 builds a solid pawn chain but locks in the dark-square bishop."
+            },
+            {
+              "uci": "f1e2",
+              "san": "Be2",
+              "title": "Prepare castling",
+              "explanation": "Be2 is simple and safe. White should not start pawn storms before the king is secure."
+            },
+            {
+              "uci": "c6c5",
+              "san": "c5",
+              "title": "Black attacks the chain",
+              "explanation": "c5 is Black's main break against the advanced e5 pawn."
+            },
+            {
+              "uci": "e1g1",
+              "san": "O-O",
+              "title": "Castle",
+              "explanation": "White castles before deciding whether to capture, support d4, or improve pieces."
+            },
+            {
+              "uci": "b8c6",
+              "san": "Nc6",
+              "title": "Black develops pressure",
+              "explanation": "Nc6 adds pressure to d4. The next lesson is to defend the center without freezing your pieces."
+            }
+          ],
+          "hints": [
+            "Follow the highlighted move and say the idea out loud.",
+            "After each move, check king safety, center control, and piece activity.",
+            "When a trade appears, ask what file opens and which piece improves next."
+          ],
+          "coachingNotes": [
+            "Black avoided the Italian with 1...c6, so this is a Caro-Kann response branch.",
+            "The Advance setup teaches space: e5 gives room, but you must support the pawn chain.",
+            "A common mistake is attacking too soon. Develop, castle, and only then consider kingside space gains.",
+            "Watch Black's c5 break; it is the main challenge to your center."
+          ],
+          "completion": {
+            "attempts": 0,
+            "completed": false,
+            "mistakes": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "if-e6",
+      "title": "If Black Plays e6",
+      "branches": [
+        {
+          "id": "vs-french",
+          "title": "If Black Plays e6: French Defense Response",
+          "description": "Black prepares d5. Take space, build a pawn chain, and develop around it.",
+          "moves": [
+            {
+              "uci": "e2e4",
+              "san": "e4",
+              "title": "Start with e4",
+              "explanation": "White claims central space and opens piece lines."
+            },
+            {
+              "uci": "e7e6",
+              "san": "e6",
+              "title": "Black chooses the French",
+              "explanation": "e6 prepares d5 and creates a more closed center than the Italian."
+            },
+            {
+              "uci": "d2d4",
+              "san": "d4",
+              "title": "Build the center",
+              "explanation": "d4 takes the space Black is about to challenge."
+            },
+            {
+              "uci": "d7d5",
+              "san": "d5",
+              "title": "Black attacks e4",
+              "explanation": "d5 is the French Defense structure. Black challenges the center immediately."
+            },
+            {
+              "uci": "e4e5",
+              "san": "e5",
+              "title": "Advance for space",
+              "explanation": "e5 gains space and starts the classic French pawn chain."
+            },
+            {
+              "uci": "c7c5",
+              "san": "c5",
+              "title": "Black attacks d4",
+              "explanation": "c5 is Black's main counterplay against the pawn chain."
+            },
+            {
+              "uci": "c2c3",
+              "san": "c3",
+              "title": "Support the chain",
+              "explanation": "c3 protects d4. This is the simple beginner way to keep the center stable."
+            },
+            {
+              "uci": "b8c6",
+              "san": "Nc6",
+              "title": "Black adds pressure",
+              "explanation": "Nc6 attacks d4 again and develops."
+            },
+            {
+              "uci": "g1f3",
+              "san": "Nf3",
+              "title": "Develop and defend",
+              "explanation": "Nf3 supports d4 and prepares castling."
+            },
+            {
+              "uci": "d8b6",
+              "san": "Qb6",
+              "title": "Black pressures d4 and b2",
+              "explanation": "Qb6 is a common French idea. Notice how Black targets the base of your pawn chain."
+            },
+            {
+              "uci": "f1d3",
+              "san": "Bd3",
+              "title": "Develop actively",
+              "explanation": "Bd3 points toward h7 and helps White castle."
+            },
+            {
+              "uci": "c5d4",
+              "san": "cxd4",
+              "title": "Black trades at the base",
+              "explanation": "cxd4 challenges the support pawn. This is the kind of trade French players look for."
+            },
+            {
+              "uci": "c3d4",
+              "san": "cxd4",
+              "title": "Recapture and keep space",
+              "explanation": "cxd4 restores the pawn chain and opens the c-file a little."
+            },
+            {
+              "uci": "g8e7",
+              "san": "Nge7",
+              "title": "Black develops flexibly",
+              "explanation": "Ne7 supports c6/f5 and avoids blocking the c-pawn structure."
+            }
+          ],
+          "hints": [
+            "Follow the highlighted move and say the idea out loud.",
+            "After each move, check king safety, center control, and piece activity.",
+            "When a trade appears, ask what file opens and which piece improves next."
+          ],
+          "coachingNotes": [
+            "Black avoided the Italian with 1...e6, so this is a French Defense response branch.",
+            "The beginner plan is d4, e5, c3, develop, and understand the pawn chain.",
+            "Your chain points toward the kingside, but castle and develop before attacking.",
+            "Black will attack d4 with c5 and pieces. Defend the base of your chain calmly."
+          ],
+          "completion": {
+            "attempts": 0,
+            "completed": false,
+            "mistakes": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "if-d5",
+      "title": "If Black Plays d5",
+      "branches": [
+        {
+          "id": "vs-scandinavian",
+          "title": "If Black Plays d5: Scandinavian Response",
+          "description": "Black attacks e4 immediately. Capture, develop with tempo, and avoid chasing too far.",
+          "moves": [
+            {
+              "uci": "e2e4",
+              "san": "e4",
+              "title": "Start with e4",
+              "explanation": "White claims the center and opens lines."
+            },
+            {
+              "uci": "d7d5",
+              "san": "d5",
+              "title": "Black chooses the Scandinavian",
+              "explanation": "d5 immediately attacks e4. This is not an Italian Game structure."
+            },
+            {
+              "uci": "e4d5",
+              "san": "exd5",
+              "title": "Capture the pawn",
+              "explanation": "exd5 accepts the challenge and opens the e-file."
+            },
+            {
+              "uci": "d8d5",
+              "san": "Qxd5",
+              "title": "Black recaptures with the queen",
+              "explanation": "Qxd5 brings the queen out early. White should gain time by developing."
+            },
+            {
+              "uci": "b1c3",
+              "san": "Nc3",
+              "title": "Develop with tempo",
+              "explanation": "Nc3 attacks the queen while developing a piece. This is exactly how to punish an early queen move."
+            },
+            {
+              "uci": "d5a5",
+              "san": "Qa5",
+              "title": "Black retreats the queen",
+              "explanation": "Qa5 keeps pressure while stepping away from the knight."
+            },
+            {
+              "uci": "d2d4",
+              "san": "d4",
+              "title": "Build the center",
+              "explanation": "d4 takes central space while Black's queen is already committed."
+            },
+            {
+              "uci": "g8f6",
+              "san": "Nf6",
+              "title": "Black develops",
+              "explanation": "Nf6 attacks the center and prepares castling."
+            },
+            {
+              "uci": "g1f3",
+              "san": "Nf3",
+              "title": "Develop normally",
+              "explanation": "Nf3 supports d4/e5 and helps White castle."
+            },
+            {
+              "uci": "c7c6",
+              "san": "c6",
+              "title": "Black gives the queen support",
+              "explanation": "c6 creates a safe square and supports central play."
+            },
+            {
+              "uci": "f1c4",
+              "san": "Bc4",
+              "title": "Develop the bishop",
+              "explanation": "Bc4 develops actively and points toward f7, now in an open-center game."
+            },
+            {
+              "uci": "c8f5",
+              "san": "Bf5",
+              "title": "Black develops the bishop",
+              "explanation": "Bf5 activates a piece before e6."
+            },
+            {
+              "uci": "e1g1",
+              "san": "O-O",
+              "title": "Castle",
+              "explanation": "White has used development to gain time and now gets the king safe."
+            },
+            {
+              "uci": "e7e6",
+              "san": "e6",
+              "title": "Black solidifies",
+              "explanation": "e6 supports the center and opens the dark-square bishop."
+            }
+          ],
+          "hints": [
+            "Follow the highlighted move and say the idea out loud.",
+            "After each move, check king safety, center control, and piece activity.",
+            "When a trade appears, ask what file opens and which piece improves next."
+          ],
+          "coachingNotes": [
+            "Black avoided the Italian with 1...d5, so this is a Scandinavian response branch.",
+            "The beginner plan is simple: capture, develop with tempo on the queen, build the center, castle.",
+            "Do not chase the queen forever. Take the free development, then play normal chess.",
+            "After castling, look for active piece squares and central control rather than a premature attack."
+          ],
+          "completion": {
+            "attempts": 0,
+            "completed": false,
+            "mistakes": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "practice",
+      "title": "Practice Drills",
+      "branches": [
+        {
+          "id": "final-review",
+          "title": "Final Review: Italian Setup",
+          "description": "Replay the quiet Italian setup from memory.",
+          "moves": [
+            {
+              "uci": "e2e4",
+              "san": "e4",
+              "title": "Claim the center",
+              "explanation": "Controls d5 and f5, opens lines for the bishop and queen, and starts the game with direct central space."
+            },
+            {
+              "uci": "e7e5",
+              "san": "e5",
+              "title": "Black mirrors the center",
+              "explanation": "Black also takes central space, creating an open game where quick development matters."
+            },
+            {
+              "uci": "g1f3",
+              "san": "Nf3",
+              "title": "Develop with a threat",
+              "explanation": "Nf3 develops a knight, attacks e5, and prepares castling without bringing the queen out too early."
+            },
+            {
+              "uci": "b8c6",
+              "san": "Nc6",
+              "title": "Black defends e5",
+              "explanation": "Nc6 develops while defending the e5 pawn. White should keep improving pieces instead of chasing pawns."
+            },
+            {
+              "uci": "f1c4",
+              "san": "Bc4",
+              "title": "Enter the Italian Game",
+              "explanation": "Bc4 develops to an active diagonal and points at f7, the most sensitive square near Black's king."
+            },
+            {
+              "uci": "f8c5",
+              "san": "Bc5",
+              "title": "Black chooses the classical setup",
+              "explanation": "Bc5 develops naturally and mirrors White's pressure. Both sides are racing to castle and finish development."
+            },
+            {
+              "uci": "c2c3",
+              "san": "c3",
+              "title": "Prepare d4",
+              "explanation": "c3 supports a later d4 break. This is the key Italian idea: build the center before opening it."
+            },
+            {
+              "uci": "g8f6",
+              "san": "Nf6",
+              "title": "Black develops and attacks e4",
+              "explanation": "Nf6 adds pressure to e4 and gets Black closer to castling."
+            },
+            {
+              "uci": "d2d3",
+              "san": "d3",
+              "title": "Support the center calmly",
+              "explanation": "d3 keeps e4 protected and opens the c1 bishop. Beginners can choose this quiet setup before learning sharper d4 lines."
+            },
+            {
+              "uci": "d7d6",
+              "san": "d6",
+              "title": "Black supports e5",
+              "explanation": "d6 protects e5 and opens the c8 bishop, keeping the position solid."
+            },
+            {
+              "uci": "e1g1",
+              "san": "O-O",
+              "title": "Castle first",
+              "explanation": "White gets the king safe before starting central or kingside plans."
+            },
+            {
+              "uci": "e8g8",
+              "san": "O-O",
+              "title": "Black castles too",
+              "explanation": "Both kings are safe. The opening is complete enough to start asking: which piece improves next?"
+            },
+            {
+              "uci": "f1e1",
+              "san": "Re1",
+              "title": "Put the rook on e1",
+              "explanation": "Re1 supports e4 and prepares the center break d4 under better conditions."
+            },
+            {
+              "uci": "a7a6",
+              "san": "a6",
+              "title": "Black asks the bishop a question later",
+              "explanation": "a6 prepares Ba7 and gives Black luft on the queenside without changing the main plan."
+            },
+            {
+              "uci": "b1d2",
+              "san": "Nbd2",
+              "title": "Finish development",
+              "explanation": "Nbd2 connects pieces and supports f1, c4, and e4. White is ready for Nf1-g3 or d4 ideas."
+            },
+            {
+              "uci": "c5a7",
+              "san": "Ba7",
+              "title": "Black preserves the bishop",
+              "explanation": "Ba7 keeps pressure on f2 and avoids a future b4 tempo. The position is a normal Italian middlegame."
+            }
+          ],
+          "hints": [
+            "Follow the highlighted move and say the idea out loud.",
+            "After each move, check king safety, center control, and piece activity.",
+            "When a trade appears, ask what file opens and which piece improves next."
+          ],
+          "coachingNotes": [
+            "This is a real Italian Game: e4 e5, Nf3 Nc6, Bc4.",
+            "For beginners, the quiet plan is c3, d3, castle, Re1, then improve pieces before opening the center.",
+            "Only push d4 when your king is safe and your pieces are ready to handle trades.",
+            "Your middlegame plan is simple: safe king, active minor pieces, pressure on e5/f7, and one central break."
+          ],
+          "completion": {
+            "attempts": 0,
+            "completed": false,
+            "mistakes": 0
+          },
+          "isMainLine": true
+        }
+      ]
+    }
+  ],
+  "ideas": [
+    "The Italian Game starts only after e4 e5, Nf3 Nc6, and Bc4.",
+    "If Black plays c5, c6, e6, or d5 on move one, switch to the correct response instead of forcing Italian ideas.",
+    "In the quiet Italian, build with c3 and d3, castle, then prepare Re1 and a later d4 break.",
+    "Against other defenses, keep the same beginner values: center, development, king safety, then a clear plan.",
+    "Do not use f7 pressure or Bc4 ideas automatically when the pawn structure belongs to another opening."
+  ],
+  "commonMistakes": [
+    "Trying to force the Italian after Black has already chosen the Sicilian, Caro-Kann, French, or Scandinavian.",
+    "Launching an f7 attack before castling or finishing development.",
+    "Playing random quiet moves instead of responding to the actual pawn structure.",
+    "Chasing the queen too far in the Scandinavian instead of taking development and castling.",
+    "Forgetting that each defense has its own central pawn breaks."
+  ],
+  "tree": {},
+  "training": {
+    "mode": "guided-line",
+    "startingFen": "startpos",
+    "sideToTrain": "white"
+  },
+  "spacedRepetition": {
+    "attempts": 0,
+    "mistakes": 0,
+    "accuracy": 0,
+    "completedLines": 0,
+    "confidence": "new",
+    "lastReviewed": null
+  }
+}
