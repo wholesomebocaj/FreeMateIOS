@@ -15,19 +15,31 @@ struct HomeView: View {
                         .foregroundStyle(FreeMateTheme.text)
                     Text("Free structured lessons, practice, and opening training for beginners who want a calm, clear path forward.")
                         .foregroundStyle(FreeMateTheme.muted)
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                        stat("Progress", "\(game.progressPercent())% of lessons")
+                        stat("Daily streak", game.dailyStreak == 1 ? "1 day" : "\(game.dailyStreak) days")
+                        stat("Lessons done", "\(game.completedLessons.count)")
+                        stat("Due for review", "\(game.hydratedQueue().count)")
+                    }
+                    ProgressMeter(value: game.progressPercent())
+                    if let course = game.currentCourse() {
+                        Button("Resume \(course.title)") { game.openCourse(course.id) }
+                            .buttonStyle(.borderedProminent)
+                            .tint(FreeMateTheme.green)
+                    }
                     ViewThatFits(in: .horizontal) {
                         HStack {
                             Button("Start Learning") { game.selectedTab = .lessons }
                                 .buttonStyle(.borderedProminent)
                                 .tint(FreeMateTheme.green)
-                            Button("Explore Openings") { game.selectedTab = .openings }
+                            Button("Explore Openings") { game.selectedTab = .practice }
                                 .buttonStyle(.bordered)
                         }
                         VStack(alignment: .leading) {
                             Button("Start Learning") { game.selectedTab = .lessons }
                                 .buttonStyle(.borderedProminent)
                                 .tint(FreeMateTheme.green)
-                            Button("Explore Openings") { game.selectedTab = .openings }
+                            Button("Explore Openings") { game.selectedTab = .practice }
                                 .buttonStyle(.bordered)
                         }
                     }
@@ -758,7 +770,7 @@ struct ReviewView: View {
                         Button("Continue lessons") { game.selectedTab = .lessons }
                             .buttonStyle(.borderedProminent)
                             .tint(FreeMateTheme.green)
-                        Button("Train openings") { game.selectedTab = .openings }
+                        Button("Train openings") { game.selectedTab = .practice }
                             .buttonStyle(.bordered)
                     } else {
                         ForEach(Array(queue.enumerated()), id: \.element.key) { index, item in
@@ -795,6 +807,156 @@ struct ReviewView: View {
         } else {
             game.openLesson(item.id)
         }
+    }
+}
+
+struct PracticeHubView: View {
+    @EnvironmentObject private var game: GameState
+
+    var body: some View {
+        FreeMateScreen(title: "Practice") {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Sandbox and repertoire")
+                        .font(.title2.bold())
+                        .foregroundStyle(FreeMateTheme.text)
+                    Text("Play both sides on a free board, or drill a beginner opening line.")
+                        .foregroundStyle(FreeMateTheme.muted)
+                    NavigationLink {
+                        PracticeView()
+                    } label: {
+                        practiceCard(
+                            title: "Free board",
+                            detail: "Move both sides, test legal moves, and load a position.",
+                            action: "Open sandbox"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    Text("Repertoire drills")
+                        .font(.title3.bold())
+                        .foregroundStyle(FreeMateTheme.text)
+                    if game.openings.isEmpty {
+                        Text("No opening lines are loaded yet.")
+                            .foregroundStyle(FreeMateTheme.muted)
+                    }
+                    ForEach(game.openings) { opening in
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("\(opening.eco) · \(opening.side)")
+                                .font(.caption.bold())
+                                .foregroundStyle(FreeMateTheme.accent)
+                            Text(opening.name).font(.headline).foregroundStyle(FreeMateTheme.text)
+                            Text(opening.description)
+                                .font(.subheadline)
+                                .foregroundStyle(FreeMateTheme.muted)
+                            HStack {
+                                Button("Overview") { game.openOpening(opening.id) }
+                                    .buttonStyle(.bordered)
+                                Button("Train") { game.openTrainer(id: opening.id, line: nil) }
+                                    .buttonStyle(.borderedProminent)
+                                    .tint(FreeMateTheme.green)
+                            }
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 28)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        }
+    }
+
+    private func practiceCard(title: String, detail: String, action: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title).font(.headline).foregroundStyle(FreeMateTheme.text)
+            Text(detail).font(.subheadline).foregroundStyle(FreeMateTheme.muted)
+            Text(action).font(.caption.weight(.bold)).foregroundStyle(FreeMateTheme.green)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+struct ProfileView: View {
+    @EnvironmentObject private var game: GameState
+
+    var body: some View {
+        FreeMateScreen(title: "Profile") {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(game.currentUser?.displayName ?? "Guest")
+                        .font(.title.bold())
+                        .foregroundStyle(FreeMateTheme.text)
+                    Text(game.currentUser == nil ? "Sign in to keep progress on this device." : "Account saved on this device.")
+                        .foregroundStyle(FreeMateTheme.muted)
+                    NavigationLink {
+                        AuthView()
+                    } label: {
+                        Text(game.currentUser == nil ? "Account settings" : "Manage account")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(FreeMateTheme.green)
+                    Text("Stats")
+                        .font(.title3.bold())
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                        profileStat("Course progress", "\(game.progressPercent())%")
+                        profileStat("Daily streak", game.dailyStreak == 1 ? "1 day" : "\(game.dailyStreak) days")
+                        profileStat("Lessons complete", "\(game.completedLessons.count)")
+                        profileStat("Openings", "\(game.openings.count)")
+                    }
+                    ProgressMeter(value: game.progressPercent())
+                    NavigationLink {
+                        ReviewView()
+                    } label: {
+                        Text("Review queue · \(game.hydratedQueue().count) ready")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .buttonStyle(.bordered)
+                    Text("Skill brackets")
+                        .font(.title3.bold())
+                    ForEach(game.brackets) { bracket in
+                        Button {
+                            game.openBracket(bracket.slug)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("\(bracket.title) · \(bracket.range)")
+                                    .font(.headline)
+                                    .foregroundStyle(FreeMateTheme.text)
+                                Text(bracket.description)
+                                    .font(.subheadline)
+                                    .foregroundStyle(FreeMateTheme.muted)
+                                ProgressMeter(value: game.bracketProgress(bracket))
+                            }
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 28)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        }
+    }
+
+    private func profileStat(_ title: String, _ detail: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title).font(.caption.bold()).foregroundStyle(FreeMateTheme.text)
+            Text(detail).font(.caption2).foregroundStyle(FreeMateTheme.muted)
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

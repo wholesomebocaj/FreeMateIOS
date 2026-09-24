@@ -127,6 +127,41 @@ final class GameState: ObservableObject {
         brackets.first { bracketProgress($0) < 100 } ?? brackets.first
     }
 
+    func currentCourse() -> Course? {
+        if let lesson = nextLesson(),
+           let match = courses.first(where: { CurriculumLoader.courseLessons($0).contains { $0.id == lesson.id } }) {
+            return match
+        }
+        return courses.first
+    }
+
+    var dailyStreak: Int {
+        let calendar = Calendar.current
+        var days = Set<Date>()
+        func record(_ raw: String?) {
+            guard let raw, let date = Self.parseISO(raw) else { return }
+            days.insert(calendar.startOfDay(for: date))
+        }
+        for item in reviewItems.values {
+            record(item.lastSucceededAt)
+            record(item.updatedAt)
+        }
+        for row in lessonRows { record(row.updatedAt) }
+        for row in courseRows { record(row.updatedAt) }
+        for row in openingRows { record(row.updatedAt) }
+        var cursor = calendar.startOfDay(for: Date())
+        if !days.contains(cursor) {
+            cursor = calendar.date(byAdding: .day, value: -1, to: cursor) ?? cursor
+        }
+        var streak = 0
+        while days.contains(cursor) {
+            streak += 1
+            guard let previous = calendar.date(byAdding: .day, value: -1, to: cursor) else { break }
+            cursor = previous
+        }
+        return streak
+    }
+
     func libraryEntries() -> [CourseLibraryMeta] {
         let all = courses.map { CourseLibrary.meta(for: $0, brackets: brackets, completed: completedLessons) }
         let visible = all.filter { CourseLibrary.matches($0, state: library, brackets: brackets) }
@@ -454,12 +489,12 @@ final class GameState: ObservableObject {
     }
 
     func openOpening(_ id: String) {
-        selectedTab = .openings
+        selectedTab = .practice
         openingPath.append(.overview(id))
     }
 
     func openTrainer(id: String, line: String?) {
-        selectedTab = .openings
+        selectedTab = .practice
         openingPath.append(.train(id: id, line: line))
     }
 
@@ -830,7 +865,7 @@ private struct StoredUser: Codable {
 }
 
 enum AppTab: Hashable {
-    case home, lessons, openings, practice, review
+    case home, lessons, practice, profile
 }
 
 enum LessonRoute: Hashable {
