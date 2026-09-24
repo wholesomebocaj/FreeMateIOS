@@ -4,10 +4,7 @@ struct ContentView: View {
     @EnvironmentObject private var game: GameState
 
     var body: some View {
-        VStack(spacing: 0) {
-            freeMateHeaderBar
-
-            TabView(selection: $game.selectedTab) {
+        TabView(selection: $game.selectedTab) {
                 NavigationStack {
                     HomeView()
                 }
@@ -55,32 +52,52 @@ struct ContentView: View {
                 }
                 .tabItem { Label("Review", systemImage: "arrow.clockwise") }
                 .tag(AppTab.review)
-            }
+        }
+        .safeAreaInset(edge: .top, spacing: 8) {
+            freeMateHeaderBar
         }
     }
 
     private var freeMateHeaderBar: some View {
-        HStack {
+        HStack(spacing: 12) {
             Text("♔ FreeMate Chess")
                 .font(.largeTitle.bold())
                 .foregroundStyle(.white)
                 .lineLimit(1)
-                .minimumScaleFactor(0.6)
+                .minimumScaleFactor(0.55)
 
-            Spacer()
+            Spacer(minLength: 8)
 
             Text("Level: Beginner")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.white)
+                .lineLimit(1)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
                 .background(.white.opacity(0.2), in: Capsule())
         }
-        .padding()
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
         .background(Color(red: 0.07, green: 0.18, blue: 0.42))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .padding(.horizontal)
-        .padding(.top, 8)
-        .padding(.bottom, 8)
+        .padding(.horizontal, 12)
     }
+}
+
+#Preview("iPhone SE", traits: .fixedLayout(width: 375, height: 667)) {
+    ContentView()
+        .environmentObject(GameState())
+        .preferredColorScheme(.dark)
+}
+
+#Preview("iPhone 16 Pro", traits: .fixedLayout(width: 402, height: 874)) {
+    ContentView()
+        .environmentObject(GameState())
+        .preferredColorScheme(.dark)
+}
+
+#Preview("iPhone 16 Pro Max", traits: .fixedLayout(width: 440, height: 956)) {
+    ContentView()
+        .environmentObject(GameState())
+        .preferredColorScheme(.dark)
 }

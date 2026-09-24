@@ -159,6 +159,7 @@ enum ChessSquare {
     }
 }
 
+@MainActor
 final class ChessEngine {
     static let startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     static let emptyFen = "8/8/8/8/8/8/8/8 w - - 0 1"

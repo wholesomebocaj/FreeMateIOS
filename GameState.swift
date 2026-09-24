@@ -378,13 +378,15 @@ final class GameState: ObservableObject {
         }
     }
 
-    func signUp(username: String, password: String) -> String? {
+    func signUp(username: String, password: String) async -> String? {
         do {
             let normalized = try AuthSession.normalizeUsername(username)
             if users.contains(where: { $0.username == normalized }) {
                 return "That username is already taken."
             }
-            let hash = try AuthSession.hashPassword(password)
+            let hash = try await Task.detached(priority: .userInitiated) {
+                try AuthSession.hashPassword(password)
+            }.value
             let now = Self.isoNow()
             let user = FreeMateUser(
                 id: (users.map(\.id).max() ?? 0) + 1,
@@ -406,11 +408,17 @@ final class GameState: ObservableObject {
         }
     }
 
-    func logIn(username: String, password: String) -> String? {
+    func logIn(username: String, password: String) async -> String? {
         do {
             let normalized = try AuthSession.normalizeUsername(username)
-            guard let user = users.first(where: { $0.username == normalized }),
-                  AuthSession.verifyPassword(password, storedHash: user.passwordHash) else {
+            guard let user = users.first(where: { $0.username == normalized }) else {
+                return "Invalid username or password."
+            }
+            let storedHash = user.passwordHash
+            let matches = await Task.detached(priority: .userInitiated) {
+                AuthSession.verifyPassword(password, storedHash: storedHash)
+            }.value
+            guard matches else {
                 return "Invalid username or password."
             }
             currentUser = user

@@ -15,12 +15,21 @@ struct HomeView: View {
                         .foregroundStyle(FreeMateTheme.text)
                     Text("Free structured lessons, practice, and opening training for beginners who want a calm, clear path forward.")
                         .foregroundStyle(FreeMateTheme.muted)
-                    HStack {
-                        Button("Start Learning") { game.selectedTab = .lessons }
-                            .buttonStyle(.borderedProminent)
-                            .tint(FreeMateTheme.green)
-                        Button("Explore Openings") { game.selectedTab = .openings }
-                            .buttonStyle(.bordered)
+                    ViewThatFits(in: .horizontal) {
+                        HStack {
+                            Button("Start Learning") { game.selectedTab = .lessons }
+                                .buttonStyle(.borderedProminent)
+                                .tint(FreeMateTheme.green)
+                            Button("Explore Openings") { game.selectedTab = .openings }
+                                .buttonStyle(.bordered)
+                        }
+                        VStack(alignment: .leading) {
+                            Button("Start Learning") { game.selectedTab = .lessons }
+                                .buttonStyle(.borderedProminent)
+                                .tint(FreeMateTheme.green)
+                            Button("Explore Openings") { game.selectedTab = .openings }
+                                .buttonStyle(.bordered)
+                        }
                     }
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                         stat("Interactive", "Practice boards and guided lessons")
@@ -36,8 +45,11 @@ struct HomeView: View {
                             .tint(FreeMateTheme.green)
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 28)
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 
@@ -132,8 +144,11 @@ struct CourseLibraryView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 28)
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 
@@ -244,9 +259,12 @@ struct BracketDetailView: View {
                             .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
                         }
                     }
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .padding(.bottom, 28)
                 }
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 }
@@ -280,9 +298,12 @@ struct CourseDetailView: View {
                             }
                         }
                     }
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .padding(.bottom, 28)
                 }
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 
@@ -397,8 +418,11 @@ struct LessonPlayerBody: View {
                     }
                     sidebar
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 28)
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 
@@ -486,8 +510,11 @@ struct OpeningBrowserView: View {
                         .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 28)
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 }
@@ -523,9 +550,12 @@ struct OpeningOverviewView: View {
                             .font(.footnote)
                             .foregroundStyle(FreeMateTheme.muted)
                     }
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .padding(.bottom, 28)
                 }
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 }
@@ -610,8 +640,11 @@ struct OpeningTrainerBody: View {
                     Text("Common mistakes").font(.headline)
                     ForEach(trainer.opening.commonMistakes, id: \.self) { idea in Text("• \(idea)").font(.subheadline) }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 28)
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 
@@ -656,8 +689,11 @@ struct PracticeView: View {
                         }
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 28)
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 
@@ -745,8 +781,11 @@ struct ReviewView: View {
                         }
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 28)
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
     }
 
@@ -803,7 +842,10 @@ struct AuthView: View {
                     }
                     Spacer()
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 12)
+                .safeAreaPadding(.bottom)
             }
             .navigationTitle("Account")
             .toolbar {
@@ -817,9 +859,18 @@ struct AuthView: View {
     private func submit() {
         message = mode == "login" ? "Signing in..." : "Creating account..."
         failed = false
-        let error = mode == "login"
-            ? game.logIn(username: username, password: password)
-            : game.signUp(username: username, password: password)
+        let username = username
+        let password = password
+        let mode = mode
+        Task {
+            let error = mode == "login"
+                ? await game.logIn(username: username, password: password)
+                : await game.signUp(username: username, password: password)
+            applyAuthResult(error)
+        }
+    }
+
+    private func applyAuthResult(_ error: String?) {
         if let error {
             if mode == "signup" && error == "That username is already taken." {
                 message = error
@@ -835,4 +886,28 @@ struct AuthView: View {
             dismiss()
         }
     }
+}
+
+#Preview("Home · iPhone SE", traits: .fixedLayout(width: 375, height: 667)) {
+    NavigationStack { HomeView() }
+        .environmentObject(GameState())
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Home · iPhone 16 Pro Max", traits: .fixedLayout(width: 440, height: 956)) {
+    NavigationStack { HomeView() }
+        .environmentObject(GameState())
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Practice · iPhone SE", traits: .fixedLayout(width: 375, height: 667)) {
+    NavigationStack { PracticeView() }
+        .environmentObject(GameState())
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Practice · iPhone 16 Pro Max", traits: .fixedLayout(width: 440, height: 956)) {
+    NavigationStack { PracticeView() }
+        .environmentObject(GameState())
+        .preferredColorScheme(.dark)
 }

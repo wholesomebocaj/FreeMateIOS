@@ -43,9 +43,22 @@ final class OpeningTrainer: ObservableObject {
         completions = game.branchCompletionMap(for: opening.id)
         let starting = opening.training.startingFen == "startpos" ? ChessEngine.startingFen : opening.training.startingFen
         currentFen = starting
+        let fallback = TrainingLine(
+            id: "empty",
+            title: "Line",
+            description: "",
+            hints: [],
+            coachingNotes: [],
+            completionMessage: nil,
+            sectionId: "",
+            sectionTitle: "",
+            isMainLine: true,
+            moves: []
+        )
         let initial = lines.first { $0.id == requestedLineId }
             ?? lines.first { $0.id == stored.activeLineId }
-            ?? lines[0]
+            ?? lines.first
+            ?? fallback
         activeLine = initial
         board = PracticeBoard(fen: starting, mode: "lesson", orientation: trainSide == "black" ? "black" : "white")
         board.lockToAllowedMoves = true
@@ -53,9 +66,6 @@ final class OpeningTrainer: ObservableObject {
         fastForwardToUserTurn()
         render(syncBoard: true)
         wireBoard()
-        for line in lines where cache[line.id] == nil {
-            cache[line.id] = buildCache(line)
-        }
     }
 
     func loadBranch(_ line: TrainingLine) {
