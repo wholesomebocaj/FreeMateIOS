@@ -6,5 +6,80 @@
   "topic": "strategy",
   "order": 3,
   "summary": "Learn why the center matters.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "Why the center matters",
+      "body": "Pieces in the center reach more squares. A knight in the center has eight jumps. A knight in the corner has two."
+    },
+    {
+      "type": "click-all-squares",
+      "title": "Mark the center",
+      "body": "Click the four center squares again: d4, e4, d5, and e5.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "targetSquares": [
+        "d4",
+        "d5",
+        "e4",
+        "e5"
+      ],
+      "highlightSquares": [
+        "d4",
+        "d5",
+        "e4",
+        "e5"
+      ],
+      "successText": "Fight for these squares in the opening.",
+      "errorText": "Stay on d4, e4, d5, and e5."
+    },
+    {
+      "type": "move-task",
+      "title": "Put a pawn in the center",
+      "body": "Move the e-pawn from e2 to e4.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "startSquare": "e2",
+      "targetSquare": "e4",
+      "highlightSquares": [
+        "d5",
+        "e4",
+        "f5"
+      ],
+      "successText": "e4 claims space and opens a path for the bishop and queen.",
+      "errorText": "Advance the pawn on e2 to e4."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "A useful first pawn move",
+      "question": "Which pawn move fights for the center?",
+      "board": true,
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "choices": [
+        {
+          "label": "a3",
+          "value": "a3"
+        },
+        {
+          "label": "h4",
+          "value": "h4"
+        },
+        {
+          "label": "e4",
+          "value": "e4"
+        },
+        {
+          "label": "a4",
+          "value": "a4"
+        }
+      ],
+      "correctChoice": "e4",
+      "successText": "e4 and d4 are the classic central pawn moves.",
+      "errorText": "Edge pawns do not control d4, e4, d5, or e5."
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "Use your first moves to influence the center. You do not have to capture there. Standing on it, or attacking it, is enough."
+    }
+  ],
+  "timeMinutes": 5
 }

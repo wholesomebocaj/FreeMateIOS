@@ -6,5 +6,85 @@
   "topic": "fundamentals",
   "order": 1,
   "summary": "Learn the board, files, ranks, and square names.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "The board",
+      "body": "Chess uses 64 squares. Columns are files a through h, left to right for White. Rows are ranks 1 through 8, counting up from White's side."
+    },
+    {
+      "type": "board-demo",
+      "title": "Corners and the center",
+      "body": "a1 is White's left corner and h1 is White's right corner. The center is d4, e4, d5, and e5.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "highlightSquares": [
+        "a1",
+        "h1",
+        "a8",
+        "h8",
+        "d4",
+        "e4",
+        "d5",
+        "e5"
+      ]
+    },
+    {
+      "type": "click-all-squares",
+      "title": "Find the center",
+      "body": "Click d4, e4, d5, and e5.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "targetSquares": [
+        "d4",
+        "e4",
+        "d5",
+        "e5"
+      ],
+      "highlightSquares": [
+        "d4",
+        "e4",
+        "d5",
+        "e5"
+      ],
+      "successText": "Those four squares are the center.",
+      "errorText": "The center is where the d and e files cross ranks 4 and 5."
+    },
+    {
+      "type": "square-click",
+      "title": "Name e4",
+      "body": "File e is the fifth file. Rank 4 is four squares up from White. Click e4.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "targetSquare": "e4",
+      "successText": "e4 sits in front of White's king pawn.",
+      "errorText": "Count a, b, c, d, e, then stop on rank 4."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "What color is a1?",
+      "question": "White's left corner, a1, is which color?",
+      "board": true,
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "highlightSquares": [
+        "a1"
+      ],
+      "choices": [
+        {
+          "label": "Dark",
+          "value": "dark"
+        },
+        {
+          "label": "Light",
+          "value": "light"
+        }
+      ],
+      "correctChoice": "dark",
+      "successText": "a1 is dark. h1, White's right corner, is light.",
+      "errorText": "Look at a1 again. It is the dark corner."
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "Name a square with its file, then its rank: e4, d5, h1. You will use those names in every lesson."
+    }
+  ],
+  "timeMinutes": 6
 }
