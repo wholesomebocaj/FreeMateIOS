@@ -6,5 +6,60 @@
   "topic": "strategy",
   "order": 1,
   "summary": "Learn a calm check before you play.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "Pause for one breath",
+      "body": "Fast moves lose pieces. Before every move, name the check, the captures, and the threat on the board."
+    },
+    {
+      "type": "checklist",
+      "title": "A simple checklist",
+      "body": "Use this list until it becomes a habit.",
+      "tasks": [
+        "Am I in check?",
+        "Did my opponent leave a piece hanging?",
+        "Will my move hang a piece or allow a fork?",
+        "Is my king still safe?"
+      ]
+    },
+    {
+      "type": "multiple-choice",
+      "title": "The tempting pawn",
+      "question": "You can capture a pawn, but the capture leaves your queen on a square attacked by a rook. What do you do?",
+      "choices": [
+        {
+          "label": "Take the pawn. Pawns win games.",
+          "value": "take"
+        },
+        {
+          "label": "Save the queen. Material matters more than one pawn.",
+          "value": "save"
+        },
+        {
+          "label": "Move the king for no reason.",
+          "value": "king"
+        }
+      ],
+      "correctChoice": "save",
+      "successText": "Keep the queen. Look for the pawn again after she is safe.",
+      "errorText": "A queen is worth far more than a pawn."
+    },
+    {
+      "type": "board-demo",
+      "title": "See the danger first",
+      "body": "The rook on d8 attacks the white queen down the open d-file. Saving the queen comes before any attack.",
+      "fen": "3rk3/8/8/8/8/8/8/3QK3 w - - 0 1",
+      "highlightSquares": [
+        "d1",
+        "d8"
+      ]
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "One quiet look prevents most blunders. Checks, captures, threats, then your plan."
+    }
+  ],
+  "timeMinutes": 5
 }

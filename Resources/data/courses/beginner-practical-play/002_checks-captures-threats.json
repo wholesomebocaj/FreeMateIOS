@@ -6,5 +6,77 @@
   "topic": "strategy",
   "order": 2,
   "summary": "Learn the first questions to ask on every turn.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "Look in this order",
+      "body": "Checks come first because they demand an answer. Then captures, especially of undefended pieces. Then threats such as forks and pins."
+    },
+    {
+      "type": "board-demo",
+      "title": "This is check",
+      "body": "The queen on e2 attacks the king on e1. White must answer the check.",
+      "fen": "4k3/8/8/8/8/8/4q3/4K3 w - - 0 1",
+      "highlightSquares": [
+        "e2",
+        "e1"
+      ]
+    },
+    {
+      "type": "move-task",
+      "title": "Capture the checker",
+      "body": "The queen is unprotected. Take it with the king, from e1 to e2.",
+      "fen": "4k3/8/8/8/8/8/4q3/4K3 w - - 0 1",
+      "startSquare": "e1",
+      "targetSquare": "e2",
+      "successText": "Capturing the checking piece is one of the three ways out of check.",
+      "errorText": "Move the king from e1 to e2."
+    },
+    {
+      "type": "move-task",
+      "title": "Step out of check",
+      "body": "The queen on e3 checks along the file. Move the king to d1 or f1.",
+      "fen": "4k3/8/8/8/8/4q3/8/4K3 w - - 0 1",
+      "allowedMoves": [
+        "e1d1",
+        "e1f1"
+      ],
+      "lockToAllowedMoves": true,
+      "highlightSquares": [
+        "d1",
+        "f1",
+        "e3"
+      ],
+      "successText": "Moving the king off the line also escapes check.",
+      "errorText": "Step to d1 or f1. Both squares are safe."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "The third way out",
+      "question": "Besides moving the king or capturing the checker, how else can you escape check from a sliding piece?",
+      "choices": [
+        {
+          "label": "Block the line with another piece",
+          "value": "block"
+        },
+        {
+          "label": "Skip your turn",
+          "value": "skip"
+        },
+        {
+          "label": "Move a pawn backward",
+          "value": "back"
+        }
+      ],
+      "correctChoice": "block",
+      "successText": "Interposing works against rooks, bishops, and queens. It does not work against knights.",
+      "errorText": "Put something in the way of a rook, bishop, or queen."
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "Checks, then captures, then threats. Use that scan on your opponent's move and on the move you are about to play."
+    }
+  ],
+  "timeMinutes": 7
 }

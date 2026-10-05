@@ -6,5 +6,182 @@
   "topic": "fundamentals",
   "order": 2,
   "summary": "Learn how each piece moves.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "Pieces move differently",
+      "body": "Rooks slide on ranks and files. Bishops slide on diagonals. The queen does both. Knights jump in an L. Kings step one square. Pawns step forward and capture diagonally."
+    },
+    {
+      "type": "board-demo",
+      "title": "The rook",
+      "body": "A rook moves any number of empty squares along a rank or file. It cannot jump.",
+      "fen": "4k3/8/8/8/3R4/8/8/4K3 w - - 0 1",
+      "highlightSquares": [
+        "d1",
+        "d2",
+        "d3",
+        "d5",
+        "d6",
+        "d7",
+        "d8",
+        "a4",
+        "b4",
+        "c4",
+        "e4",
+        "f4",
+        "g4",
+        "h4"
+      ]
+    },
+    {
+      "type": "move-task",
+      "title": "Move the rook",
+      "body": "Move the rook from d4 to d7.",
+      "fen": "4k3/8/8/8/3R4/8/8/4K3 w - - 0 1",
+      "startSquare": "d4",
+      "targetSquare": "d7",
+      "successText": "Rooks travel in straight lines.",
+      "errorText": "Slide the rook straight up the d-file to d7."
+    },
+    {
+      "type": "board-demo",
+      "title": "The bishop",
+      "body": "A bishop stays on one color and moves any number of empty squares diagonally.",
+      "fen": "4k3/8/8/8/3B4/8/8/4K3 w - - 0 1",
+      "highlightSquares": [
+        "a1",
+        "b2",
+        "c3",
+        "e5",
+        "f6",
+        "g7",
+        "h8",
+        "a7",
+        "b6",
+        "c5",
+        "e3",
+        "f2",
+        "g1"
+      ]
+    },
+    {
+      "type": "move-task",
+      "title": "Move the bishop",
+      "body": "Move the bishop from d4 to g7.",
+      "fen": "4k3/8/8/8/3B4/8/8/4K3 w - - 0 1",
+      "startSquare": "d4",
+      "targetSquare": "g7",
+      "successText": "That diagonal is the bishop's road.",
+      "errorText": "Follow the diagonal from d4 to e5, f6, and g7."
+    },
+    {
+      "type": "board-demo",
+      "title": "The knight",
+      "body": "A knight jumps in an L: two squares one way and one square sideways. It can jump over pieces.",
+      "fen": "4k3/8/8/8/3N4/8/8/4K3 w - - 0 1",
+      "highlightSquares": [
+        "b3",
+        "b5",
+        "c2",
+        "c6",
+        "e2",
+        "e6",
+        "f3",
+        "f5"
+      ]
+    },
+    {
+      "type": "move-task",
+      "title": "Jump the knight",
+      "body": "Move the knight from d4 to f5.",
+      "fen": "4k3/8/8/8/3N4/8/8/4K3 w - - 0 1",
+      "startSquare": "d4",
+      "targetSquare": "f5",
+      "successText": "Two up and one to the side. That is the knight.",
+      "errorText": "From d4, the L to f5 is two squares toward f and one square up."
+    },
+    {
+      "type": "move-task",
+      "title": "Move the queen",
+      "body": "The queen combines rook and bishop. Move her from d4 to h4.",
+      "fen": "4k3/8/8/8/3Q4/8/8/4K3 w - - 0 1",
+      "startSquare": "d4",
+      "targetSquare": "h4",
+      "successText": "The queen can use any clear rank, file, or diagonal.",
+      "errorText": "Slide the queen along the fourth rank to h4."
+    },
+    {
+      "type": "move-task",
+      "title": "Step with the king",
+      "body": "The king moves one square at a time. Move the white king from e4 to e5.",
+      "fen": "4k3/8/8/8/4K3/8/8/8 w - - 0 1",
+      "startSquare": "e4",
+      "targetSquare": "e5",
+      "successText": "Kings are slow. Keep yours safe until the endgame.",
+      "errorText": "The king on e4 can step one square forward to e5."
+    },
+    {
+      "type": "move-task",
+      "title": "The pawn's first step",
+      "body": "Pawns move forward. On their first move they may advance one or two squares. Play e2 to e4.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "startSquare": "e2",
+      "targetSquare": "e4",
+      "successText": "That pawn now controls d5 and f5.",
+      "errorText": "Push the pawn on e2 two squares to e4."
+    },
+    {
+      "type": "move-task",
+      "title": "Pawns capture diagonally",
+      "body": "A pawn cannot capture straight ahead. Capture the black pawn by moving from d4 to e5.",
+      "fen": "4k3/8/8/4p3/3P4/8/8/4K3 w - - 0 1",
+      "startSquare": "d4",
+      "targetSquare": "e5",
+      "successText": "Pawns capture one square diagonally forward.",
+      "errorText": "Move the white pawn from d4 to e5."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "Which piece can jump?",
+      "question": "Which piece can leap over other pieces?",
+      "choices": [
+        {
+          "label": "Rook",
+          "value": "rook"
+        },
+        {
+          "label": "Bishop",
+          "value": "bishop"
+        },
+        {
+          "label": "Knight",
+          "value": "knight"
+        },
+        {
+          "label": "Pawn",
+          "value": "pawn"
+        }
+      ],
+      "correctChoice": "knight",
+      "successText": "Only the knight jumps. Everyone else needs a clear path.",
+      "errorText": "Think of the piece that moves in an L."
+    },
+    {
+      "type": "board-demo",
+      "title": "Check",
+      "body": "Check means the king is attacked. The side in check must escape on the next move: move the king, capture the attacker, or block the attack.",
+      "fen": "4k3/8/8/8/8/8/4q3/4K3 w - - 0 1",
+      "highlightSquares": [
+        "e1",
+        "e2"
+      ]
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "Learn the shape of each move before you try to attack. A legal move never leaves your own king in check."
+    }
+  ],
+  "timeMinutes": 10
 }

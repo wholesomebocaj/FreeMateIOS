@@ -6,5 +6,80 @@
   "topic": "tactics",
   "order": 1,
   "summary": "Learn how one move can attack two targets.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "One move, two targets",
+      "body": "A fork is a move that attacks two pieces at once. The opponent can usually save only one. Knights are famous for forks because their L-shaped jump is hard to see."
+    },
+    {
+      "type": "board-demo",
+      "title": "A knight fork",
+      "body": "The knight on c7 attacks the king on a8 and the rook on e8 at the same time.",
+      "fen": "k3r3/2N5/8/8/8/8/8/4K3 b - - 0 1",
+      "highlightSquares": [
+        "c7",
+        "a8",
+        "e8"
+      ]
+    },
+    {
+      "type": "move-task",
+      "title": "Fork the king and queen",
+      "body": "Move the knight from d4 to f5. It will check the king and attack the queen.",
+      "fen": "8/6k1/8/8/3N4/4q3/8/K7 w - - 0 1",
+      "startSquare": "d4",
+      "targetSquare": "f5",
+      "highlightSquares": [
+        "f5",
+        "g7",
+        "e3"
+      ],
+      "successText": "f5 attacks g7 and e3. That is a fork.",
+      "errorText": "Jump the knight from d4 to f5."
+    },
+    {
+      "type": "move-task",
+      "title": "A pawn fork",
+      "body": "Push the pawn from d2 to d4. From d4 it attacks both black knights.",
+      "fen": "4k3/8/8/2n1n3/8/8/3P4/4K3 w - - 0 1",
+      "startSquare": "d2",
+      "targetSquare": "d4",
+      "highlightSquares": [
+        "d4",
+        "c5",
+        "e5"
+      ],
+      "successText": "Pawns fork on the two squares they attack diagonally.",
+      "errorText": "Advance the d2 pawn two squares to d4."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "Spot the idea",
+      "question": "What makes a fork powerful?",
+      "choices": [
+        {
+          "label": "It attacks two things, so one can be won",
+          "value": "two"
+        },
+        {
+          "label": "It always checkmates",
+          "value": "mate"
+        },
+        {
+          "label": "It lets a pawn move backward",
+          "value": "back"
+        }
+      ],
+      "correctChoice": "two",
+      "successText": "Look for one piece that can attack two undefended or valuable targets.",
+      "errorText": "A fork is about two targets, not an automatic mate."
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "Before you move, ask: does my opponent have a fork? After you move, ask the same question about your own pieces."
+    }
+  ],
+  "timeMinutes": 7
 }

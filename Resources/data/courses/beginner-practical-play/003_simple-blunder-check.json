@@ -6,5 +6,65 @@
   "topic": "strategy",
   "order": 3,
   "summary": "Learn a short routine to avoid obvious mistakes.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "One question saves games",
+      "body": "After the move you want to play, ask: can my opponent checkmate me or win a piece for free? If yes, pick another move."
+    },
+    {
+      "type": "move-task",
+      "title": "Save the queen",
+      "body": "The rook on d8 attacks your queen. Move the queen off the d-file, or capture the rook.",
+      "fen": "3rk3/8/8/8/8/8/8/3QK3 w - - 0 1",
+      "allowedMoves": [
+        "d1d8",
+        "d1a4",
+        "d1h5",
+        "d1c2",
+        "d1e2",
+        "d1b3",
+        "d1f3",
+        "d1g4",
+        "d1c1",
+        "d1b1",
+        "d1a1"
+      ],
+      "lockToAllowedMoves": true,
+      "highlightSquares": [
+        "d1",
+        "d8"
+      ],
+      "successText": "The queen is safe. That is the whole lesson.",
+      "errorText": "Leave the d-file, or capture the rook on d8. Moving the king leaves the queen hanging."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "What is a blunder?",
+      "question": "Which move is a blunder?",
+      "choices": [
+        {
+          "label": "A move that drops a piece or allows mate",
+          "value": "drop"
+        },
+        {
+          "label": "Any move that does not give check",
+          "value": "check"
+        },
+        {
+          "label": "Castling kingside",
+          "value": "castle"
+        }
+      ],
+      "correctChoice": "drop",
+      "successText": "Quiet moves are fine. Dropping a piece is not.",
+      "errorText": "A blunder loses something important. Castling is usually good."
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "You do not need a long combination to improve. Stop hanging pieces, answer checks, and castle."
+    }
+  ],
+  "timeMinutes": 5
 }
