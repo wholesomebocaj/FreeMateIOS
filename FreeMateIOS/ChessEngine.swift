@@ -172,7 +172,7 @@ final class ChessEngine {
     private var positionCounts: [String: Int]
 
     init(fen: String) throws {
-        let parts = ChessEngine.normalize(fen)
+        let parts = try ChessEngine.normalize(fen)
         let parsed = try ChessEngine.parsePlacement(parts[0])
         board = parsed
         turn = ChessColor.from(fen: parts[1])
@@ -913,7 +913,7 @@ final class ChessEngine {
     }
 
     private func sanitizeCastling() {
-        func home(_ square: String, kind: PieceKind, color: ChessColor) -> Bool {
+        func home(_ square: String, _ kind: PieceKind, _ color: ChessColor) -> Bool {
             guard let index = ChessSquare.index(square) else { return false }
             return board[index]?.kind == kind && board[index]?.color == color
         }
