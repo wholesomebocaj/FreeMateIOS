@@ -78,6 +78,7 @@ struct OpeningTutorialScreen: View {
         .animation(reduceMotion ? nil : DesignMotion.spring, value: session.phase)
         .navigationTitle(session.opening.name)
         .navigationBarTitleDisplayMode(.inline)
+        .focusedScreen()
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {

@@ -16,6 +16,7 @@ final class GameState: ObservableObject {
     @Published var selectedTab = AppTab.home
     @Published var lessonPath = [LessonRoute]()
     @Published var openingPath = [OpeningRoute]()
+    @Published var practicePath = [PracticeRoute]()
 
     private let store: LearnerProgressStore
     private let activity: ActivityStore
@@ -277,6 +278,11 @@ final class GameState: ObservableObject {
         openingPath.append(.train(id: id, line: line))
     }
 
+    func openPractice(_ route: PracticeRoute) {
+        selectedTab = .practice
+        practicePath = [route]
+    }
+
     func openTutorial(_ id: String) {
         selectedTab = .openings
         openingPath.append(.tutorial(id))
@@ -292,6 +298,13 @@ enum LessonRoute: Hashable {
     case bracket(String)
     case course(String)
     case lesson(String)
+}
+
+enum PracticeRoute: Hashable {
+    case computer
+    case freeBoard
+    /// A puzzle level ("level/1") or a drill ("drill/forks"), by `PuzzleSet.id`.
+    case puzzles(String)
 }
 
 enum OpeningRoute: Hashable {

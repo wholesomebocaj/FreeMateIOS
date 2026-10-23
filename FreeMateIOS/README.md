@@ -39,7 +39,7 @@ Code in `FreeMateIOS/OpeningTutorials/`:
 * `OpeningTutorialSession.swift`: the tutorial state machine. It owns the position and is UI-free.
 * `OpeningTutorialPresentation.swift`: what the card, progress bar, and completion screen say. UI-free and unit tested.
 * `OpeningTutorialController.swift`: drives the shared `PracticeBoard` through its `onMoveAttempt` hook.
-* `Views/`: the tutorial card, the tutorial screen, the progress header, the floating instruction card, and the completion overlay.
+* `Views/`: the tutorial screen, the progress header, the floating instruction card, and the completion overlay. The Openings list row is `TutorialRow` in `Tabs/OpeningBrowserView.swift`.
 
 Reusable pieces in `FreeMateIOS/DesignSystem/`:
 
@@ -48,7 +48,6 @@ Reusable pieces in `FreeMateIOS/DesignSystem/`:
 * `BoardPieceLayout.swift`: keeps piece identities across moves so pieces glide instead of jumping.
 * `BoardThumbnail.swift`: a single-pass `Canvas` preview board.
 * `MotionEffects.swift` and `Haptics.swift`: the shared spring, shake, glow, pressable cards, and light, error, and success haptics.
-* `FilterChips.swift`: the search-and-filter chip row used by the Lessons and Openings tabs.
 
 ## Play the computer
 
@@ -68,7 +67,7 @@ Code:
 * `ComputerCoach.swift`: grades moves for the warning, hint, and review. It looks at the opponent's best reply and then plays out captures, so it sees hanging pieces, bad trades, and mate in one. UI-free.
 * `ComputerGame.swift`: plays a game on a `PracticeBoard` and keeps the record.
 * `ComputerGameReview.swift`: grades a finished game one move at a time and steps a board through it.
-* `Tabs/ComputerPlayPanel.swift` and `Tabs/ComputerGameReviewView.swift`: the screens.
+* `Tabs/ComputerGameView.swift` and `Tabs/ComputerGameReviewView.swift`: the screens.
 
 ## Puzzles and drills
 
@@ -90,7 +89,7 @@ python3 tools/check_puzzles.py
 
 It checks that every FEN and solution is legal, and that mate solutions mate. For win-a-piece puzzles, it checks that each solution wins at least 2 pawns' worth and that every other move is clearly worse, so a learner is never marked wrong for an equally good move.
 
-The tab root screens live in `FreeMateIOS/Tabs/`: Lessons (`CourseLibraryView`), Openings (`OpeningBrowserView`), and Practice (`PracticeView`). Every board in the app, including lessons, the opening trainer, and Practice, uses `ModernBoardView`.
+The tabs are Today (`TodayView`), Learn (`CourseLibraryView`), Openings (`OpeningBrowserView`), Practice (`PracticeView`), and Review, in `FreeMateIOS/Tabs/` and `FeatureViews.swift`. Practice is a list that opens the computer, the free board, puzzle levels, and drills as focused screens. Settings opens from Today. Every board in the app uses `ModernBoardView`.
 
 To add an opening, edit `opening-tutorials.json`, then check it and fill ECO codes from [eco.json](https://github.com/JeffML/eco.json):
 

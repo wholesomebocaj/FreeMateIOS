@@ -1,12 +1,9 @@
 import SwiftUI
 
-/// The Openings tab: search and filter chips on top, guided tutorials, then repertoire courses.
+/// The Openings tab: guided tutorials, then repertoire courses by side, with search.
 struct OpeningBrowserView: View {
     @EnvironmentObject private var game: GameState
     @State private var query = ""
-    /// "all", "White", or "Black", matching `OpeningCourse.side`.
-    @State private var side = "all"
-    @State private var difficulty = "all"
     @State private var tutorialProgress: [String: OpeningTutorialProgress] = [:]
 
     private var trimmedQuery: String {
@@ -15,129 +12,75 @@ struct OpeningBrowserView: View {
 
     private var tutorials: [OpeningTutorial] {
         game.openingTutorials.filter { tutorial in
+            guard !trimmedQuery.isEmpty else { return true }
             let opening = tutorial.opening
-            guard side == "all" || opening.userSide.label == side else { return false }
-            guard !trimmedQuery.isEmpty else { return true }
-            let haystack = ([opening.name, opening.eco ?? "", opening.ecoName ?? "", opening.summary]
-                + opening.variations.map(\.name)).joined(separator: " ").lowercased()
-            return haystack.contains(trimmedQuery)
+            return ([opening.name, opening.eco ?? "", opening.ecoName ?? ""] + opening.variations.map(\.name))
+                .joined(separator: " ").lowercased().contains(trimmedQuery)
         }
     }
 
-    private var courses: [OpeningCourse] {
+    private func courses(side: String) -> [OpeningCourse] {
         game.openings.filter { opening in
-            guard side == "all" || opening.side == side else { return false }
-            guard difficulty == "all" || opening.difficulty == difficulty else { return false }
+            guard opening.side == side else { return false }
             guard !trimmedQuery.isEmpty else { return true }
-            return "\(opening.name) \(opening.eco) \(opening.description)".lowercased().contains(trimmedQuery)
+            return "\(opening.name) \(opening.eco)".lowercased().contains(trimmedQuery)
         }
-    }
-
-    private var levels: [String] {
-        Array(Set(game.openings.map(\.difficulty))).sorted()
     }
 
     var body: some View {
         let tutorials = tutorials
-        let courses = courses
-        ScrollView {
-            VStack(alignment: .leading, spacing: 28) {
-                filterBar
-                VStack(alignment: .leading, spacing: 28) {
-                    if !tutorials.isEmpty {
-                        tutorialSection(tutorials)
+        let white = courses(side: "White")
+        let black = courses(side: "Black")
+        List {
+            if !tutorials.isEmpty {
+                Section {
+                    ForEach(tutorials) { tutorial in
+                        NavigationLink(value: OpeningRoute.tutorial(tutorial.id)) {
+                            TutorialRow(
+                                tutorial: tutorial,
+                                status: (tutorialProgress[tutorial.id] ?? OpeningTutorialProgress()).status(for: tutorial.opening)
+                            )
+                        }
                     }
-                    if !courses.isEmpty {
-                        courseSection(courses)
-                    }
-                    if tutorials.isEmpty && courses.isEmpty {
-                        emptyState
-                    }
+                } header: {
+                    Text("Guided Tutorials")
+                } footer: {
+                    Text("Play the main line, then answer the common replies from memory.")
                 }
-                .padding(.horizontal, 20)
             }
-            .padding(.top, 4)
-            .padding(.bottom, 32)
-            .frame(maxWidth: 720)
-            .frame(maxWidth: .infinity)
+            courseSection("Play as White", white)
+            courseSection("Play as Black", black)
         }
-        .scrollDismissesKeyboard(.immediately)
-        .themeBackground()
+        .listStyle(.insetGrouped)
+        .overlay {
+            if tutorials.isEmpty && white.isEmpty && black.isEmpty {
+                ContentUnavailableView.search(text: query)
+            }
+        }
         .navigationTitle("Openings")
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search openings or ECO codes")
-        .settingsToolbar()
-        .animation(DesignMotion.spring, value: side)
-        .animation(DesignMotion.spring, value: difficulty)
+        .searchable(text: $query, prompt: "Openings or ECO codes")
         .onAppear(perform: reloadTutorialProgress)
     }
 
-    private var filterBar: some View {
-        FilterChipBar {
-            FilterChipToggle(text: "All", isSelected: side == "all") { side = "all" }
-            FilterChipToggle(text: "White", systemImage: "circle", isSelected: side == "White") { side = "White" }
-            FilterChipToggle(text: "Black", systemImage: "circle.fill", isSelected: side == "Black") { side = "Black" }
-            Divider()
-                .frame(height: 22)
-                .padding(.horizontal, 2)
-            FilterChipMenu(
-                title: "Course Level",
-                selection: $difficulty,
-                options: [FilterOption(value: "all", label: "All Levels")] + levels.map { FilterOption(value: $0, label: $0) }
-            )
-            if side != "all" || difficulty != "all" {
-                ClearFiltersChip {
-                    side = "all"
-                    difficulty = "all"
-                }
-            }
-        }
-    }
-
-    private func tutorialSection(_ tutorials: [OpeningTutorial]) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            SectionHeader(title: "Guided Tutorials", subtitle: "Learn the main line, then branch out")
-            ForEach(tutorials) { tutorial in
-                NavigationLink(value: OpeningRoute.tutorial(tutorial.id)) {
-                    OpeningTutorialCard(
-                        tutorial: tutorial,
-                        status: (tutorialProgress[tutorial.id] ?? OpeningTutorialProgress()).status(for: tutorial.opening)
-                    )
-                }
-                .buttonStyle(PressableCardStyle())
-            }
-        }
-    }
-
-    private func courseSection(_ courses: [OpeningCourse]) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
-            SectionHeader(title: "Repertoire Courses", subtitle: "\(courses.count) course\(courses.count == 1 ? "" : "s") with branching lines")
-            ForEach(courses) { opening in
-                OpeningCourseCard(
-                    opening: opening,
-                    onTrain: { game.openTrainer(id: opening.id, line: nil) },
-                    onOverview: { game.openOpening(opening.id) }
-                )
-            }
-        }
-    }
-
     @ViewBuilder
-    private var emptyState: some View {
-        if trimmedQuery.isEmpty {
-            ContentUnavailableView {
-                Label("No Openings", systemImage: "line.3.horizontal.decrease.circle")
-            } description: {
-                Text("No openings match these filters.")
-            } actions: {
-                Button("Clear Filters") {
-                    side = "all"
-                    difficulty = "all"
+    private func courseSection(_ title: String, _ courses: [OpeningCourse]) -> some View {
+        if !courses.isEmpty {
+            Section(title) {
+                ForEach(courses) { opening in
+                    NavigationLink(value: OpeningRoute.overview(opening.id)) {
+                        HStack(spacing: Theme.Spacing.s) {
+                            SideTile(isWhite: opening.side == "White", size: 32)
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(opening.name)
+                                Text("\(opening.eco) · \(opening.difficulty)")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(.vertical, 2)
+                    }
                 }
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.capsule)
             }
-        } else {
-            ContentUnavailableView.search(text: query)
         }
     }
 
@@ -147,68 +90,58 @@ struct OpeningBrowserView: View {
         for tutorial in game.openingTutorials {
             map[tutorial.id] = store.progress(for: tutorial.id)
         }
-        withAnimation(DesignMotion.spring) { tutorialProgress = map }
+        tutorialProgress = map
     }
 }
 
-struct OpeningCourseCard: View {
-    let opening: OpeningCourse
-    var onTrain: () -> Void
-    var onOverview: () -> Void
+struct TutorialRow: View {
+    let tutorial: OpeningTutorial
+    let status: TutorialMasteryStatus
 
     var body: some View {
-        HStack(alignment: .top, spacing: 14) {
-            SideTile(isWhite: opening.side == "White")
-            VStack(alignment: .leading, spacing: 6) {
-                Text("\(opening.eco) · \(opening.difficulty) · \(opening.side)")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+        let opening = tutorial.opening
+        HStack(spacing: Theme.Spacing.m) {
+            BoardThumbnail(fen: tutorial.previewFen, isFlipped: opening.userSide == .black)
+                .frame(width: 60, height: 60)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            VStack(alignment: .leading, spacing: 2) {
                 Text(opening.name)
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(.primary)
-                Text(opening.description)
+                    .font(.headline)
+                Text("\(opening.userSide.label) · \(opening.variations.count) variations")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                Text("\(opening.sectionCount) sections · \(opening.moveCount) moves")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                HStack(spacing: 10) {
-                    Button(action: onTrain) {
-                        Label("Train", systemImage: "play.fill")
-                            .font(.subheadline.weight(.semibold))
-                    }
-                    .buttonStyle(.borderedProminent)
-                    Button(action: onOverview) {
-                        Text("Overview")
-                            .font(.subheadline.weight(.semibold))
-                    }
-                    .buttonStyle(.bordered)
-                }
-                .buttonBorderShape(.capsule)
-                .controlSize(.small)
-                .padding(.top, 4)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            Spacer(minLength: Theme.Spacing.xs)
+            switch status {
+            case .mastered:
+                Image(systemName: "checkmark.seal.fill")
+                    .foregroundStyle(Theme.success)
+            case .inProgress(let percent):
+                Text("\(percent)%")
+                    .font(.subheadline.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            case .notStarted:
+                EmptyView()
+            }
         }
-        .padding(16)
-        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
-        .accessibilityElement(children: .contain)
+        .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityValue(status.label)
     }
 }
 
-/// A small board square with a knight in the side the course is played from.
+/// A board square with a knight of the side the course is played from.
 struct SideTile: View {
     let isWhite: Bool
+    var size: CGFloat = 52
 
     var body: some View {
         ChessPieceView(glyph: .knight, isWhite: isWhite)
-            .padding(7)
-            .frame(width: 52, height: 52)
+            .padding(size * 0.14)
+            .frame(width: size, height: size)
             .background(
                 isWhite ? BoardPalette.sage.dark : BoardPalette.sage.light,
-                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+                in: RoundedRectangle(cornerRadius: size * 0.27, style: .continuous)
             )
             .accessibilityHidden(true)
     }

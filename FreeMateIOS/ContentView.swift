@@ -5,55 +5,48 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $game.selectedTab) {
-            NavigationStack {
-                HomeView()
+            Tab("Today", systemImage: "sun.max", value: AppTab.home) {
+                NavigationStack {
+                    HomeView()
+                }
             }
-            .tabItem { Label("Home", systemImage: "house") }
-            .tag(AppTab.home)
 
-            NavigationStack(path: $game.lessonPath) {
-                CourseLibraryView()
-                    .navigationDestination(for: LessonRoute.self) { route in
-                        switch route {
-                        case .bracket(let id):
-                            BracketDetailView(bracketId: id)
-                        case .course(let id):
-                            CourseDetailView(courseId: id)
-                        case .lesson(let id):
-                            LessonPlayerView(lessonId: id)
+            Tab("Learn", systemImage: "book", value: AppTab.lessons) {
+                NavigationStack(path: $game.lessonPath) {
+                    CourseLibraryView()
+                        .navigationDestination(for: LessonRoute.self) { route in
+                            switch route {
+                            case .bracket(let id): BracketDetailView(bracketId: id)
+                            case .course(let id): CourseDetailView(courseId: id)
+                            case .lesson(let id): LessonPlayerView(lessonId: id)
+                            }
                         }
-                    }
+                }
             }
-            .tabItem { Label("Lessons", systemImage: "book") }
-            .tag(AppTab.lessons)
 
-            NavigationStack(path: $game.openingPath) {
-                OpeningBrowserView()
-                    .navigationDestination(for: OpeningRoute.self) { route in
-                        switch route {
-                        case .overview(let id):
-                            OpeningOverviewView(openingId: id)
-                        case .train(let id, let line):
-                            OpeningTrainerView(openingId: id, lineId: line)
-                        case .tutorial(let id):
-                            OpeningTutorialView(tutorialId: id)
+            Tab("Openings", systemImage: "arrow.triangle.branch", value: AppTab.openings) {
+                NavigationStack(path: $game.openingPath) {
+                    OpeningBrowserView()
+                        .navigationDestination(for: OpeningRoute.self) { route in
+                            switch route {
+                            case .overview(let id): OpeningOverviewView(openingId: id)
+                            case .train(let id, let line): OpeningTrainerView(openingId: id, lineId: line)
+                            case .tutorial(let id): OpeningTutorialView(tutorialId: id)
+                            }
                         }
-                    }
+                }
             }
-            .tabItem { Label("Openings", systemImage: "arrow.triangle.branch") }
-            .tag(AppTab.openings)
 
-            NavigationStack {
+            Tab("Practice", systemImage: "checkerboard.rectangle", value: AppTab.practice) {
                 PracticeView()
             }
-            .tabItem { Label("Practice", systemImage: "square.grid.3x3") }
-            .tag(AppTab.practice)
 
-            NavigationStack {
-                ReviewView()
+            Tab("Review", systemImage: "clock.arrow.circlepath", value: AppTab.review) {
+                NavigationStack {
+                    ReviewView()
+                }
             }
-            .tabItem { Label("Review", systemImage: "arrow.clockwise") }
-            .tag(AppTab.review)
+            .badge(game.reviewQueue().count)
         }
     }
 }
