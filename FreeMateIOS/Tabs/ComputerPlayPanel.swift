@@ -4,6 +4,7 @@ import SwiftUI
 struct ComputerPlayPanel: View {
     @ObservedObject var game: ComputerGame
     @State private var confirmsResign = false
+    @State private var showsReview = false
 
     private var board: PracticeBoard { game.board }
 
@@ -15,6 +16,7 @@ struct ComputerPlayPanel: View {
             case .drawn: return (result.title, "equal.circle.fill", .secondary)
             }
         }
+        if game.warning != nil { return ("Careful!", "exclamationmark.triangle.fill", Theme.warning) }
         if game.isThinking { return ("The computer is thinking", "ellipsis", .secondary) }
         if board.isCheck && game.isLearnersTurn {
             return ("You're in check", "exclamationmark.triangle.fill", Theme.warning)
@@ -28,7 +30,9 @@ struct ComputerPlayPanel: View {
             statusRow
             ModernBoardView(board: board, isInteractive: game.canMove)
                 .frame(maxWidth: 560)
-            if let result = game.result {
+            if let warning = game.warning {
+                warningCard(warning)
+            } else if let result = game.result {
                 resultCard(result)
             } else {
                 controls
@@ -40,6 +44,7 @@ struct ComputerPlayPanel: View {
             )
         }
         .animation(DesignMotion.spring, value: game.result)
+        .animation(DesignMotion.spring, value: game.warning)
         .onChange(of: board.history.count) { oldCount, newCount in
             // White plays the odd-numbered moves.
             guard newCount == oldCount + 1, let last = board.history.last,
@@ -48,6 +53,12 @@ struct ComputerPlayPanel: View {
         }
         .onChange(of: game.result) { _, result in
             if result == .won { Haptics.success() }
+        }
+        .onChange(of: game.warning) { _, warning in
+            if warning != nil { Haptics.error() }
+        }
+        .sheet(isPresented: $showsReview) {
+            ComputerGameReviewView(game: game)
         }
     }
 
@@ -71,30 +82,81 @@ struct ComputerPlayPanel: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// One row when the four buttons fit, two rows of two on narrower screens.
     private var controls: some View {
-        HStack(spacing: 10) {
-            Menu {
-                Button("Play White", systemImage: "circle") { game.newGame(as: .white) }
-                Button("Play Black", systemImage: "circle.fill") { game.newGame(as: .black) }
-            } label: {
-                Label("New", systemImage: "plus")
-                    .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity)
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 10) {
+                newGameMenu
+                hintButton
+                undoButton
+                resignButton
             }
-            .buttonStyle(.bordered)
-            .buttonBorderShape(.capsule)
-            .controlSize(.large)
-            PracticeControlButton(title: "Undo", systemImage: "arrow.uturn.backward") { game.undo() }
-                .disabled(!game.canUndo)
-            PracticeControlButton(title: "Resign", systemImage: "flag") { confirmsResign = true }
-                .disabled(board.history.isEmpty)
-                .confirmationDialog("Resign this game?", isPresented: $confirmsResign, titleVisibility: .visible) {
-                    Button("Resign", role: .destructive) { game.resign() }
-                } message: {
-                    Text("It counts as a loss.")
+            VStack(spacing: 10) {
+                HStack(spacing: 10) {
+                    newGameMenu
+                    hintButton
                 }
+                HStack(spacing: 10) {
+                    undoButton
+                    resignButton
+                }
+            }
         }
+    }
+
+    private var newGameMenu: some View {
+        Menu {
+            Button("Play White", systemImage: "circle") { game.newGame(as: .white) }
+            Button("Play Black", systemImage: "circle.fill") { game.newGame(as: .black) }
+        } label: {
+            Label("New", systemImage: "plus")
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(1)
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .buttonBorderShape(.capsule)
+        .controlSize(.large)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var hintButton: some View {
+        PracticeControlButton(title: "Hint", systemImage: game.isFindingHint ? "ellipsis" : "lightbulb") { game.showHint() }
+            .disabled(!game.canHint)
+    }
+
+    private var undoButton: some View {
+        PracticeControlButton(title: "Undo", systemImage: "arrow.uturn.backward") { game.undo() }
+            .disabled(!game.canUndo)
+    }
+
+    private var resignButton: some View {
+        PracticeControlButton(title: "Resign", systemImage: "flag") { confirmsResign = true }
+            .disabled(board.history.isEmpty)
+            .confirmationDialog("Resign this game?", isPresented: $confirmsResign, titleVisibility: .visible) {
+                Button("Resign", role: .destructive) { game.resign() }
+            } message: {
+                Text("It counts as a loss.")
+            }
+    }
+
+    private func warningCard(_ warning: MoveWarning) -> some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+            Label("Careful!", systemImage: "lightbulb.fill")
+                .font(.headline)
+                .foregroundStyle(Theme.warning)
+            Text(warning.message)
+                .font(.subheadline)
+                .fixedSize(horizontal: false, vertical: true)
+            ActionButtons(
+                primaryTitle: "Take It Back",
+                secondaryTitle: "Play Anyway",
+                primary: { game.takeBackWarnedMove() },
+                secondary: { game.ignoreWarning() }
+            )
+        }
+        .cardStyle()
+        .transition(.opacity.combined(with: .scale(scale: 0.96)))
     }
 
     private func resultCard(_ result: ComputerGameResult) -> some View {
@@ -102,12 +164,23 @@ struct ComputerPlayPanel: View {
             Text("Game over").eyebrowStyle()
             Text(result.title)
                 .font(.title3.weight(.bold))
-            ActionButtons(
-                primaryTitle: game.learner == .white ? "Play White Again" : "Play Black Again",
-                secondaryTitle: game.learner == .white ? "Play Black" : "Play White",
-                primary: { game.newGame(as: game.learner) },
-                secondary: { game.newGame(as: game.learner.opposite) }
-            )
+            if board.history.contains(where: { ($0.index % 2 == 1) == (game.learner == .white) }) {
+                ActionButtons(
+                    primaryTitle: "Review Game",
+                    secondaryTitle: "Play Again",
+                    primary: { showsReview = true },
+                    secondary: { game.newGame(as: game.learner) }
+                )
+            } else {
+                Button("Play Again") { game.newGame(as: game.learner) }
+                    .font(.headline)
+                    .controlSize(.large)
+                    .primaryButtonStyle()
+            }
+            Button(game.learner == .white ? "Switch to Black" : "Switch to White") {
+                game.newGame(as: game.learner.opposite)
+            }
+            .font(.subheadline.weight(.semibold))
         }
         .cardStyle()
         .transition(.opacity.combined(with: .scale(scale: 0.96)))
@@ -126,6 +199,10 @@ struct ComputerPlayPanel: View {
             Text(game.level.summary)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Toggle("Warn me before a blunder", isOn: $game.warnsAboutBlunders)
+                .font(.subheadline)
+                .tint(Theme.accent)
             if game.record.played > 0 {
                 Text(recordText)
                     .font(.footnote.monospacedDigit())
