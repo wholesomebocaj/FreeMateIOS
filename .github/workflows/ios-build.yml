@@ -42,6 +42,14 @@ jobs:
             echo "$XCODE has no usable iOS Simulator"
           done
           echo "No installed Xcode can run an iOS Simulator" >&2
+          echo "::group::Diagnostics"
+          xcrun simctl list runtimes
+          echo "--- destinations with IPHONEOS_DEPLOYMENT_TARGET=$CI_DEPLOYMENT_TARGET"
+          xcodebuild -showdestinations -project FreeMateIOS.xcodeproj -scheme FreeMateIOS \
+            IPHONEOS_DEPLOYMENT_TARGET="$CI_DEPLOYMENT_TARGET" 2>&1 | tail -40
+          echo "--- destinations with the project's own settings"
+          xcodebuild -showdestinations -project FreeMateIOS.xcodeproj -scheme FreeMateIOS 2>&1 | tail -40
+          echo "::endgroup::"
           exit 1
 
       - name: Build app and tests
