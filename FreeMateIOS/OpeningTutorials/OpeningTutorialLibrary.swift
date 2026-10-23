@@ -125,6 +125,12 @@ struct OpeningTutorial: Equatable, Identifiable {
 
     var id: String { opening.id }
 
+    /// The position to show in previews: after `previewPly` plies, or the end of the main line.
+    var previewFen: String {
+        let plies = min(max(opening.previewPly ?? plan.mainLine.count, 1), plan.mainLine.count)
+        return plan.mainLine[plies - 1].fenAfter
+    }
+
     init(opening: ChessOpening) throws {
         self.opening = opening
         plan = try OpeningTutorialPlan(opening: opening)
@@ -158,6 +164,8 @@ struct OpeningTutorialProgress: Codable, Equatable {
     var mainLineCompleted = false
     var completedVariationIds: Set<String> = []
     var fewestMistakes: Int?
+    /// The furthest the learner has got through the tutorial, from 0 to 100.
+    var bestPercent: Int?
 }
 
 /// Saves tutorial progress on the device. No account is involved.

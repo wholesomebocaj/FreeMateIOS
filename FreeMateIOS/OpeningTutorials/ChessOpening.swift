@@ -9,6 +9,8 @@ struct ChessOpening: Codable, Equatable, Identifiable {
     var userSide: ChessColor
     var summary: String
     var ideas: [String]
+    /// How many main line plies to show in preview thumbnails. Defaults to the whole line.
+    var previewPly: Int?
     /// Every ply from the starting position, alternating white and black.
     var mainLine: [OpeningStep]
     var variations: [OpeningVariation]

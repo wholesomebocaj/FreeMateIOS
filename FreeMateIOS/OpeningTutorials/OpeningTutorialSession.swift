@@ -193,15 +193,25 @@ struct OpeningTutorialSession: Equatable {
         case .whatIf:
             loadVariation(variationIndex)
         case .mainLine, .mainLineComplete, .completed:
-            phase = .mainLine
-            cursor = 0
-            fen = ChessEngine.startingFen
-            lastMove = nil
-            hintRevealed = false
-            feedback = .none
-            mistakes = []
-            completedVariationIds = []
+            restartTutorial()
         }
+    }
+
+    /// Back to the first move of the main line, clearing mistakes and variation progress.
+    mutating func restartTutorial() {
+        phase = .mainLine
+        variationIndex = 0
+        cursor = 0
+        fen = ChessEngine.startingFen
+        lastMove = nil
+        hintRevealed = false
+        feedback = .none
+        mistakes = []
+        completedVariationIds = []
+    }
+
+    func variationMoves(_ id: String) -> [TutorialMove]? {
+        plan.variations[id]
     }
 
     static func hint(for move: TutorialMove) -> String {
