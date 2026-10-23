@@ -21,19 +21,29 @@ This repository houses the native iOS version of the platform, built to help new
 
 ## Opening Tutorials
 
-Guided tutorials live at the top of the Openings tab. Each one has two steps:
+Openings tab → **Opening Tutorials** lists each tutorial with a board preview and its status (Not Started, In Progress, Mastered). Each tutorial has two steps:
 
-1. **Main line.** The learner plays one side of the opening. The start and end squares of each move are highlighted. A wrong move does not land, and a hint appears.
-2. **What if?** The opponent tries the common alternatives from the tutorial data, and the learner must answer from memory. Squares are only highlighted after a mistake or when the learner asks for a hint.
+1. **Main line.** The learner plays one side. The start square is tinted and the target square glows. A wrong move springs back with a gentle shake and an error haptic, and the card shows a hint.
+2. **Branching out.** The opponent tries the common alternatives from the tutorial data, and the learner answers from memory. Squares only light up after a mistake or when the learner taps Hint.
 
-Code is in `FreeMateIOS/OpeningTutorials/`:
+Finishing everything shows a completion overlay with stats.
+
+Code in `FreeMateIOS/OpeningTutorials/`:
 
 * `ChessOpening.swift`: the data model (`ChessOpening`, `OpeningStep`, `OpeningVariation`) and the merged variation tree.
 * `OpeningTutorialLibrary.swift`: loads `opening-tutorials.json`, resolves every SAN move with `ChessEngine`, and saves progress on the device.
 * `OpeningTutorialSession.swift`: the tutorial state machine. It owns the position and is UI-free.
-* `OpeningTutorialCoaching.swift`: coach and feedback text.
+* `OpeningTutorialPresentation.swift`: what the card, progress bar, and completion screen say. UI-free and unit tested.
 * `OpeningTutorialController.swift`: drives the shared `PracticeBoard` through its `onMoveAttempt` hook.
-* `OpeningTutorialViews.swift`: SwiftUI screens.
+* `Views/`: the list, the tutorial screen, the progress header, the floating instruction card, and the completion overlay.
+
+Reusable pieces in `FreeMateIOS/DesignSystem/`:
+
+* `ModernBoardView.swift`: the cream and sage board for any `PracticeBoard`. Supports tap or drag, sliding pieces, a breathing guide glow, and VoiceOver actions per square.
+* `ChessPieceShape.swift`: vector pieces, so they stay crisp at any size.
+* `BoardPieceLayout.swift`: keeps piece identities across moves so pieces glide instead of jumping.
+* `BoardThumbnail.swift`: a single-pass `Canvas` preview board.
+* `MotionEffects.swift` and `Haptics.swift`: the shared spring, shake, glow, pressable cards, and light, error, and success haptics.
 
 To add an opening, edit `opening-tutorials.json`, then check it and fill ECO codes from [eco.json](https://github.com/JeffML/eco.json):
 

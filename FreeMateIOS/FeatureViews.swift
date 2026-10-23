@@ -448,7 +448,7 @@ struct OpeningBrowserView: View {
         FreeMateScreen(title: "Openings") {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    OpeningTutorialsSection()
+                    OpeningTutorialsEntryCard()
                     Text("Train a beginner repertoire.")
                         .font(.title2.bold())
                     Text("\(visible.count) opening courses")

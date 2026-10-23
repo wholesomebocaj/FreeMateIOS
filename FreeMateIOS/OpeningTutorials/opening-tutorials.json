@@ -5,6 +5,8 @@
     {
       "id": "ruy-lopez",
       "name": "Ruy Lopez",
+      "eco": "C92",
+      "ecoName": "Ruy Lopez: Closed",
       "userSide": "white",
       "summary": "Develop quickly, pressure the knight that defends e5, castle, and build the center with c3 and d4.",
       "ideas": [
@@ -12,6 +14,7 @@
         "Castle early so the rook can support e4 from e1.",
         "c3 prepares d4, and h3 keeps Black's bishop off g4."
       ],
+      "previewPly": 5,
       "mainLine": [
         {
           "san": "e4",
@@ -410,13 +413,13 @@
           "eco": "C89",
           "ecoName": "Ruy Lopez: Marshall Attack"
         }
-      ],
-      "eco": "C92",
-      "ecoName": "Ruy Lopez: Closed"
+      ]
     },
     {
       "id": "caro-kann",
       "name": "Caro-Kann Defense",
+      "eco": "B19",
+      "ecoName": "Caro-Kann Defense: Classical Variation, Spassky Variation",
       "userSide": "black",
       "summary": "Prepare d5 with c6, keep your structure solid, and develop the light-squared bishop before e6.",
       "ideas": [
@@ -424,6 +427,7 @@
         "Get the bishop out to f5 or g4 before you play e6.",
         "Against h-pawn pushes, answer calmly with h6 and keep the bishop safe."
       ],
+      "previewPly": 4,
       "mainLine": [
         {
           "san": "e4",
@@ -709,9 +713,7 @@
           "eco": "B13",
           "ecoName": "Caro-Kann Defense: Panov Attack"
         }
-      ],
-      "eco": "B19",
-      "ecoName": "Caro-Kann Defense: Classical Variation, Spassky Variation"
+      ]
     }
   ]
 }

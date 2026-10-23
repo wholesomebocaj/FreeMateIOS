@@ -462,6 +462,11 @@ final class GameState: ObservableObject {
         openingPath.append(.train(id: id, line: line))
     }
 
+    func openTutorials() {
+        selectedTab = .openings
+        openingPath.append(.tutorials)
+    }
+
     func openTutorial(_ id: String) {
         selectedTab = .openings
         openingPath.append(.tutorial(id))
@@ -846,5 +851,6 @@ enum LessonRoute: Hashable {
 enum OpeningRoute: Hashable {
     case overview(String)
     case train(id: String, line: String?)
+    case tutorials
     case tutorial(String)
 }

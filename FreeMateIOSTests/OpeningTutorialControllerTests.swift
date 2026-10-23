@@ -40,7 +40,8 @@ final class OpeningTutorialControllerTests: XCTestCase {
         XCTAssertEqual(controller.board.position["d2"], "wP")
         XCTAssertNil(controller.board.position["d4"])
         XCTAssertEqual(controller.rejectionCount, 1)
-        XCTAssertEqual(controller.board.highlightSquares.map(\.className), ["danger", "danger"])
+        XCTAssertEqual(controller.rejectedSquare, "d2")
+        XCTAssertEqual(controller.board.highlightSquares.map(\.square), ["e2", "e4"], "The guide squares stay; no red flash")
     }
 
     func testCorrectMoveIsPlayedAndTheOpponentReplies() async throws {
