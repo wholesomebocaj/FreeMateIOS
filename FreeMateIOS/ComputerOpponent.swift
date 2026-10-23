@@ -3,20 +3,41 @@ import Foundation
 // Native port of the beginner computer in web/engine.js (`evaluate` and `chooseComputerMove`).
 
 nonisolated enum ComputerLevel: String, CaseIterable, Identifiable, Sendable {
+    /// iOS only, below the web app's levels: for players who have just learned the moves.
+    case beginner
     case easy
     case fair
 
     var id: String { rawValue }
-    var label: String { self == .easy ? "Easy" : "Fair" }
+
+    var label: String {
+        switch self {
+        case .beginner: return "Beginner"
+        case .easy: return "Easy"
+        case .fair: return "Fair"
+        }
+    }
 
     var summary: String {
-        self == .easy ? "Misses some tactics." : "Looks one move deeper."
+        switch self {
+        case .beginner: return "Plays loosely and leaves pieces hanging. Good for your first games."
+        case .easy: return "Misses some tactics."
+        case .fair: return "Looks one move deeper."
+        }
     }
 
     /// How many half-moves the search looks ahead.
-    var depth: Int { self == .easy ? 1 : 2 }
-    /// The spread of random centipawns added to each root move, so games vary.
-    var noise: Double { self == .easy ? 160 : 35 }
+    var depth: Int { self == .fair ? 2 : 1 }
+
+    /// The spread of random centipawns added to each root move, so games vary. Beginner's
+    /// spread is wider than a knight is worth, so it grabs a free queen but not much else.
+    var noise: Double {
+        switch self {
+        case .beginner: return 500
+        case .easy: return 160
+        case .fair: return 35
+        }
+    }
 }
 
 nonisolated enum ComputerOpponent {
@@ -75,7 +96,7 @@ nonisolated enum ComputerOpponent {
     }
 
     /// Captures first, best trade first, so alpha-beta cuts more.
-    private static func ordered(_ moves: [SearchMove]) -> [SearchMove] {
+    static func ordered(_ moves: [SearchMove]) -> [SearchMove] {
         func priority(_ move: SearchMove) -> Int {
             guard let captured = move.captured else { return 0 }
             return value(of: captured) * 10 - value(of: move.piece)
@@ -89,7 +110,7 @@ nonisolated enum ComputerOpponent {
             .map(\.element)
     }
 
-    private static func value(of kind: PieceKind) -> Int {
+    static func value(of kind: PieceKind) -> Int {
         switch kind {
         case .pawn: return 100
         case .knight: return 320
