@@ -21,7 +21,7 @@ This repository houses the native iOS version of the platform, built to help new
 
 ## Opening Tutorials
 
-Openings tab → **Opening Tutorials** lists each tutorial with a board preview and its status (Not Started, In Progress, Mastered). Each tutorial has two steps:
+The guided tutorials sit at the top of the Openings tab, each with a board preview and its status (Not Started, In Progress, or Mastered). Each tutorial has two steps:
 
 1. **Main line.** The learner plays one side. The start square is tinted and the target square glows. A wrong move springs back with a gentle shake and an error haptic, and the card shows a hint.
 2. **Branching out.** The opponent tries the common alternatives from the tutorial data, and the learner answers from memory. Squares only light up after a mistake or when the learner taps Hint.
@@ -35,7 +35,7 @@ Code in `FreeMateIOS/OpeningTutorials/`:
 * `OpeningTutorialSession.swift`: the tutorial state machine. It owns the position and is UI-free.
 * `OpeningTutorialPresentation.swift`: what the card, progress bar, and completion screen say. UI-free and unit tested.
 * `OpeningTutorialController.swift`: drives the shared `PracticeBoard` through its `onMoveAttempt` hook.
-* `Views/`: the list, the tutorial screen, the progress header, the floating instruction card, and the completion overlay.
+* `Views/`: the tutorial card, the tutorial screen, the progress header, the floating instruction card, and the completion overlay.
 
 Reusable pieces in `FreeMateIOS/DesignSystem/`:
 
@@ -44,6 +44,9 @@ Reusable pieces in `FreeMateIOS/DesignSystem/`:
 * `BoardPieceLayout.swift`: keeps piece identities across moves so pieces glide instead of jumping.
 * `BoardThumbnail.swift`: a single-pass `Canvas` preview board.
 * `MotionEffects.swift` and `Haptics.swift`: the shared spring, shake, glow, pressable cards, and light, error, and success haptics.
+* `FilterChips.swift`: the search-and-filter chip row used by the Lessons and Openings tabs.
+
+The tab root screens live in `FreeMateIOS/Tabs/`: Lessons (`CourseLibraryView`), Openings (`OpeningBrowserView`), and Practice (`PracticeView`). Every board in the app, including lessons, the opening trainer, and Practice, uses `ModernBoardView`.
 
 To add an opening, edit `opening-tutorials.json`, then check it and fill ECO codes from [eco.json](https://github.com/JeffML/eco.json):
 
@@ -54,7 +57,7 @@ python3 tools/opening_tutorials.py --eco-dir /path/to/eco-json
 
 ## Tests
 
-In Xcode, run the `FreeMateIOS` scheme's tests (Cmd-U). Without Xcode, including on Linux, the UI-free core runs with:
+In Xcode, run the `FreeMateIOS` scheme's tests (Cmd-U). GitHub Actions (`.github/workflows/ios-build.yml`) builds the app and runs the tests on every push. Without Xcode, including on Linux, the UI-free core runs with:
 
 ```bash
 swift test
