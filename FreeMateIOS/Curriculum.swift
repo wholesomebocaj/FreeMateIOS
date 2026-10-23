@@ -232,8 +232,7 @@ enum CurriculumLoader {
         for url in bundleCandidates.compactMap({ $0 }) {
             if let data = try? Data(contentsOf: url) { return data }
         }
-        let file = URL(fileURLWithPath: "/workspace/FreeMateIOS/Resources/FreeMateCatalog.json")
-        return try? Data(contentsOf: file)
+        return nil
     }
 
     private static func buildCourses(from folders: [(name: String, files: [(name: String, lesson: [String: Any])])]) -> [Course] {

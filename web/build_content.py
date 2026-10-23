@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Fill beginner lesson steps and bundle them for the web app."""
+"""Fill beginner lesson steps, bundle them for the web app, and build the iOS catalog.
+
+Resources/data is the one source. Run this after editing it, and both apps update.
+"""
 
 import json
 from pathlib import Path
@@ -730,15 +733,29 @@ def load_lessons():
     return lessons
 
 
-def patch_catalog(by_id):
-    catalog = json.loads(CATALOG.read_text())
-    for folder in catalog.get("courseFolders", []):
-        for entry in folder.get("files", []):
-            lesson = entry.get("lesson") or {}
-            updated = by_id.get(lesson.get("id"))
-            if updated:
-                lesson["steps"] = updated["steps"]
-                lesson["timeMinutes"] = updated["timeMinutes"]
+def write_catalog():
+    """Build the iOS catalog from Resources/data, so every lesson, bracket, and opening edit
+    reaches the app, not only lesson steps."""
+    order = {course_id: info["order"] for course_id, info in COURSE_INFO.items()}
+    folders = sorted((path for path in COURSES.iterdir() if path.is_dir()), key=lambda path: (order.get(path.name, 999), path.name))
+    index = json.loads((OPENINGS / "index.json").read_text())
+    catalog = {
+        "brackets": json.loads(BRACKETS.read_text()),
+        "courseFolders": [
+            {
+                "name": folder.name,
+                "files": [
+                    {"name": path.name, "lesson": json.loads(path.read_text())}
+                    for path in sorted(folder.glob("*.json"))
+                ],
+            }
+            for folder in folders
+        ],
+        "openings": [
+            {"index": entry, "opening": json.loads((OPENINGS / entry["path"]).read_text())}
+            for entry in index
+        ],
+    }
     CATALOG.write_text(json.dumps(catalog, separators=(",", ":"), ensure_ascii=True) + "\n")
 
 
@@ -782,7 +799,7 @@ def main():
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(bundle, indent=2) + "\n")
-    patch_catalog(by_id)
+    write_catalog()
     print(f"lessons {len(by_id)} openings {len(openings)} drills {sum(len(d['puzzles']) for d in DRILLS)}")
 
 

@@ -54,6 +54,7 @@ struct ComputerPlayPanel: View {
         .onChange(of: game.result) { _, result in
             if result == .won { Haptics.success() }
         }
+        .onAppear { game.reloadOtherDevices() }
         .onChange(of: game.warning) { _, warning in
             if warning != nil { Haptics.error() }
         }
@@ -203,7 +204,7 @@ struct ComputerPlayPanel: View {
             Toggle("Warn me before a blunder", isOn: $game.warnsAboutBlunders)
                 .font(.subheadline)
                 .tint(Theme.accent)
-            if game.record.played > 0 {
+            if game.totalRecord.played > 0 {
                 Text(recordText)
                     .font(.footnote.monospacedDigit())
                     .foregroundStyle(.secondary)
@@ -213,7 +214,7 @@ struct ComputerPlayPanel: View {
     }
 
     private var recordText: String {
-        let record = game.record
+        let record = game.totalRecord
         let games = record.played == 1 ? "1 game" : "\(record.played) games"
         let wins = record.wins == 1 ? "1 win" : "\(record.wins) wins"
         let draws = record.draws == 1 ? "1 draw" : "\(record.draws) draws"

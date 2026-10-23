@@ -168,13 +168,12 @@ final class LessonSession: ObservableObject {
     }
 
     private func recordFailure(_ step: LessonStep) {
-        _ = game.recordReviewFailure(ReviewSeed(
-            type: "lesson",
-            id: lesson.id,
+        game.recordReviewFailure(ReviewSeed(
+            kind: .lesson,
+            itemId: lesson.id,
             branchId: nil,
             title: lesson.title,
-            subtitle: step.title.isEmpty ? "Lesson practice" : "Missed: \(step.title)",
-            href: "/lessons/\(lesson.id)"
+            subtitle: step.title.isEmpty ? "Lesson practice" : "Missed: \(step.title)"
         ))
     }
 

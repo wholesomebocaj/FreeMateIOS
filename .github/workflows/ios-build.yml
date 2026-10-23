@@ -24,6 +24,16 @@ jobs:
       - name: Show Xcode
         run: xcodebuild -version
 
+      # Resources/data is the one content source. The web bundle and the iOS catalog are
+      # generated from it, so they must match what is checked in.
+      - name: Check generated content is up to date
+        run: |
+          python3 web/build_content.py
+          git diff --exit-code -- web/content FreeMateIOS/Resources Resources/data || {
+            echo "::error::Run python3 web/build_content.py and commit the result."
+            exit 1
+          }
+
       # The project targets iOS 27, which the runner's simulators do not have yet. Lower it
       # in the CI checkout only so the app installs on an iOS 26 simulator.
       - name: Lower the deployment target for CI

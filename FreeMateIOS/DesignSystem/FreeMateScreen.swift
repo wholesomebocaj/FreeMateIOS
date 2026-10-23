@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The standard screen: themed background, a native navigation title, and the account button.
+/// The standard screen: themed background, a native navigation title, and the settings button.
 struct FreeMateScreen<Content: View>: View {
     var title: String
     var largeTitle = false
@@ -12,7 +12,7 @@ struct FreeMateScreen<Content: View>: View {
             .themeBackground()
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(largeTitle ? .large : .inline)
-            .accountToolbar()
+            .settingsToolbar()
     }
 }
 

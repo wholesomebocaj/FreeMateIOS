@@ -160,7 +160,7 @@ enum OpeningTutorialLibrary {
     }
 }
 
-struct OpeningTutorialProgress: Codable, Equatable {
+nonisolated struct OpeningTutorialProgress: Codable, Equatable {
     var mainLineCompleted = false
     var completedVariationIds: Set<String> = []
     var fewestMistakes: Int?
@@ -169,11 +169,13 @@ struct OpeningTutorialProgress: Codable, Equatable {
 }
 
 /// Saves tutorial progress on the device. No account is involved.
-struct OpeningTutorialProgressStore {
+nonisolated struct OpeningTutorialProgressStore {
+    static let storageKey = "freemate.openingTutorials.v1"
+
     private let defaults: UserDefaults
     private let key: String
 
-    init(defaults: UserDefaults = .standard, key: String = "freemate.openingTutorials.v1") {
+    init(defaults: UserDefaults = .standard, key: String = storageKey) {
         self.defaults = defaults
         self.key = key
     }

@@ -47,7 +47,7 @@ struct CourseLibraryView: View {
         .themeBackground()
         .navigationTitle("Lessons")
         .searchable(text: $game.library.query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search courses and topics")
-        .accountToolbar()
+        .settingsToolbar()
         .animation(DesignMotion.spring, value: game.library)
     }
 

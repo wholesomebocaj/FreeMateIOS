@@ -16,7 +16,9 @@ final class ComputerGame: ObservableObject {
     @Published private(set) var isThinking = false
     @Published private(set) var isFindingHint = false
     @Published private(set) var result: ComputerGameResult?
+    /// This device's games. Other devices' games arrive through iCloud sync.
     @Published private(set) var record: ComputerGameRecord
+    @Published private(set) var otherDevicesRecord = ComputerGameRecord()
     /// The learner's last move looks like a blunder. The computer waits until they take it
     /// back or play on.
     @Published private(set) var warning: MoveWarning?
@@ -41,6 +43,8 @@ final class ComputerGame: ObservableObject {
         result == nil && !isThinking && warning == nil && board.history.contains { $0.index % 2 == learnerParity }
     }
     var canHint: Bool { canMove && !isFindingHint }
+    /// Games on every device signed in to the same iCloud account.
+    var totalRecord: ComputerGameRecord { record + otherDevicesRecord }
     /// History index parity of the learner's moves. White plays moves 1, 3, 5, and so on.
     private var learnerParity: Int { learner == .white ? 1 : 0 }
 
@@ -57,9 +61,15 @@ final class ComputerGame: ObservableObject {
         } else {
             record = ComputerGameRecord()
         }
+        reloadOtherDevices()
         board.onMoveSuccess = { [weak self] _ in self?.learnerMoved() }
         // Turn and history live on the board, so views of the game refresh with it.
         boardChanges = board.objectWillChange.sink { [weak self] in self?.objectWillChange.send() }
+    }
+
+    func reloadOtherDevices() {
+        otherDevicesRecord = defaults.data(forKey: CloudSync.otherDevicesComputerKey)
+            .flatMap { try? JSONDecoder().decode(ComputerGameRecord.self, from: $0) } ?? ComputerGameRecord()
     }
 
     /// Starts a game. A custom `fen` must have White to move, since move parity follows White.
@@ -203,5 +213,6 @@ final class ComputerGame: ObservableObject {
         if let data = try? JSONEncoder().encode(record) {
             defaults.set(data, forKey: Self.recordKey)
         }
+        ActivityStore(defaults: defaults).record()
     }
 }

@@ -8,6 +8,7 @@ struct HomeView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
                     hero
+                    ProgressDashboard()
                     HStack(alignment: .top, spacing: Theme.Spacing.s) {
                         feature("square.grid.3x3.fill", Theme.accent, "Interactive", "Boards and guided lessons")
                         feature("figure.walk", Theme.success, "Beginner first", "Clear steps, calm pacing")
@@ -688,43 +689,42 @@ struct ReviewView: View {
     @EnvironmentObject private var game: GameState
 
     var body: some View {
-        let queue = game.hydratedQueue()
+        let queue = game.reviewQueue()
+        let upcoming = game.upcomingReviews()
         FreeMateScreen(title: "Review", largeTitle: true) {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
                     if queue.isEmpty {
-                        VStack(spacing: Theme.Spacing.m) {
-                            IconTile(systemImage: "checkmark", color: Theme.success, size: 56)
-                            Text("Nothing due")
-                                .font(.title2.weight(.bold))
-                            Text("Missed lesson tasks and opening branches appear here automatically.")
-                                .font(.body)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.center)
-                            ActionButtons(
-                                primaryTitle: "Continue Lessons",
-                                secondaryTitle: "Train Openings",
-                                primary: { game.selectedTab = .lessons },
-                                secondary: { game.selectedTab = .openings }
-                            )
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, Theme.Spacing.l)
-                        .cardStyle()
+                        emptyState(hasUpcoming: !upcoming.isEmpty)
                     } else {
-                        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-                            Text("\(queue.count) item\(queue.count == 1 ? "" : "s") ready")
-                                .font(.headline)
-                            ProgressMeter(value: min(100, queue.count * 18), tint: Theme.warning)
-                        }
-                        .cardStyle()
                         VStack(alignment: .leading, spacing: Theme.Spacing.s) {
-                            SectionHeader(title: "Due Now")
-                            ForEach(queue, id: \.key) { item in
+                            SectionHeader(
+                                title: "Due Today",
+                                subtitle: "\(queue.count) item\(queue.count == 1 ? "" : "s"). Missed ones come first."
+                            )
+                            ForEach(queue) { item in
                                 reviewCard(item)
                             }
                         }
                     }
+                    if !upcoming.isEmpty {
+                        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                            SectionHeader(title: "Coming Up")
+                            VStack(spacing: 0) {
+                                ForEach(Array(upcoming.prefix(12).enumerated()), id: \.element.id) { index, item in
+                                    upcomingRow(item)
+                                    if index < min(upcoming.count, 12) - 1 {
+                                        Divider().padding(.leading, 44)
+                                    }
+                                }
+                            }
+                            .cardStyle(padding: Theme.Spacing.m)
+                        }
+                    }
+                    Text("Reviews come back after 1, 3, 7, and 14 days. Miss one and it starts over, so the ideas you find hard come back more often.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(Theme.Spacing.l)
                 .frame(maxWidth: 720)
@@ -733,8 +733,31 @@ struct ReviewView: View {
         }
     }
 
+    private func emptyState(hasUpcoming: Bool) -> some View {
+        VStack(spacing: Theme.Spacing.m) {
+            IconTile(systemImage: "checkmark", color: Theme.success, size: 56)
+            Text("Nothing due")
+                .font(.title2.weight(.bold))
+            Text(hasUpcoming
+                 ? "You're up to date. Your next reviews are below."
+                 : "Finish a lesson or an opening line and it comes back here for review.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            ActionButtons(
+                primaryTitle: "Continue Lessons",
+                secondaryTitle: "Train Openings",
+                primary: { game.selectedTab = .lessons },
+                secondary: { game.selectedTab = .openings }
+            )
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, Theme.Spacing.l)
+        .cardStyle()
+    }
+
     private func reviewCard(_ item: ReviewItem) -> some View {
-        let isOpening = item.type == "opening"
+        let isOpening = item.kind == .opening
         return HStack(alignment: .top, spacing: Theme.Spacing.s) {
             IconTile(
                 systemImage: isOpening ? "arrow.triangle.branch" : "book.fill",
@@ -742,128 +765,71 @@ struct ReviewView: View {
                 size: 44
             )
             VStack(alignment: .leading, spacing: Theme.Spacing.xxs) {
-                Text("\(isOpening ? "Opening branch" : "Lesson") · \(game.reviewLabel(item))")
+                Text("\(isOpening ? "Opening line" : "Lesson") · \(game.reviewLabel(item))")
                     .eyebrowStyle()
                 Text(item.title)
                     .font(.headline)
                 Text(item.subtitle.isEmpty ? "Practice this once, then move on." : item.subtitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Text("\(item.failures) miss\(item.failures == 1 ? "" : "es") · \(item.successStreak) correct in a row")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                StageDots(stage: item.stage)
+                    .padding(.vertical, 2)
                 Button("Review") { open(item) }
                     .primaryButtonStyle()
                     .controlSize(.small)
                     .padding(.top, Theme.Spacing.xxs)
             }
             Spacer(minLength: 0)
-            StatusBadge(text: item.state.capitalized, tint: Theme.warning)
+            if item.state == .shaky {
+                StatusBadge(text: "Missed", systemImage: "lightbulb.fill", tint: Theme.warning)
+            }
         }
         .cardStyle()
     }
 
+    private func upcomingRow(_ item: ReviewItem) -> some View {
+        HStack(spacing: Theme.Spacing.s) {
+            Image(systemName: item.kind == .opening ? "arrow.triangle.branch" : "book")
+                .foregroundStyle(.secondary)
+                .frame(width: 32)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.title)
+                    .font(.subheadline.weight(.medium))
+                    .lineLimit(1)
+                StageDots(stage: item.stage)
+            }
+            Spacer(minLength: Theme.Spacing.xs)
+            if let due = item.dueAt {
+                Text(due.formatted(.relative(presentation: .named)))
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, Theme.Spacing.xs)
+        .accessibilityElement(children: .combine)
+    }
+
     private func open(_ item: ReviewItem) {
-        if item.type == "opening" {
-            game.openTrainer(id: item.id, line: item.branchId)
-        } else {
-            game.openLesson(item.id)
+        switch item.kind {
+        case .opening: game.openTrainer(id: item.itemId, line: item.branchId)
+        case .lesson: game.openLesson(item.itemId)
         }
     }
 }
 
-struct AuthView: View {
-    @EnvironmentObject private var game: GameState
-    @Environment(\.dismiss) private var dismiss
-    @State private var username = ""
-    @State private var password = ""
-    @State private var mode = "login"
-    @State private var message = ""
-    @State private var failed = false
+/// Where an item is on the 1, 3, 7, and 14 day ladder.
+struct StageDots: View {
+    var stage: Int
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: Theme.Spacing.m) {
-                    if let user = game.currentUser {
-                        HStack(spacing: Theme.Spacing.s) {
-                            IconTile(systemImage: "person.fill", color: Theme.accent, size: 44)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Signed in as").eyebrowStyle()
-                                Text(user.displayName).font(.title3.weight(.bold))
-                            }
-                        }
-                        .cardStyle()
-                        Button(role: .destructive) {
-                            game.logOut()
-                            dismiss()
-                        } label: {
-                            Text("Log Out").frame(maxWidth: .infinity)
-                        }
-                        .secondaryButtonStyle(tint: Theme.danger)
-                        .controlSize(.large)
-                    } else {
-                        Text("Learning never needs an account. Sign in only to keep a named profile on this device.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                        Picker("Account", selection: $mode) {
-                            Text("Sign In").tag("login")
-                            Text("Create Account").tag("signup")
-                        }
-                        .pickerStyle(.segmented)
-                        VStack(spacing: Theme.Spacing.xs) {
-                            TextField("Username", text: $username)
-                                .textInputAutocapitalization(.never)
-                                .autocorrectionDisabled()
-                                .textContentType(.username)
-                                .padding(Theme.Spacing.s)
-                                .background(Theme.fill, in: RoundedRectangle(cornerRadius: Theme.Radius.small, style: .continuous))
-                            SecureField("Password", text: $password)
-                                .textContentType(mode == "login" ? .password : .newPassword)
-                                .padding(Theme.Spacing.s)
-                                .background(Theme.fill, in: RoundedRectangle(cornerRadius: Theme.Radius.small, style: .continuous))
-                        }
-                        Button {
-                            submit()
-                        } label: {
-                            Text(mode == "login" ? "Sign In" : "Create Account")
-                                .font(.headline)
-                                .frame(maxWidth: .infinity)
-                        }
-                        .primaryButtonStyle()
-                        .controlSize(.large)
-                        if !message.isEmpty {
-                            Text(message)
-                                .font(.subheadline)
-                                .foregroundStyle(failed ? Theme.danger : Color.secondary)
-                        }
-                    }
-                }
-                .padding(Theme.Spacing.l)
-            }
-            .themeBackground()
-            .navigationTitle("Account")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") { dismiss() }
-                }
+        HStack(spacing: 4) {
+            ForEach(ReviewSchedule.intervals.indices, id: \.self) { index in
+                Capsule()
+                    .fill(index < stage ? Theme.success : Theme.fill)
+                    .frame(width: 18, height: 5)
             }
         }
-        .tint(Theme.accent)
-    }
-
-    private func submit() {
-        message = mode == "login" ? "Signing in..." : "Creating account..."
-        failed = false
-        let error = mode == "login"
-            ? game.logIn(username: username, password: password)
-            : game.signUp(username: username, password: password)
-        if let error {
-            message = error
-            failed = true
-        } else {
-            dismiss()
-        }
+        .accessibilityElement()
+        .accessibilityLabel("\(min(stage, ReviewSchedule.intervals.count)) of \(ReviewSchedule.intervals.count) check-ins passed")
     }
 }

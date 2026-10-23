@@ -20,7 +20,7 @@ It includes:
 - A board to play the computer, plus a free board for experimenting
 - Guided opening lines from the bundled course data
 
-Lesson sources live in `Resources/data/courses`. Regenerate the web bundle after editing them:
+`Resources/data` is the one content source for both apps. After editing lessons, brackets, or openings there, regenerate the web bundle and the iOS catalog (`FreeMateIOS/Resources/FreeMateCatalog.json`) together. CI fails if they are out of date.
 
 ```bash
 python3 web/build_content.py

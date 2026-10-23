@@ -18,7 +18,7 @@ let package = Package(
             name: "FreeMateIOS",
             path: "FreeMateIOS",
             exclude: [
-                "AuthSession.swift",
+                "Assets.xcassets",
                 "ComputerGame.swift",
                 "ComputerGameReview.swift",
                 "DebugLaunchRoute.swift",
@@ -30,6 +30,7 @@ let package = Package(
                 "LessonSession.swift",
                 "OpeningTrainer.swift",
                 "PracticeBoard.swift",
+                "Progress/CloudSync.swift",
                 "README.md",
                 "Resources",
                 "DesignSystem/BoardThumbnail.swift",
@@ -46,6 +47,7 @@ let package = Package(
                 "Puzzles/Views",
                 "OpeningTutorials/opening-tutorials.json",
                 "Tabs",
+                "WidgetSnapshotWriter.swift",
             ],
             sources: [
                 "ChessEngine.swift",
@@ -57,6 +59,10 @@ let package = Package(
                 "OpeningTutorials/OpeningTutorialLibrary.swift",
                 "OpeningTutorials/OpeningTutorialPresentation.swift",
                 "OpeningTutorials/OpeningTutorialSession.swift",
+                "Progress/ActivityStore.swift",
+                "Progress/LearnerProgress.swift",
+                "Progress/LegacyProgressMigration.swift",
+                "Progress/SyncMerge.swift",
                 "Puzzles/Puzzle.swift",
             ],
             swiftSettings: appSettings
