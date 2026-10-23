@@ -6,12 +6,17 @@ nonisolated struct BoardPalette: Equatable, Sendable {
     var lastMove: Color
     /// Guidance color for hint squares, selection, and the breathing target glow.
     var guide: Color
+    /// Soft tints for lesson marks: squares found correctly, and squares under threat.
+    var correct: Color
+    var danger: Color
 
     static let sage = BoardPalette(
         light: Color(red: 0.933, green: 0.914, blue: 0.867),
         dark: Color(red: 0.561, green: 0.651, blue: 0.549),
         lastMove: Color(red: 0.980, green: 0.859, blue: 0.471).opacity(0.42),
-        guide: Color(red: 0.243, green: 0.557, blue: 0.871)
+        guide: Color(red: 0.243, green: 0.557, blue: 0.871),
+        correct: Color(red: 0.204, green: 0.659, blue: 0.325).opacity(0.38),
+        danger: Color(red: 0.902, green: 0.298, blue: 0.259).opacity(0.34)
     )
 }
 
@@ -87,20 +92,22 @@ struct ModernBoardView: View {
     // MARK: Squares
 
     private func squaresLayer(_ size: CGFloat) -> some View {
-        VStack(spacing: 0) {
+        // One target breathes; when a lesson marks several, they stay still so the board stays calm.
+        let pulsesTarget = board.highlightSquares.filter { $0.className == "target" }.count == 1
+        return VStack(spacing: 0) {
             ForEach(0..<8, id: \.self) { row in
                 HStack(spacing: 0) {
                     ForEach(0..<8, id: \.self) { column in
-                        squareView(squareName(row: row, column: column), row: row, column: column, size: size)
+                        squareView(squareName(row: row, column: column), row: row, column: column, size: size, pulsesTarget: pulsesTarget)
                     }
                 }
             }
         }
     }
 
-    private func squareView(_ name: String, row: Int, column: Int, size: CGFloat) -> some View {
+    private func squareView(_ name: String, row: Int, column: Int, size: CGFloat, pulsesTarget: Bool) -> some View {
         let isLight = isLightSquare(name)
-        let guideClass = board.highlightSquares.first { $0.square == name }?.className
+        let guideClass = board.highlightSquares.last { $0.square == name }?.className
         let isDestination = board.legalDestinations.contains(name)
         let hasPiece = board.position[name] != nil
         return ZStack {
@@ -111,12 +118,18 @@ struct ModernBoardView: View {
             if board.selectedSquare == name || guideClass == "focus" {
                 Rectangle().fill(palette.guide.opacity(0.26))
             }
+            if guideClass == "correct" {
+                Rectangle().fill(palette.correct)
+            }
+            if guideClass == "danger" {
+                Rectangle().fill(palette.danger)
+            }
             if board.isCheck, board.position[name] == (board.turn == "white" ? "wK" : "bK") {
                 RadialGradient(colors: [Color.red.opacity(0.6), .clear], center: .center, startRadius: 0, endRadius: size * 0.62)
             }
             coordinates(row: row, column: column, isLight: isLight, size: size)
             if guideClass == "target" {
-                PulsingGlow(color: palette.guide, size: size)
+                PulsingGlow(color: palette.guide, size: size, pulses: pulsesTarget)
             }
             if isDestination {
                 if hasPiece {
@@ -295,8 +308,10 @@ struct ModernBoardView: View {
             parts.append("empty")
         }
         if board.selectedSquare == square { parts.append("selected") }
-        if guide == "focus" { parts.append("move this piece") }
-        if guide == "target" { parts.append("move here") }
+        if guide == "focus" { parts.append("highlighted") }
+        if guide == "target" { parts.append("target square") }
+        if guide == "correct" { parts.append("found") }
+        if guide == "danger" { parts.append("under attack") }
         return parts.joined(separator: ", ")
     }
 }

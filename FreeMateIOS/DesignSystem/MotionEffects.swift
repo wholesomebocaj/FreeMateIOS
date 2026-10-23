@@ -30,6 +30,7 @@ nonisolated struct ShakeEffect: GeometryEffect {
 struct PulsingGlow: View {
     var color: Color
     var size: CGFloat
+    var pulses = true
     @State private var breathing = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -42,7 +43,7 @@ struct PulsingGlow: View {
             .scaleEffect(breathing ? 1 : 0.86)
             .opacity(breathing ? 1 : 0.55)
             .onAppear {
-                guard !reduceMotion else {
+                guard pulses, !reduceMotion else {
                     breathing = true
                     return
                 }

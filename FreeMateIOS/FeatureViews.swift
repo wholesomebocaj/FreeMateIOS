@@ -72,139 +72,6 @@ struct HomeView: View {
     }
 }
 
-struct CourseLibraryView: View {
-    @EnvironmentObject private var game: GameState
-
-    var body: some View {
-        FreeMateScreen(title: "Courses") {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Browse the course library.")
-                        .font(.title.bold())
-                    Text("Filter by level, topic, color, and progress to find the next lesson path.")
-                        .foregroundStyle(FreeMateTheme.muted)
-                    let entries = game.libraryEntries()
-                    Text("\(game.completedLessons.count) lessons complete")
-                        .foregroundStyle(FreeMateTheme.accent)
-                    ProgressMeter(value: game.progressPercent())
-                    TextField("Search courses", text: $game.library.query)
-                        .textFieldStyle(.roundedBorder)
-                    filterMenus
-                    Button("Reset") { game.resetLibrary() }
-                        .buttonStyle(.bordered)
-                    Text("\(entries.count) course\(entries.count == 1 ? "" : "s") shown")
-                        .font(.subheadline)
-                        .foregroundStyle(FreeMateTheme.muted)
-                    if game.activeLibraryTags().isEmpty {
-                        Text("All courses").font(.caption).foregroundStyle(FreeMateTheme.muted)
-                    } else {
-                        Text(game.activeLibraryTags().joined(separator: " · "))
-                            .font(.caption)
-                            .foregroundStyle(FreeMateTheme.accent)
-                    }
-                    if entries.isEmpty {
-                        Text("No courses match these filters.")
-                            .foregroundStyle(FreeMateTheme.muted)
-                    }
-                    ForEach(entries) { meta in
-                        courseCard(meta)
-                    }
-                    Text("Skill brackets")
-                        .font(.title3.bold())
-                        .padding(.top, 8)
-                    ForEach(game.brackets) { bracket in
-                        Button {
-                            game.openBracket(bracket.slug)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("\(bracket.title) · \(bracket.range)")
-                                    .font(.headline)
-                                    .foregroundStyle(FreeMateTheme.text)
-                                Text(bracket.description)
-                                    .font(.subheadline)
-                                    .foregroundStyle(FreeMateTheme.muted)
-                                ProgressMeter(value: game.bracketProgress(bracket))
-                            }
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .padding()
-            }
-        }
-    }
-
-    private var filterMenus: some View {
-        VStack(spacing: 8) {
-            Picker("Level", selection: $game.library.bracket) {
-                Text("All levels").tag("all")
-                ForEach(game.brackets) { bracket in
-                    Text("\(bracket.title) (\(bracket.range))").tag(bracket.id)
-                }
-            }
-            Picker("Topic", selection: $game.library.topic) {
-                Text("All topics").tag("all")
-                Text("Fundamentals").tag("fundamentals")
-                Text("Openings").tag("openings")
-                Text("Tactics").tag("tactics")
-                Text("Endgame").tag("endgame")
-                Text("Strategy").tag("strategy")
-            }
-            Picker("Color", selection: $game.library.color) {
-                Text("All colors").tag("all")
-                Text("White").tag("white")
-                Text("Black").tag("black")
-                Text("Both").tag("both")
-            }
-            Picker("Type", selection: $game.library.type) {
-                Text("All types").tag("all")
-                Text("Interactive lesson").tag("interactive lesson")
-                Text("Opening course").tag("opening course")
-                Text("Drill").tag("drill")
-                Text("Quiz").tag("quiz")
-                Text("Practice").tag("practice")
-            }
-            Picker("Status", selection: $game.library.status) {
-                Text("All status").tag("all")
-                Text("Not started").tag("not-started")
-                Text("In progress").tag("in-progress")
-                Text("Completed").tag("completed")
-            }
-            Picker("Sort", selection: $game.library.sort) {
-                ForEach(CourseLibrarySort.allCases) { sort in
-                    Text(sort.label).tag(sort)
-                }
-            }
-        }
-        .pickerStyle(.menu)
-    }
-
-    private func courseCard(_ meta: CourseLibraryMeta) -> some View {
-        let label = meta.status == "completed" ? "Review" : meta.status == "in-progress" ? "Continue" : "Open"
-        return Button {
-            game.openCourse(meta.course.id)
-        } label: {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(meta.bracketLabel).font(.caption.weight(.bold)).foregroundStyle(FreeMateTheme.accent)
-                Text(meta.course.title).font(.headline).foregroundStyle(FreeMateTheme.text)
-                Text(meta.course.description).font(.subheadline).foregroundStyle(FreeMateTheme.muted)
-                Text("\(meta.bracketRange) · \(meta.topic) · \(meta.color) · \(meta.type)")
-                    .font(.caption)
-                    .foregroundStyle(FreeMateTheme.muted)
-                ProgressMeter(value: meta.progress)
-                Text(label).font(.caption.weight(.bold)).foregroundStyle(FreeMateTheme.green)
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
-        }
-        .buttonStyle(.plain)
-    }
-}
-
 struct BracketDetailView: View {
     @EnvironmentObject private var game: GameState
     let bracketId: String
@@ -363,7 +230,7 @@ struct LessonPlayerBody: View {
                             }
                         }
                         if let board = session.board {
-                            ChessboardView(board: board)
+                            ModernBoardView(board: board)
                             Text(note(for: step))
                                 .font(.footnote)
                                 .foregroundStyle(FreeMateTheme.muted)
@@ -436,63 +303,6 @@ struct LessonPlayerBody: View {
     }
 }
 
-struct OpeningBrowserView: View {
-    @EnvironmentObject private var game: GameState
-    @State private var side = "all"
-    @State private var difficulty = "all"
-
-    var body: some View {
-        let visible = game.openings.filter { opening in
-            (side == "all" || opening.side == side) && (difficulty == "all" || opening.difficulty == difficulty)
-        }
-        FreeMateScreen(title: "Openings") {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    OpeningTutorialsEntryCard()
-                    Text("Train a beginner repertoire.")
-                        .font(.title2.bold())
-                    Text("\(visible.count) opening courses")
-                        .foregroundStyle(FreeMateTheme.muted)
-                    Picker("Side", selection: $side) {
-                        Text("All sides").tag("all")
-                        Text("White").tag("White")
-                        Text("Black").tag("Black")
-                    }
-                    Picker("Difficulty", selection: $difficulty) {
-                        Text("All levels").tag("all")
-                        ForEach(Array(Set(game.openings.map(\.difficulty))).sorted(), id: \.self) { level in
-                            Text(level).tag(level)
-                        }
-                    }
-                    ForEach(visible) { opening in
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("\(opening.eco) · \(opening.difficulty) · \(opening.side)")
-                                .font(.caption.bold())
-                                .foregroundStyle(FreeMateTheme.accent)
-                            Text(opening.name).font(.headline)
-                            Text(opening.description).font(.subheadline).foregroundStyle(FreeMateTheme.muted)
-                            Text("\(opening.sectionCount) sections · \(opening.moveCount) moves")
-                                .font(.caption)
-                                .foregroundStyle(FreeMateTheme.muted)
-                            HStack {
-                                Button("Overview") { game.openOpening(opening.id) }
-                                    .buttonStyle(.bordered)
-                                Button("Train") { game.openTrainer(id: opening.id, line: nil) }
-                                    .buttonStyle(.borderedProminent)
-                                    .tint(FreeMateTheme.green)
-                            }
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
-                    }
-                }
-                .padding()
-            }
-        }
-    }
-}
-
 struct OpeningOverviewView: View {
     @EnvironmentObject private var game: GameState
     let openingId: String
@@ -561,7 +371,7 @@ struct OpeningTrainerBody: View {
                     Text(trainer.status)
                         .font(.caption.weight(.bold))
                         .foregroundStyle(trainer.statusDone ? FreeMateTheme.green : FreeMateTheme.muted)
-                    ChessboardView(board: trainer.board)
+                    ModernBoardView(board: trainer.board)
                     Text(trainer.noteTitle).font(.headline)
                     Text(trainer.explanation).foregroundStyle(FreeMateTheme.muted)
                     if !trainer.feedback.isEmpty {
@@ -621,85 +431,6 @@ struct OpeningTrainerBody: View {
         case "done": return "✓"
         case "active": return "→"
         default: return "•"
-        }
-    }
-}
-
-struct PracticeView: View {
-    @StateObject private var board = PracticeBoard()
-
-    var body: some View {
-        FreeMateScreen(title: "Practice") {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Free board practice.")
-                        .font(.title2.bold())
-                    Text("Move both sides, test legal moves, and load custom positions.")
-                        .foregroundStyle(FreeMateTheme.muted)
-                    Text(statusText)
-                        .font(.headline)
-                        .foregroundStyle(board.isCheckmate ? FreeMateTheme.red : board.isCheck ? FreeMateTheme.gold : FreeMateTheme.text)
-                    Text("Current turn: \(turnText)")
-                    Text("Last move: \(board.history.last?.san ?? "None")")
-                    ChessboardView(board: board)
-                    HStack {
-                        Button("Reset") { board.reset() }.buttonStyle(.bordered)
-                        Button("Flip") { board.flip() }.buttonStyle(.bordered)
-                        Button("Clear") { board.clear() }.buttonStyle(.bordered)
-                    }
-                    FenForm(board: board)
-                    Text("Move history").font(.headline)
-                    if board.history.isEmpty {
-                        Text("No moves yet.").foregroundStyle(FreeMateTheme.muted)
-                    } else {
-                        ForEach(board.history) { entry in
-                            Text("\(entry.index). \(entry.san)")
-                        }
-                    }
-                }
-                .padding()
-            }
-        }
-    }
-
-    private var turnText: String { board.turn == "white" ? "White" : "Black" }
-    private var statusText: String {
-        if board.isCheckmate { return "Checkmate — game over" }
-        if board.isCheck { return "\(turnText) is in check" }
-        return "\(turnText) to move"
-    }
-}
-
-struct FenForm: View {
-    @ObservedObject var board: PracticeBoard
-    @State private var text = ChessEngine.startingFen
-    @State private var message = ""
-    @State private var failed = false
-
-    var body: some View {
-        VStack(alignment: .leading) {
-            TextField("FEN", text: $text)
-                .textFieldStyle(.roundedBorder)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-            Button("Load position") {
-                do {
-                    try board.loadFen(text, setInitial: true, clearHistory: true)
-                    message = "Position loaded."
-                    failed = false
-                } catch {
-                    message = error.localizedDescription
-                    failed = true
-                }
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(FreeMateTheme.green)
-            if !message.isEmpty {
-                Text(message).foregroundStyle(failed ? FreeMateTheme.red : FreeMateTheme.accent)
-            }
-        }
-        .onChange(of: board.fen) { _, newValue in
-            text = newValue
         }
     }
 }
