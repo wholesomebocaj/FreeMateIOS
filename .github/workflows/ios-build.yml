@@ -89,6 +89,9 @@ jobs:
         run: |
           APP=$(find DerivedData/Build/Products -maxdepth 2 -name FreeMateIOS.app -path "*iphonesimulator*" | head -1)
           BUNDLE_ID=com.jacobbakerpersonalteam.FreeMateIOS
+          # Tests run on clones of the simulator and leave the original shut down.
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
           xcrun simctl install "$UDID" "$APP"
           xcrun simctl status_bar "$UDID" override --time 9:41 --batteryState charged --batteryLevel 100 || true
           mkdir -p screenshots
