@@ -38,6 +38,8 @@ struct ContentView: View {
                                 OpeningOverviewView(openingId: id)
                             case .train(let id, let line):
                                 OpeningTrainerView(openingId: id, lineId: line)
+                            case .tutorial(let id):
+                                OpeningTutorialView(tutorialId: id)
                             }
                         }
                 }
