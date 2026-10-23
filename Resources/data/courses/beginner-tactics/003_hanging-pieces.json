@@ -6,5 +6,59 @@
   "topic": "tactics",
   "order": 3,
   "summary": "Learn to spot loose material quickly.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "Hanging means undefended",
+      "body": "A hanging piece can be captured for free. Most beginner games are decided by one piece left without a defender."
+    },
+    {
+      "type": "board-demo",
+      "title": "The queen is loose",
+      "body": "Black's queen on d5 has no defender. White's rook looks straight up the d-file.",
+      "fen": "4k3/8/8/3q4/8/8/8/3R2K1 w - - 0 1",
+      "highlightSquares": [
+        "d1",
+        "d5"
+      ]
+    },
+    {
+      "type": "move-task",
+      "title": "Take the hanging queen",
+      "body": "Capture the queen with the rook, from d1 to d5.",
+      "fen": "4k3/8/8/3q4/8/8/8/3R2K1 w - - 0 1",
+      "startSquare": "d1",
+      "targetSquare": "d5",
+      "successText": "You won the queen because nothing defended it.",
+      "errorText": "Move the rook from d1 to d5."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "Before you grab",
+      "question": "You see a free pawn. What should you check first?",
+      "choices": [
+        {
+          "label": "Whether taking it hangs one of your own pieces",
+          "value": "safe"
+        },
+        {
+          "label": "Whether you have castled on the opposite wing",
+          "value": "wing"
+        },
+        {
+          "label": "The color of the square the pawn sits on",
+          "value": "color"
+        }
+      ],
+      "correctChoice": "safe",
+      "successText": "A free pawn is not free if you lose a piece to take it.",
+      "errorText": "Ask what the opponent can capture after your move."
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "Scan every enemy piece that attacks one of yours. If a piece has no friend defending it, it is hanging."
+    }
+  ],
+  "timeMinutes": 6
 }

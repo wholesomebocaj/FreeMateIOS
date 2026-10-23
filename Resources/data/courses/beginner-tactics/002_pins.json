@@ -6,5 +6,72 @@
   "topic": "tactics",
   "order": 2,
   "summary": "Learn how pinned pieces lose freedom.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "A piece that cannot move",
+      "body": "A pin happens when a piece stands between your attacker and a more valuable piece, often the king. If the pinned piece is shielding the king, moving it would be illegal."
+    },
+    {
+      "type": "board-demo",
+      "title": "An absolute pin",
+      "body": "The bishop on b5 looks through the knight on c6 to the king on e8. The knight cannot legally move.",
+      "fen": "4k3/8/2n5/1B6/8/8/8/4K3 w - - 0 1",
+      "highlightSquares": [
+        "b5",
+        "c6",
+        "e8"
+      ]
+    },
+    {
+      "type": "move-task",
+      "title": "Create the pin",
+      "body": "Move the bishop from f1 to b5. It will pin the knight on c6 to the king.",
+      "fen": "4k3/8/2n5/8/8/8/8/5BK1 w - - 0 1",
+      "startSquare": "f1",
+      "targetSquare": "b5",
+      "highlightSquares": [
+        "b5",
+        "c6",
+        "e8"
+      ],
+      "successText": "The knight is pinned. Capturing it next is often the idea.",
+      "errorText": "Travel the diagonal from f1 to b5."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "Can the knight move?",
+      "question": "The knight on c6 is pinned to the king by the bishop. What is true?",
+      "board": true,
+      "fen": "4k3/8/2n5/1B6/8/8/8/4K3 b - - 0 1",
+      "highlightSquares": [
+        "b5",
+        "c6",
+        "e8"
+      ],
+      "choices": [
+        {
+          "label": "The knight can capture the bishop",
+          "value": "capture"
+        },
+        {
+          "label": "Moving the knight would expose the king, so it is illegal",
+          "value": "illegal"
+        },
+        {
+          "label": "Pins only apply to pawns",
+          "value": "pawns"
+        }
+      ],
+      "correctChoice": "illegal",
+      "successText": "That is an absolute pin. Relative pins against a queen are legal, but usually costly.",
+      "errorText": "Look along the diagonal from the bishop through the knight to the king."
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "Rooks, bishops, and queens create pins. When you see three pieces on a line, ask who is pinned."
+    }
+  ],
+  "timeMinutes": 6
 }

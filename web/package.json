@@ -1,0 +1,8 @@
+{
+  "name": "freemate",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node engine.test.js && node content.test.js"
+  }
+}

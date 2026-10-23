@@ -6,5 +6,61 @@
   "topic": "openings",
   "order": 3,
   "summary": "Learn why king safety comes early.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "Castle early",
+      "body": "Castling moves the king away from the center and brings a rook toward the action. You may castle once per game, and only if the king and that rook have not moved."
+    },
+    {
+      "type": "board-demo",
+      "title": "Ready to castle",
+      "body": "The knight and the light-squared bishop are out. The squares between the king and the h1 rook are empty.",
+      "fen": "rnbqk2r/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+      "highlightSquares": [
+        "e1",
+        "f1",
+        "g1",
+        "h1"
+      ]
+    },
+    {
+      "type": "move-task",
+      "title": "Castle kingside",
+      "body": "Move the king from e1 to g1. The rook will jump to f1.",
+      "fen": "rnbqk2r/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+      "startSquare": "e1",
+      "targetSquare": "g1",
+      "successText": "The king is safer, and the rook has entered the game.",
+      "errorText": "Slide the king two squares toward the rook, from e1 to g1."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "When castling is illegal",
+      "question": "Which condition stops you from castling?",
+      "choices": [
+        {
+          "label": "Your king is in check and stays on an attacked square",
+          "value": "check"
+        },
+        {
+          "label": "You have already moved a pawn",
+          "value": "pawn"
+        },
+        {
+          "label": "The opponent has more pieces",
+          "value": "material"
+        }
+      ],
+      "correctChoice": "check",
+      "successText": "You also cannot castle through check, out of check, or if the king or rook has moved.",
+      "errorText": "Pawn moves do not by themselves cancel castling. Check does."
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "Castle before you attack. A king left on e1 is a target once the center opens."
+    }
+  ],
+  "timeMinutes": 6
 }

@@ -1,0 +1,10 @@
+{
+  "name": "FreeMate",
+  "short_name": "FreeMate",
+  "description": "Free beginner chess lessons, drills, and play. No ads and no account.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#101820",
+  "theme_color": "#101820",
+  "lang": "en"
+}

@@ -17,7 +17,10 @@
       "title": "Start by shrinking the box",
       "body": "Do not give random checks forever. First reduce the enemy king's safe area.",
       "fen": "7k/8/8/8/8/8/6Q1/6K1 w - - 0 1",
-      "highlightSquares": ["g2", "h8"]
+      "highlightSquares": [
+        "g2",
+        "h8"
+      ]
     },
     {
       "type": "multiple-choice",
@@ -26,9 +29,18 @@
       "board": true,
       "fen": "7k/8/8/8/8/8/6Q1/6K1 w - - 0 1",
       "choices": [
-        { "label": "Give endless checks", "value": "checks" },
-        { "label": "Trap the king and bring your king closer", "value": "trap-and-king" },
-        { "label": "Offer a queen trade", "value": "trade" }
+        {
+          "label": "Give endless checks",
+          "value": "checks"
+        },
+        {
+          "label": "Trap the king and bring your king closer",
+          "value": "trap-and-king"
+        },
+        {
+          "label": "Offer a queen trade",
+          "value": "trade"
+        }
       ],
       "correctChoice": "trap-and-king",
       "successText": "Correct. Restrict first, then bring your king in.",
@@ -41,7 +53,11 @@
       "fen": "7k/8/8/8/8/8/6Q1/6K1 w - - 0 1",
       "startSquare": "g2",
       "targetSquare": "g6",
-      "highlightSquares": ["g6", "h7", "h8"],
+      "highlightSquares": [
+        "g6",
+        "h7",
+        "h8"
+      ],
       "successText": "Good. That move cuts the king's space down sharply.",
       "errorText": "Try again. Move the queen to g6."
     },
@@ -50,12 +66,17 @@
       "title": "After the box shrinks",
       "body": "Once the king is boxed in, your king can walk forward and help finish the mate.",
       "fen": "7k/8/8/8/8/6Q1/8/6K1 b - - 0 1",
-      "highlightSquares": ["g8", "h8", "h7"]
+      "highlightSquares": [
+        "g8",
+        "h8",
+        "h7"
+      ]
     },
     {
       "type": "explain",
       "title": "Lesson recap",
       "body": "With queen vs king, shrink the box, bring your king in, and avoid accidental stalemate."
     }
-  ]
+  ],
+  "timeMinutes": 6
 }

@@ -6,5 +6,61 @@
   "topic": "openings",
   "order": 2,
   "summary": "Learn simple development habits.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "Develop before you attack",
+      "body": "Bring knights and bishops out before the queen and rooks. A developed piece influences the board. A piece on its home square does not."
+    },
+    {
+      "type": "board-demo",
+      "title": "Knights like the center",
+      "body": "Both sides have a pawn in the center. White's next useful job is to develop the knight from g1.",
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
+      "highlightSquares": [
+        "g1",
+        "f3",
+        "e4",
+        "e5"
+      ]
+    },
+    {
+      "type": "move-task",
+      "title": "Develop the knight",
+      "body": "Move the knight from g1 to f3. It attacks e5 and prepares castling.",
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
+      "startSquare": "g1",
+      "targetSquare": "f3",
+      "successText": "Nf3 develops with a purpose: it eyes the center.",
+      "errorText": "Move the knight on g1 to f3."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "Leave the queen at home",
+      "question": "Why should beginners delay queen moves?",
+      "choices": [
+        {
+          "label": "The queen is not allowed to move early",
+          "value": "illegal"
+        },
+        {
+          "label": "Early queen moves lose time when the opponent attacks her",
+          "value": "tempo"
+        },
+        {
+          "label": "The queen cannot move until a pawn has captured",
+          "value": "pawn"
+        }
+      ],
+      "correctChoice": "tempo",
+      "successText": "Develop minor pieces first. The queen joins once she has a clear job.",
+      "errorText": "The queen is legal early. She just becomes a target."
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "Develop knights toward the center, then bishops, then castle. Rooks belong on open or half-open files later."
+    }
+  ],
+  "timeMinutes": 6
 }

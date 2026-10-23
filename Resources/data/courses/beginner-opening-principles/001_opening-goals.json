@@ -6,5 +6,79 @@
   "topic": "openings",
   "order": 1,
   "summary": "Learn the main goals of the opening.",
-  "steps": []
+  "steps": [
+    {
+      "type": "explain",
+      "title": "Three opening goals",
+      "body": "In the first ten moves, do three things: influence the center, develop knights and bishops, and castle your king. Do not hunt the enemy queen."
+    },
+    {
+      "type": "multiple-choice",
+      "title": "Choose a first move",
+      "question": "Which move best matches those goals?",
+      "board": true,
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "choices": [
+        {
+          "label": "a4, pushing an edge pawn",
+          "value": "a4"
+        },
+        {
+          "label": "e4, claiming the center",
+          "value": "e4"
+        },
+        {
+          "label": "Qh5, bringing the queen out",
+          "value": "qh5"
+        },
+        {
+          "label": "Na3, putting a knight on the rim",
+          "value": "na3"
+        }
+      ],
+      "correctChoice": "e4",
+      "successText": "e4 fights for the center and frees the light-squared bishop.",
+      "errorText": "Start with the center, not the edge and not the queen."
+    },
+    {
+      "type": "move-task",
+      "title": "Play a principled first move",
+      "body": "Play one of these: e4, d4, c4, or Nf3.",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "allowedMoves": [
+        "e2e4",
+        "d2d4",
+        "c2c4",
+        "g1f3"
+      ],
+      "lockToAllowedMoves": true,
+      "highlightSquares": [
+        "e4",
+        "d4",
+        "c4",
+        "f3"
+      ],
+      "successText": "That move develops a piece or fights for the center.",
+      "errorText": "Try e2-e4, d2-d4, c2-c4, or the knight from g1 to f3."
+    },
+    {
+      "type": "board-demo",
+      "title": "After 1. e4",
+      "body": "The pawn on e4 controls d5 and f5. The bishop on f1 and the queen on d1 now have diagonals.",
+      "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+      "highlightSquares": [
+        "e4",
+        "d5",
+        "f5",
+        "f1",
+        "d1"
+      ]
+    },
+    {
+      "type": "explain",
+      "title": "Lesson recap",
+      "body": "Center, development, king safety. If a move does none of those, look for a better one."
+    }
+  ],
+  "timeMinutes": 6
 }

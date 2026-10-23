@@ -1,6 +1,8 @@
 # FreeMate iOS
 
-FreeMate is a free, beginner-focused chess learning platform designed to make high-quality chess education accessible to everyone. 
+FreeMate is a free, beginner-focused chess learning platform designed to make high-quality chess education accessible to everyone.
+
+The phone-and-desktop web app lives in `web/`. From that folder, run `python3 -m http.server 8765` and open http://127.0.0.1:8765. Learning does not require an account. 
 
 This repository houses the native iOS version of the platform, built to help new players improve their game through practical learning rather than paywalled courses.
 
