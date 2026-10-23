@@ -64,7 +64,7 @@ struct PracticeView: View {
         .scrollDismissesKeyboard(.immediately)
         .themeBackground()
         .navigationTitle("Practice")
-        .accountToolbar()
+        .settingsToolbar()
         .animation(DesignMotion.spring, value: board.history.count)
         .animation(DesignMotion.spring, value: board.feedback)
     }

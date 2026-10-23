@@ -65,7 +65,7 @@ struct OpeningBrowserView: View {
         .themeBackground()
         .navigationTitle("Openings")
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search openings or ECO codes")
-        .accountToolbar()
+        .settingsToolbar()
         .animation(DesignMotion.spring, value: side)
         .animation(DesignMotion.spring, value: difficulty)
         .onAppear(perform: reloadTutorialProgress)

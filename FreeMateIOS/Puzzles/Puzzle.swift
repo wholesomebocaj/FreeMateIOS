@@ -134,6 +134,8 @@ nonisolated enum PuzzleLibrary {
 
 /// Which puzzles the learner has solved, saved on the device.
 nonisolated struct PuzzleProgressStore {
+    static let storageKey = "freemate.puzzles.v1"
+
     struct Record: Codable, Equatable {
         /// Solved without a wrong move or the answer being shown.
         var firstTry: Bool
@@ -142,7 +144,7 @@ nonisolated struct PuzzleProgressStore {
     private let defaults: UserDefaults
     private let key: String
 
-    init(defaults: UserDefaults = .standard, key: String = "freemate.puzzles.v1") {
+    init(defaults: UserDefaults = .standard, key: String = storageKey) {
         self.defaults = defaults
         self.key = key
     }

@@ -16,9 +16,11 @@ final class PuzzleTrainer: ObservableObject {
 
     let board = PracticeBoard()
     private let store: PuzzleProgressStore
+    private let activity: ActivityStore
 
-    init(set: PuzzleSet, store: PuzzleProgressStore = PuzzleProgressStore()) {
+    init(set: PuzzleSet, store: PuzzleProgressStore = PuzzleProgressStore(), activity: ActivityStore = ActivityStore()) {
         self.store = store
+        self.activity = activity
         let solved = store.solved
         self.solved = solved
         // Pick up at the first puzzle not solved yet.
@@ -53,6 +55,7 @@ final class PuzzleTrainer: ObservableObject {
             let key = session.puzzleSet.key(for: puzzle)
             store.markSolved(key, firstTry: session.isFirstTry)
             solved.insert(key)
+            activity.record()
         case .wrong:
             rejectedSquare = String(uci.prefix(2))
             rejectionCount += 1

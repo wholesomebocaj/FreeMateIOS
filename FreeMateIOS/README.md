@@ -10,7 +10,7 @@ This repository houses the native iOS version of the platform, built to help new
 
 * **Engine Core:** Native Swift implementation porting modular game loops and state evaluation logic.
 * **User Interface:** Rebuilt completely using modern Apple SwiftUI rendering patterns.
-* **Data Layer:** Local storage for tracking puzzle completion rates, lesson checkpoints, and rating progression.
+* **Data Layer:** Typed, Codable progress saved on the device and synced through the learner's own iCloud. There are no accounts.
 
 ## Roadmap & Features
 
@@ -97,6 +97,27 @@ To add an opening, edit `opening-tutorials.json`, then check it and fill ECO cod
 ```bash
 pip install chess
 python3 tools/opening_tutorials.py --eco-dir /path/to/eco-json
+```
+
+## Progress, sync, and the widget
+
+Code in `FreeMateIOS/Progress/`:
+
+* `LearnerProgress.swift`: lessons, lesson steps, opening lines, and the review queue as one Codable value, saved under `freemate.progress.v2`. Reviews use spaced repetition: an item comes back after 1, 3, 7, and 14 days, and a miss sends it back to the start, due at once. Practicing before an item is due does not move it up.
+* `LegacyProgressMigration.swift`: on first launch, reads the old loose keys, then deletes them. That includes the old local accounts and their password hashes.
+* `ActivityStore.swift`: the days the learner practiced anything, for the streak.
+* `SyncMerge.swift` and `CloudSync.swift`: iCloud sync through the key-value store. Each store is merged without losing work on either device: completions are unions, steps keep the furthest point, and reviews keep the newer copy. Games against the computer are counted per device and added up.
+
+Home shows a progress dashboard: the streak, reviews due, lessons, mastered openings, puzzles, and the record against the computer.
+
+The Home Screen widget is in `FreeMateWidget/`. It shows the next lesson, reviews due today, and the streak. It reads a `WidgetSnapshot` (in `Shared/`) that the app writes to the App Group `group.com.jacobbakerpersonalteam.FreeMateIOS`. Tapping it opens `freemate://lesson/<id>` or `freemate://review`.
+
+Both targets need their capabilities on the Apple Developer account: App Groups for the app and the widget, and iCloud (key-value storage) for the app. The entitlements are in `Config/`. Simulator builds without signing still run, but they do not sync, and the widget shows its placeholder.
+
+The app icon is drawn from the app's own vector knight. To redraw it:
+
+```bash
+tools/render_app_icon.sh
 ```
 
 ## Tests

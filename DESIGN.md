@@ -54,7 +54,7 @@ All text uses San Francisco through Dynamic Type styles, so it scales with the u
 
 | Need | Use |
 | --- | --- |
-| A screen | `FreeMateScreen(title:largeTitle:)` gives the themed background, navigation title, and account button. Custom roots add `.themeBackground()` and `.accountToolbar()`. |
+| A screen | `FreeMateScreen(title:largeTitle:)` gives the themed background, navigation title, and settings button. Custom roots add `.themeBackground()` and `.settingsToolbar()`. |
 | A card | `.cardStyle()` |
 | Main and secondary actions | `.primaryButtonStyle()` and `.secondaryButtonStyle()`. Use `.controlSize(.large)` for full-width actions. |
 | A pair of actions | `ActionButtons`, which sits side by side when there is room and stacks full width when there is not |
@@ -74,4 +74,4 @@ All text uses San Francisco through Dynamic Type styles, so it scales with the u
 
 ## Appearance
 
-The app currently runs in dark mode (`.preferredColorScheme(.dark)` in `FreeMateIOSApp`). Every token adapts, so removing that line gives a matching light mode.
+The app follows the system's light or dark mode. Settings has an Appearance choice (System, Light, or Dark), stored as `freemate.appearance` and applied in `FreeMateIOSApp`. Every token adapts, so check new screens in both modes.
