@@ -12,16 +12,16 @@ struct ComputerGameReviewView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: Theme.Spacing.m) {
                     summary
                     ModernBoardView(board: review.board, isInteractive: false)
                         .frame(maxWidth: 560)
-                    moveCard
-                    stepper
+                        .frame(maxWidth: .infinity)
+                    moveDetail
                     moveList
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 32)
+                .padding(.horizontal, Theme.Spacing.l)
+                .padding(.bottom, Theme.Spacing.xl)
                 .frame(maxWidth: 640)
                 .frame(maxWidth: .infinity)
             }
@@ -31,6 +31,16 @@ struct ComputerGameReviewView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
+                }
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Button { review.step(-1) } label: { Label("Previous Move", systemImage: "chevron.backward") }
+                        .disabled(review.selectedPly == nil)
+                    Spacer()
+                    Button { review.selectNextMistake() } label: { Label("Next Mistake", systemImage: "exclamationmark.triangle") }
+                        .disabled(review.count(.mistake) + review.count(.blunder) == 0)
+                    Spacer()
+                    Button { review.step(1) } label: { Label("Next Move", systemImage: "chevron.forward") }
+                        .disabled(review.selectedPly == review.moves.count - 1)
                 }
             }
             .animation(DesignMotion.spring, value: review.reviewed.count)
@@ -44,94 +54,89 @@ struct ComputerGameReviewView: View {
     @ViewBuilder
     private var summary: some View {
         if review.isFinished {
-            HStack(spacing: Theme.Spacing.xs) {
+            HStack(spacing: 0) {
                 ForEach([ReviewedMove.Quality.best, .good, .mistake, .blunder], id: \.self) { quality in
-                    StatusBadge(
-                        text: "\(review.count(quality)) \(quality.label)",
-                        systemImage: Self.symbol(quality),
-                        tint: Self.tint(quality)
-                    )
+                    VStack(spacing: 2) {
+                        Text("\(review.count(quality))")
+                            .font(.title3.weight(.bold).monospacedDigit())
+                            .foregroundStyle(review.count(quality) > 0 ? Self.tint(quality) : .secondary)
+                        Text(quality.label)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .accessibilityElement(children: .combine)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, Theme.Spacing.s)
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
         } else {
             VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-                Text("Reviewing your moves").eyebrowStyle()
+                Text("Reviewing your moves…")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
                 ProgressView(value: review.progress)
                     .tint(Theme.accent)
             }
         }
     }
 
-    private var moveCard: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+    private var moveDetail: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             if let ply = review.selectedPly {
-                HStack {
+                HStack(alignment: .firstTextBaseline) {
                     Text(numbered(ply))
                         .font(.title3.weight(.bold).monospaced())
                     Spacer()
                     if let graded = review.reviewed[ply] {
-                        StatusBadge(text: graded.quality.label, systemImage: Self.symbol(graded.quality), tint: Self.tint(graded.quality))
-                    } else if isLearners(ply) {
-                        ProgressView().controlSize(.small)
+                        Label(graded.quality.label, systemImage: Self.symbol(graded.quality))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Self.tint(graded.quality))
+                    } else if !isLearners(ply) {
+                        Text("Computer")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     } else {
-                        StatusBadge(text: "Computer", systemImage: "desktopcomputer", tint: .secondary)
+                        ProgressView().controlSize(.small)
                     }
                 }
                 if let graded = review.reviewed[ply], let explanation = graded.explanation {
                     Text(explanation)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                     Button {
                         review.toggleBetterMove()
                     } label: {
-                        Label(
-                            review.showsBetterMove ? "Show your move" : "Show \(graded.betterSAN ?? "better move")",
-                            systemImage: review.showsBetterMove ? "arrow.uturn.backward" : "lightbulb"
-                        )
-                        .font(.subheadline.weight(.semibold))
+                        Text(review.showsBetterMove ? "Show Your Move" : "Show \(graded.betterSAN ?? "Better Move")")
+                            .font(.subheadline.weight(.semibold))
                     }
-                    .secondaryButtonStyle(tint: Theme.warning)
-                } else if let graded = review.reviewed[ply] {
-                    Text(graded.quality == .best ? "The best move here." : "A solid move.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
+                    .tint(Theme.warning)
+                    .padding(.top, 2)
                 }
             } else {
                 Text("Starting position")
                     .font(.title3.weight(.bold))
-                Text("Step through the game to see how each of your moves did.")
+                Text("Step through the game to see how each move did.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
         }
-        .cardStyle()
-    }
-
-    private var stepper: some View {
-        HStack(spacing: 10) {
-            PracticeControlButton(title: "Back", systemImage: "chevron.left") { review.step(-1) }
-                .disabled(review.selectedPly == nil)
-            PracticeControlButton(title: "Next", systemImage: "chevron.right") { review.step(1) }
-                .disabled(review.selectedPly == review.moves.count - 1)
-            PracticeControlButton(title: "Errors", systemImage: "exclamationmark.triangle") { review.selectNextMistake() }
-                .accessibilityLabel("Next mistake")
-                .disabled(review.count(.mistake) + review.count(.blunder) == 0)
-        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var moveList: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Your moves")
-                .font(.headline)
-                .padding(.bottom, 6)
-            ForEach(review.learnerPlies, id: \.self) { ply in
+        VStack(spacing: 0) {
+            ForEach(Array(review.learnerPlies.enumerated()), id: \.element) { index, ply in
                 Button {
                     review.select(ply)
                 } label: {
                     HStack {
                         Text(numbered(ply))
-                            .font(.subheadline.monospaced())
+                            .font(.body.monospaced())
+                            .foregroundStyle(.primary)
                         Spacer()
                         if let graded = review.reviewed[ply] {
                             Image(systemName: Self.symbol(graded.quality))
@@ -141,18 +146,19 @@ struct ComputerGameReviewView: View {
                             ProgressView().controlSize(.mini)
                         }
                     }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .background(
-                        review.selectedPly == ply ? Theme.fill : .clear,
-                        in: RoundedRectangle(cornerRadius: Theme.Radius.small, style: .continuous)
-                    )
+                    .padding(.horizontal, Theme.Spacing.m)
+                    .padding(.vertical, 11)
+                    .background(review.selectedPly == ply ? Theme.fill : .clear)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                if index < review.learnerPlies.count - 1 {
+                    Divider().padding(.leading, Theme.Spacing.m)
+                }
             }
         }
-        .cardStyle()
+        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
     }
 
     private func isLearners(_ ply: Int) -> Bool {
@@ -160,14 +166,14 @@ struct ComputerGameReviewView: View {
     }
 
     private func numbered(_ ply: Int) -> String {
-        "\(ply / 2 + 1)\(ply % 2 == 0 ? "." : "...") \(review.sans[ply])"
+        "\(ply / 2 + 1)\(ply % 2 == 0 ? "." : "…") \(review.sans[ply])"
     }
 
     static func symbol(_ quality: ReviewedMove.Quality) -> String {
         switch quality {
         case .best: return "star.fill"
-        case .good: return "checkmark"
-        case .mistake: return "questionmark"
+        case .good: return "checkmark.circle.fill"
+        case .mistake: return "questionmark.circle.fill"
         case .blunder: return "exclamationmark.triangle.fill"
         }
     }
@@ -175,7 +181,7 @@ struct ComputerGameReviewView: View {
     static func tint(_ quality: ReviewedMove.Quality) -> Color {
         switch quality {
         case .best: return Theme.success
-        case .good: return .secondary
+        case .good: return Theme.accent
         case .mistake, .blunder: return Theme.warning
         }
     }

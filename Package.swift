@@ -35,8 +35,6 @@ let package = Package(
                 "Resources",
                 "DesignSystem/BoardThumbnail.swift",
                 "DesignSystem/ChessPieceShape.swift",
-                "DesignSystem/FilterChips.swift",
-                "DesignSystem/FreeMateScreen.swift",
                 "DesignSystem/Haptics.swift",
                 "DesignSystem/ModernBoardView.swift",
                 "DesignSystem/MotionEffects.swift",
