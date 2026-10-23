@@ -32,7 +32,7 @@ struct FilterChipLabel: View {
         .padding(.vertical, 8)
         .foregroundStyle(isActive ? Color.white : Color.primary)
         .background(
-            isActive ? AnyShapeStyle(DesignTokens.accent) : AnyShapeStyle(Color(.secondarySystemGroupedBackground)),
+            isActive ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Theme.surface),
             in: Capsule()
         )
         .contentShape(Capsule())
@@ -96,7 +96,7 @@ struct ClearFiltersChip: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .foregroundStyle(.secondary)
-            .background(Color(.tertiarySystemFill), in: Capsule())
+            .background(Theme.fill, in: Capsule())
         }
         .buttonStyle(PressableCardStyle())
         .accessibilityLabel("Clear filters")

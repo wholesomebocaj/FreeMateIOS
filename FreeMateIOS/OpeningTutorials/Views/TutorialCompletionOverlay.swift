@@ -61,7 +61,7 @@ struct TutorialCompletionOverlay: View {
             }
             .padding(28)
             .frame(maxWidth: 420)
-            .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 34, style: .continuous))
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 34, style: .continuous))
             .shadow(color: .black.opacity(0.35), radius: 40, y: 20)
             .padding(24)
             .scaleEffect(appeared ? 1 : 0.86)
@@ -84,14 +84,14 @@ private struct SuccessRing: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(DesignTokens.success.opacity(0.18), lineWidth: 8)
+                .stroke(Theme.success.opacity(0.18), lineWidth: 8)
             Circle()
                 .trim(from: 0, to: progress)
-                .stroke(DesignTokens.success.gradient, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                .stroke(Theme.success.gradient, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                 .rotationEffect(.degrees(-90))
             Image(systemName: "checkmark")
                 .font(.system(size: 42, weight: .bold))
-                .foregroundStyle(DesignTokens.success)
+                .foregroundStyle(Theme.success)
                 .symbolEffect(.bounce, value: didFinish)
         }
         .frame(width: 108, height: 108)
@@ -113,7 +113,7 @@ private struct StatTile: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
-        .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .background(Theme.surfaceRaised, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .accessibilityElement(children: .combine)
     }
 }
@@ -126,7 +126,7 @@ private struct ConfettiBurst: View {
     @State private var running = false
     private let duration: TimeInterval = 2.2
     private let colors: [Color] = [
-        DesignTokens.success, DesignTokens.accent, Color(.systemYellow), Color(.systemMint), Color(.systemOrange),
+        Theme.success, Theme.accent, Theme.highlight, Theme.topic("openings").color, Theme.warning,
     ]
 
     var body: some View {

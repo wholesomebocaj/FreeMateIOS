@@ -44,7 +44,7 @@ struct OpeningTutorialScreen: View {
             .frame(maxWidth: .infinity)
         }
         .scrollBounceBehavior(.basedOnSize)
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .themeBackground()
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if session.phase != .completed {
                 TutorialInstructionCard(
@@ -90,7 +90,6 @@ struct OpeningTutorialScreen: View {
                 }
             }
         }
-        .tint(DesignTokens.accent)
         .onChange(of: controller.rejectionCount) { Haptics.error() }
         .onChange(of: session.feedback) { _, feedback in
             switch feedback {

@@ -44,11 +44,10 @@ struct CourseLibraryView: View {
             .frame(maxWidth: .infinity)
         }
         .scrollDismissesKeyboard(.immediately)
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .themeBackground()
         .navigationTitle("Lessons")
         .searchable(text: $game.library.query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search courses and topics")
         .accountToolbar()
-        .tint(DesignTokens.accent)
         .animation(DesignMotion.spring, value: game.library)
     }
 
@@ -179,7 +178,7 @@ struct ContinueLearningCard: View {
 
     var body: some View {
         HStack(spacing: 18) {
-            ProgressRing(fraction: Double(percent) / 100, tint: DesignTokens.success)
+            ProgressRing(fraction: Double(percent) / 100, tint: Theme.success)
                 .frame(width: 64, height: 64)
                 .overlay {
                     Text("\(percent)%")
@@ -201,7 +200,7 @@ struct ContinueLearningCard: View {
             Spacer(minLength: 0)
         }
         .padding(18)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
+        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
         .accessibilityElement(children: .contain)
     }
 }
@@ -227,7 +226,7 @@ struct LibraryCourseCard: View {
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                 HStack(spacing: 10) {
-                    CapsuleProgressBar(fraction: Double(meta.progress) / 100, tint: meta.status == "completed" ? DesignTokens.success : DesignTokens.accent)
+                    CapsuleProgressBar(fraction: Double(meta.progress) / 100, tint: meta.status == "completed" ? Theme.success : Theme.accent)
                     Text(meta.status == "not-started" ? "New" : "\(meta.progress)%")
                         .font(.caption.weight(.semibold).monospacedDigit())
                         .foregroundStyle(.secondary)
@@ -241,34 +240,20 @@ struct LibraryCourseCard: View {
                 .padding(.top, 4)
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
+        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityValue(meta.statusLabel)
     }
 }
 
-/// A rounded tile with a symbol for the course topic.
+/// A rounded tile with the symbol and color of the course topic.
 struct TopicTile: View {
     let topic: String
 
-    private var style: (symbol: String, tint: Color) {
-        switch topic.lowercased() {
-        case "openings": return ("arrow.triangle.branch", Color(.systemIndigo))
-        case "tactics": return ("bolt.fill", Color(.systemOrange))
-        case "endgame": return ("flag.checkered", Color(.systemGreen))
-        case "strategy": return ("brain.head.profile", Color(.systemPurple))
-        default: return ("square.grid.3x3.fill", Color(.systemBlue))
-        }
-    }
-
     var body: some View {
-        Image(systemName: style.symbol)
-            .font(.title3.weight(.semibold))
-            .foregroundStyle(.white)
-            .frame(width: 52, height: 52)
-            .background(style.tint.gradient, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .accessibilityHidden(true)
+        let style = Theme.topic(topic)
+        IconTile(systemImage: style.symbol, color: style.color)
     }
 }
 
@@ -291,7 +276,7 @@ struct BracketCard: View {
                 .multilineTextAlignment(.leading)
                 .frame(maxHeight: .infinity, alignment: .top)
             HStack(spacing: 8) {
-                CapsuleProgressBar(fraction: Double(progress) / 100, tint: progress >= 100 ? DesignTokens.success : DesignTokens.accent)
+                CapsuleProgressBar(fraction: Double(progress) / 100, tint: progress >= 100 ? Theme.success : Theme.accent)
                 Text("\(progress)%")
                     .font(.caption.weight(.semibold).monospacedDigit())
                     .foregroundStyle(.secondary)
@@ -299,8 +284,8 @@ struct BracketCard: View {
         }
         .padding(16)
         .frame(width: 250, height: 190, alignment: .topLeading)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
+        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
         .accessibilityElement(children: .combine)
     }
 }
@@ -314,7 +299,7 @@ struct ProgressRing: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(Color(.tertiarySystemFill), lineWidth: lineWidth)
+                .stroke(Theme.fill, lineWidth: lineWidth)
             Circle()
                 .trim(from: 0, to: min(max(fraction, 0), 1))
                 .stroke(tint.gradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))

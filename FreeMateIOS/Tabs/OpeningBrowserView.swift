@@ -62,11 +62,10 @@ struct OpeningBrowserView: View {
             .frame(maxWidth: .infinity)
         }
         .scrollDismissesKeyboard(.immediately)
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .themeBackground()
         .navigationTitle("Openings")
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search openings or ECO codes")
         .accountToolbar()
-        .tint(DesignTokens.accent)
         .animation(DesignMotion.spring, value: side)
         .animation(DesignMotion.spring, value: difficulty)
         .onAppear(perform: reloadTutorialProgress)
@@ -194,7 +193,7 @@ struct OpeningCourseCard: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
+        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
         .accessibilityElement(children: .contain)
     }
 }

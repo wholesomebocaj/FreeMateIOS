@@ -19,6 +19,10 @@ This repository houses the native iOS version of the platform, built to help new
 * **Curated Puzzles:** Zero-paywall puzzles dynamically adapted to user progression.
 * **Progress Dashboard:** Local metrics mapping strengths, weaknesses, and historical growth.
 
+## Design system
+
+Colors, type, spacing, and shared components are defined in `FreeMateIOS/DesignSystem/Theme.swift`. The rules are in [`DESIGN.md`](../DESIGN.md). Every screen uses those tokens instead of literal colors.
+
 ## Opening Tutorials
 
 The guided tutorials sit at the top of the Openings tab, each with a board preview and its status (Not Started, In Progress, or Mastered). Each tutorial has two steps:

@@ -9,7 +9,14 @@ struct FreeMateIOSApp: App {
             ContentView()
                 .environmentObject(game)
                 .preferredColorScheme(.dark)
-                .tint(FreeMateTheme.accent)
+                .tint(Theme.accent)
+                .onAppear(perform: applyLaunchRoute)
         }
+    }
+
+    private func applyLaunchRoute() {
+        #if DEBUG
+        DebugLaunchRoute.apply(to: game)
+        #endif
     }
 }

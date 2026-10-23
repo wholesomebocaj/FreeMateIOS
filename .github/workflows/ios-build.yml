@@ -84,5 +84,26 @@ jobs:
             -derivedDataPath DerivedData \
             CODE_SIGNING_ALLOWED=NO
 
+      # Debug builds open a screen from `-FreeMateScreen`, so each one can be captured.
+      - name: Capture screenshots
+        run: |
+          APP=$(find DerivedData/Build/Products -maxdepth 2 -name FreeMateIOS.app -path "*iphonesimulator*" | head -1)
+          BUNDLE_ID=com.jacobbakerpersonalteam.FreeMateIOS
+          xcrun simctl install "$UDID" "$APP"
+          xcrun simctl status_bar "$UDID" override --time 9:41 --batteryState charged --batteryLevel 100 || true
+          mkdir -p screenshots
+          for screen in home lessons openings practice review course:beginner-fundamentals lesson:piece-movement trainer:italian-game tutorial:ruy-lopez; do
+            xcrun simctl terminate "$UDID" "$BUNDLE_ID" 2>/dev/null || true
+            xcrun simctl launch "$UDID" "$BUNDLE_ID" -FreeMateScreen "$screen"
+            sleep 6
+            xcrun simctl io "$UDID" screenshot "screenshots/$(echo "$screen" | tr ':' '-').png"
+          done
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots
+
       - name: Swift package tests
         run: swift test
