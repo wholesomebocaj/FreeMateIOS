@@ -13,6 +13,9 @@ let appSettings: [SwiftSetting] = [
 
 let package = Package(
     name: "FreeMateIOS",
+    // Without this, SwiftPM assumes an old macOS minimum, and toolchains that mark the
+    // ISO 8601 date-format APIs as macOS 12+ reject the progress code.
+    platforms: [.iOS(.v17), .macOS(.v14)],
     targets: [
         .target(
             name: "FreeMateIOS",
