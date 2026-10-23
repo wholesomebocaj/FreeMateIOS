@@ -43,6 +43,7 @@ final class GameState: ObservableObject {
     @Published private(set) var courses: [Course] = []
     @Published private(set) var brackets: [SkillBracket] = []
     @Published private(set) var openings: [OpeningCourse] = []
+    @Published private(set) var openingTutorials: [OpeningTutorial] = []
     @Published private(set) var completedLessons: Set<String> = []
     @Published private(set) var savedSteps: [String: Int] = [:]
     @Published private(set) var reviewItems: [String: ReviewItem] = [:]
@@ -67,6 +68,11 @@ final class GameState: ObservableObject {
         courses = loaded.courses
         brackets = loaded.brackets
         openings = loaded.openings
+        do {
+            openingTutorials = try OpeningTutorialLibrary.loadBundled()
+        } catch {
+            print("Opening tutorials unavailable: \(error.localizedDescription)")
+        }
         loadLocal()
         if currentUser != nil {
             hydrateFromProgressRows()
@@ -80,6 +86,7 @@ final class GameState: ObservableObject {
     func lesson(id: String) -> Lesson? { allLessons.first { $0.id == id } }
     func course(id: String) -> Course? { courses.first { $0.id == id } ?? courses.first }
     func opening(id: String) -> OpeningCourse? { openings.first { $0.id == id } }
+    func openingTutorial(id: String) -> OpeningTutorial? { openingTutorials.first { $0.id == id } }
     func bracket(id: String) -> SkillBracket? { brackets.first { $0.id == id || $0.slug == id } }
 
     func isUnlocked(_ lesson: Lesson) -> Bool {
@@ -453,6 +460,11 @@ final class GameState: ObservableObject {
     func openTrainer(id: String, line: String?) {
         selectedTab = .openings
         openingPath.append(.train(id: id, line: line))
+    }
+
+    func openTutorial(_ id: String) {
+        selectedTab = .openings
+        openingPath.append(.tutorial(id))
     }
 
     private func reviewKey(_ seed: ReviewSeed) -> String {
@@ -834,4 +846,5 @@ enum LessonRoute: Hashable {
 enum OpeningRoute: Hashable {
     case overview(String)
     case train(id: String, line: String?)
+    case tutorial(String)
 }

@@ -1,0 +1,717 @@
+{
+  "version": 1,
+  "source": "Lines checked against eco.json (lichess chess-openings and SCID data, MIT licence).",
+  "openings": [
+    {
+      "id": "ruy-lopez",
+      "name": "Ruy Lopez",
+      "userSide": "white",
+      "summary": "Develop quickly, pressure the knight that defends e5, castle, and build the center with c3 and d4.",
+      "ideas": [
+        "Bb5 attacks the knight that guards e5.",
+        "Castle early so the rook can support e4 from e1.",
+        "c3 prepares d4, and h3 keeps Black's bishop off g4."
+      ],
+      "mainLine": [
+        {
+          "san": "e4",
+          "title": "Claim the center",
+          "explanation": "The pawn controls d5 and f5 and opens lines for the queen and the light-squared bishop."
+        },
+        {
+          "san": "e5",
+          "title": "Black matches you",
+          "explanation": "Black claims the same amount of central space."
+        },
+        {
+          "san": "Nf3",
+          "title": "Develop with a threat",
+          "explanation": "The knight develops toward the center and attacks the pawn on e5.",
+          "hint": "Your g1 knight can attack e5 from f3."
+        },
+        {
+          "san": "Nc6",
+          "title": "Black defends e5",
+          "explanation": "The knight defends e5 while developing."
+        },
+        {
+          "san": "Bb5",
+          "title": "The Ruy Lopez",
+          "explanation": "The bishop puts pressure on the knight that defends e5. This is the move that defines the Ruy Lopez.",
+          "hint": "Put your light-squared bishop where it attacks the c6 knight."
+        },
+        {
+          "san": "a6",
+          "title": "Morphy Defense",
+          "explanation": "Black asks the bishop where it wants to go. This is the most popular reply."
+        },
+        {
+          "san": "Ba4",
+          "title": "Keep the pin",
+          "explanation": "Retreating to a4 keeps pressure on c6. Taking on c6 is fine too, but the main line keeps the bishop.",
+          "hint": "Keep the bishop on the same diagonal by stepping back one square."
+        },
+        {
+          "san": "Nf6",
+          "title": "Black hits e4",
+          "explanation": "The knight develops and attacks your e4 pawn."
+        },
+        {
+          "san": "O-O",
+          "title": "Castle first",
+          "explanation": "Castling tucks your king away. If Black grabs e4, the rook can come to e1 and win the pawn back.",
+          "hint": "Get your king safe. Your kingside is clear."
+        },
+        {
+          "san": "Be7",
+          "title": "Black prepares to castle",
+          "explanation": "A calm developing move. The bishop makes room for Black to castle."
+        },
+        {
+          "san": "Re1",
+          "title": "Defend e4 with the rook",
+          "explanation": "The rook protects e4, so you are now really threatening to win e5 with Bxc6 and Nxe5.",
+          "hint": "Your f1 rook can defend e4 from the e-file."
+        },
+        {
+          "san": "b5",
+          "title": "Black kicks the bishop",
+          "explanation": "Black gains space on the queenside and forces the bishop to move again."
+        },
+        {
+          "san": "Bb3",
+          "title": "Aim at f7",
+          "explanation": "On b3 the bishop is safe and points at f7, Black's weakest square.",
+          "hint": "Move the bishop back to a safe square on the same diagonal as f7."
+        },
+        {
+          "san": "d6",
+          "title": "Black supports e5",
+          "explanation": "The pawn protects e5 and opens the c8 bishop."
+        },
+        {
+          "san": "c3",
+          "title": "Prepare d4",
+          "explanation": "c3 supports a later d4 and gives the bishop a retreat square on c2.",
+          "hint": "Play a quiet pawn move that prepares d4."
+        },
+        {
+          "san": "O-O",
+          "title": "Black castles",
+          "explanation": "Both kings are safe. The middlegame is about to begin."
+        },
+        {
+          "san": "h3",
+          "title": "Stop ...Bg4",
+          "explanation": "h3 keeps Black's bishop off g4, where it would pin your knight. Now d4 comes next. This is the Closed Ruy Lopez.",
+          "hint": "Take g4 away from Black's light-squared bishop with a pawn move."
+        }
+      ],
+      "variations": [
+        {
+          "id": "berlin",
+          "name": "Berlin Defense",
+          "branchPly": 5,
+          "summary": "Black ignores a6 and hits e4 straight away.",
+          "moves": [
+            {
+              "san": "Nf6",
+              "title": "What if 3...Nf6?",
+              "explanation": "The Berlin. Black develops and attacks e4 at once."
+            },
+            {
+              "san": "O-O",
+              "title": "Castle anyway",
+              "explanation": "You do not need to defend e4 yet. If Black takes it, you win time against the knight.",
+              "hint": "Calmly finish king safety. e4 can wait."
+            },
+            {
+              "san": "Nxe4",
+              "title": "Black takes the pawn",
+              "explanation": "Black grabs e4, but the king is still in the center."
+            },
+            {
+              "san": "d4",
+              "title": "Open the center",
+              "explanation": "d4 attacks e5 and opens lines toward Black's uncastled king.",
+              "hint": "Strike the center with your d-pawn."
+            },
+            {
+              "san": "Nd6",
+              "title": "The knight attacks the bishop",
+              "explanation": "The knight retreats and hits your bishop on b5."
+            },
+            {
+              "san": "Bxc6",
+              "title": "Trade on c6",
+              "explanation": "Capture the knight before Black chases the bishop away.",
+              "hint": "Take the knight that blocks Black's queenside."
+            },
+            {
+              "san": "dxc6",
+              "title": "Black recaptures",
+              "explanation": "Black takes back toward the center and opens the d-file."
+            },
+            {
+              "san": "dxe5",
+              "title": "Win space",
+              "explanation": "Capture on e5 and push the d6 knight away.",
+              "hint": "Capture the e5 pawn with a pawn."
+            },
+            {
+              "san": "Nf5",
+              "title": "Knight to f5",
+              "explanation": "The knight finds a safe square. The queens are facing each other on the d-file."
+            },
+            {
+              "san": "Qxd8+",
+              "title": "The Berlin endgame",
+              "explanation": "Trade queens with check. Black can no longer castle. This is the famous Berlin endgame.",
+              "hint": "The queens face each other on the d-file. Take with check."
+            }
+          ],
+          "eco": "C65",
+          "ecoName": "Ruy Lopez: Berlin Defense"
+        },
+        {
+          "id": "classical",
+          "name": "Classical Variation",
+          "branchPly": 5,
+          "summary": "Black develops the bishop to c5 and eyes f2.",
+          "moves": [
+            {
+              "san": "Bc5",
+              "title": "What if 3...Bc5?",
+              "explanation": "The Classical Defense. The bishop points at f2."
+            },
+            {
+              "san": "c3",
+              "title": "Prepare d4",
+              "explanation": "c3 gets ready to hit the c5 bishop with d4 and gain time.",
+              "hint": "Prepare a central pawn break that will attack the c5 bishop."
+            },
+            {
+              "san": "Nf6",
+              "title": "Black develops",
+              "explanation": "Black brings out the knight and gets ready to castle."
+            },
+            {
+              "san": "O-O",
+              "title": "Castle",
+              "explanation": "King safety first. Your rook may support e4 later.",
+              "hint": "Tuck your king away before opening the center."
+            },
+            {
+              "san": "O-O",
+              "title": "Black castles too",
+              "explanation": "Both kings are safe."
+            },
+            {
+              "san": "d4",
+              "title": "Strike the center",
+              "explanation": "d4 attacks the bishop and the e5 pawn. That was the point of c3.",
+              "hint": "Now play the move c3 prepared."
+            }
+          ],
+          "eco": "C64",
+          "ecoName": "Ruy Lopez: Classical Variation"
+        },
+        {
+          "id": "schliemann",
+          "name": "Schliemann Defense",
+          "branchPly": 5,
+          "summary": "Black counterattacks with an early f5.",
+          "moves": [
+            {
+              "san": "f5",
+              "title": "What if 3...f5?",
+              "explanation": "The Schliemann. A sharp gambit that attacks e4 and opens the f-file."
+            },
+            {
+              "san": "Nc3",
+              "title": "Defend and develop",
+              "explanation": "The knight protects e4 and develops. It is the most solid reply.",
+              "hint": "Develop a piece that also defends e4."
+            },
+            {
+              "san": "fxe4",
+              "title": "Black takes",
+              "explanation": "Black captures on e4 and the knight is attacked."
+            },
+            {
+              "san": "Nxe4",
+              "title": "Recapture",
+              "explanation": "Take back with the knight. It stands well in the center.",
+              "hint": "Win the pawn back with the piece that defended it."
+            },
+            {
+              "san": "d5",
+              "title": "Black hits the knight",
+              "explanation": "Black attacks the e4 knight, but leaves e5 weak."
+            },
+            {
+              "san": "Nxe5",
+              "title": "Counterattack",
+              "explanation": "Ignore the threat and take e5. Your knight hits c6, and Black's pieces are loose.",
+              "hint": "Your f3 knight can capture a central pawn."
+            }
+          ],
+          "eco": "C63",
+          "ecoName": "Ruy Lopez: Schliemann Defense"
+        },
+        {
+          "id": "modern-steinitz",
+          "name": "Modern Steinitz Defense",
+          "branchPly": 7,
+          "summary": "After 3...a6 4.Ba4, Black plays a solid d6 instead of Nf6.",
+          "moves": [
+            {
+              "san": "d6",
+              "title": "What if 4...d6?",
+              "explanation": "The Modern Steinitz. Black supports e5 and keeps the position closed."
+            },
+            {
+              "san": "c3",
+              "title": "Build the center",
+              "explanation": "c3 prepares d4 and keeps a retreat for the bishop.",
+              "hint": "Prepare d4 with a quiet pawn move."
+            },
+            {
+              "san": "Bd7",
+              "title": "Black unpins",
+              "explanation": "The bishop guards c6 so the knight is no longer pinned."
+            },
+            {
+              "san": "d4",
+              "title": "Take the center",
+              "explanation": "With c3 played, d4 builds a big pawn center.",
+              "hint": "Now push the pawn that c3 supports."
+            }
+          ],
+          "eco": "C71",
+          "ecoName": "Ruy Lopez: Morphy Defense, Modern Steinitz Defense"
+        },
+        {
+          "id": "open",
+          "name": "Open Variation",
+          "branchPly": 9,
+          "summary": "After 5.O-O, Black grabs the e4 pawn.",
+          "moves": [
+            {
+              "san": "Nxe4",
+              "title": "What if 5...Nxe4?",
+              "explanation": "The Open Variation. Black wins a pawn but opens the position while the king is still in the center."
+            },
+            {
+              "san": "d4",
+              "title": "Hit the center",
+              "explanation": "d4 opens lines and gets ready to win the pawn back.",
+              "hint": "Break with the d-pawn, just as in the Berlin."
+            },
+            {
+              "san": "b5",
+              "title": "Black kicks the bishop",
+              "explanation": "Black gains time on the a4 bishop."
+            },
+            {
+              "san": "Bb3",
+              "title": "Bishop to b3",
+              "explanation": "The bishop stays active, pointing at d5 and f7.",
+              "hint": "Retreat the bishop to the diagonal that aims at f7."
+            },
+            {
+              "san": "d5",
+              "title": "Black supports the knight",
+              "explanation": "d5 holds the knight on e4."
+            },
+            {
+              "san": "dxe5",
+              "title": "Win the pawn back",
+              "explanation": "Material is equal again, and your e5 pawn gains space.",
+              "hint": "Capture on e5 with a pawn."
+            },
+            {
+              "san": "Be6",
+              "title": "Black protects d5",
+              "explanation": "The bishop defends d5."
+            },
+            {
+              "san": "c3",
+              "title": "A home for the bishop",
+              "explanation": "c3 gives the b3 bishop a safe square on c2 and supports later play.",
+              "hint": "Make a quiet pawn move that gives your bishop a retreat."
+            }
+          ],
+          "eco": "C82",
+          "ecoName": "Ruy Lopez: Open"
+        },
+        {
+          "id": "marshall",
+          "name": "Marshall Attack",
+          "branchPly": 13,
+          "summary": "Black castles early and sacrifices a pawn with ...d5.",
+          "moves": [
+            {
+              "san": "O-O",
+              "title": "What if 7...O-O?",
+              "explanation": "Black castles before d6. Watch out for the Marshall Attack."
+            },
+            {
+              "san": "c3",
+              "title": "Prepare d4",
+              "explanation": "The same plan as the main line: c3 first.",
+              "hint": "Play the same quiet pawn move as in the main line."
+            },
+            {
+              "san": "d5",
+              "title": "The Marshall gambit",
+              "explanation": "Black gives up a pawn to open lines toward your king."
+            },
+            {
+              "san": "exd5",
+              "title": "Accept the pawn",
+              "explanation": "Take the pawn. Defending is part of learning this line.",
+              "hint": "Capture the d5 pawn."
+            },
+            {
+              "san": "Nxd5",
+              "title": "Black recaptures",
+              "explanation": "The knight jumps to d5 and e5 is left without a pawn defender."
+            },
+            {
+              "san": "Nxe5",
+              "title": "Win a pawn",
+              "explanation": "Take e5. You are a pawn up, but Black gets active pieces.",
+              "hint": "Your f3 knight can capture a central pawn."
+            },
+            {
+              "san": "Nxe5",
+              "title": "Black trades knights",
+              "explanation": "Black removes your active knight."
+            },
+            {
+              "san": "Rxe5",
+              "title": "The rook recaptures",
+              "explanation": "The rook takes back on e5.",
+              "hint": "Recapture with the piece on the e-file."
+            },
+            {
+              "san": "c6",
+              "title": "Black supports d5",
+              "explanation": "Black protects the knight and prepares Bd6 to attack your rook."
+            },
+            {
+              "san": "d4",
+              "title": "Develop the queenside",
+              "explanation": "d4 opens the c1 bishop and controls e5. Bring pieces out before Black's attack arrives.",
+              "hint": "Push the d-pawn to free your dark-squared bishop."
+            }
+          ],
+          "eco": "C89",
+          "ecoName": "Ruy Lopez: Marshall Attack"
+        }
+      ],
+      "eco": "C92",
+      "ecoName": "Ruy Lopez: Closed"
+    },
+    {
+      "id": "caro-kann",
+      "name": "Caro-Kann Defense",
+      "userSide": "black",
+      "summary": "Prepare d5 with c6, keep your structure solid, and develop the light-squared bishop before e6.",
+      "ideas": [
+        "c6 supports d5 without blocking your light-squared bishop.",
+        "Get the bishop out to f5 or g4 before you play e6.",
+        "Against h-pawn pushes, answer calmly with h6 and keep the bishop safe."
+      ],
+      "mainLine": [
+        {
+          "san": "e4",
+          "title": "White claims the center",
+          "explanation": "White takes central space."
+        },
+        {
+          "san": "c6",
+          "title": "The Caro-Kann",
+          "explanation": "c6 prepares d5 and keeps the c8 bishop free.",
+          "hint": "Push the c-pawn one square to support d5 next."
+        },
+        {
+          "san": "d4",
+          "title": "White builds the center",
+          "explanation": "White adds a second central pawn."
+        },
+        {
+          "san": "d5",
+          "title": "Challenge e4",
+          "explanation": "d5 attacks the e4 pawn. c6 means you can recapture with a pawn.",
+          "hint": "Strike at e4 with your d-pawn."
+        },
+        {
+          "san": "Nc3",
+          "title": "White defends e4",
+          "explanation": "The knight develops and protects e4."
+        },
+        {
+          "san": "dxe4",
+          "title": "Take on e4",
+          "explanation": "Capture the pawn. The knight will recapture.",
+          "hint": "Capture the e4 pawn."
+        },
+        {
+          "san": "Nxe4",
+          "title": "White recaptures",
+          "explanation": "The knight sits in the center."
+        },
+        {
+          "san": "Bf5",
+          "title": "The Classical move",
+          "explanation": "Develop the bishop with tempo on the knight before you play e6.",
+          "hint": "Bring out the light-squared bishop and attack the e4 knight."
+        },
+        {
+          "san": "Ng3",
+          "title": "White attacks the bishop",
+          "explanation": "The knight retreats and hits f5."
+        },
+        {
+          "san": "Bg6",
+          "title": "Keep the bishop",
+          "explanation": "The bishop stays on its good diagonal.",
+          "hint": "Step back along the diagonal to stay safe."
+        },
+        {
+          "san": "h4",
+          "title": "White threatens h5",
+          "explanation": "White wants to trap the bishop with h5."
+        },
+        {
+          "san": "h6",
+          "title": "Make an escape square",
+          "explanation": "h6 gives the bishop a home on h7.",
+          "hint": "Give your bishop an escape square with a pawn move."
+        },
+        {
+          "san": "Nf3",
+          "title": "White develops",
+          "explanation": "The knight develops toward the center."
+        },
+        {
+          "san": "Nd7",
+          "title": "Guard e5",
+          "explanation": "The knight stops Ne5 and prepares Ngf6.",
+          "hint": "Develop the b8 knight so it controls e5."
+        },
+        {
+          "san": "h5",
+          "title": "White pushes on",
+          "explanation": "White hits the bishop again."
+        },
+        {
+          "san": "Bh7",
+          "title": "Use the escape square",
+          "explanation": "That is why you played h6.",
+          "hint": "Retreat to the square h6 prepared."
+        },
+        {
+          "san": "Bd3",
+          "title": "White offers a trade",
+          "explanation": "White challenges your strong bishop."
+        },
+        {
+          "san": "Bxd3",
+          "title": "Trade bishops",
+          "explanation": "Take the bishop. White recaptures with the queen.",
+          "hint": "Capture the piece that challenges your bishop."
+        },
+        {
+          "san": "Qxd3",
+          "title": "White recaptures",
+          "explanation": "The queen takes back and eyes the kingside."
+        },
+        {
+          "san": "e6",
+          "title": "Solid and ready",
+          "explanation": "Now that the bishop is gone, e6 is safe. Next come Ngf6, Be7, and castling.",
+          "hint": "Open your dark-squared bishop with a central pawn move."
+        }
+      ],
+      "variations": [
+        {
+          "id": "two-knights",
+          "name": "Two Knights Attack",
+          "branchPly": 2,
+          "summary": "White develops a knight instead of playing d4.",
+          "moves": [
+            {
+              "san": "Nc3",
+              "title": "What if 2.Nc3?",
+              "explanation": "White delays d4 and develops."
+            },
+            {
+              "san": "d5",
+              "title": "Stick to the plan",
+              "explanation": "d5 still challenges e4.",
+              "hint": "Play the central pawn move that c6 prepared."
+            },
+            {
+              "san": "Nf3",
+              "title": "White develops again",
+              "explanation": "The second knight comes out."
+            },
+            {
+              "san": "Bg4",
+              "title": "Pin the knight",
+              "explanation": "The bishop pins the knight to the queen before you play e6.",
+              "hint": "Develop the light-squared bishop with a pin."
+            }
+          ],
+          "eco": "B10",
+          "ecoName": "Caro-Kann Defense: Two Knights Attack"
+        },
+        {
+          "id": "advance",
+          "name": "Advance Variation",
+          "branchPly": 4,
+          "summary": "White pushes past d5 with e5.",
+          "moves": [
+            {
+              "san": "e5",
+              "title": "What if 3.e5?",
+              "explanation": "The Advance Variation. White gains space and blocks the center."
+            },
+            {
+              "san": "Bf5",
+              "title": "Bishop out first",
+              "explanation": "Develop the bishop before e6 locks it in.",
+              "hint": "Bring the light-squared bishop out before closing it in."
+            },
+            {
+              "san": "Nf3",
+              "title": "White develops",
+              "explanation": "White develops calmly."
+            },
+            {
+              "san": "e6",
+              "title": "Now e6",
+              "explanation": "The bishop is already outside the pawn chain.",
+              "hint": "With the bishop out, support d5 with your e-pawn."
+            },
+            {
+              "san": "Be2",
+              "title": "White prepares to castle",
+              "explanation": "White gets ready to castle."
+            },
+            {
+              "san": "c5",
+              "title": "Hit the chain",
+              "explanation": "c5 attacks the base of White's pawn chain on d4.",
+              "hint": "Attack d4 with a pawn."
+            }
+          ],
+          "eco": "B12",
+          "ecoName": "Caro-Kann Defense: Advance Variation"
+        },
+        {
+          "id": "exchange",
+          "name": "Exchange Variation",
+          "branchPly": 4,
+          "summary": "White trades pawns on d5.",
+          "moves": [
+            {
+              "san": "exd5",
+              "title": "What if 3.exd5?",
+              "explanation": "The Exchange Variation. White releases the tension."
+            },
+            {
+              "san": "cxd5",
+              "title": "Recapture with the c-pawn",
+              "explanation": "Taking back with the c-pawn keeps a pawn in the center.",
+              "hint": "Recapture toward the center."
+            },
+            {
+              "san": "Bd3",
+              "title": "White eyes h7",
+              "explanation": "The bishop points at your kingside."
+            },
+            {
+              "san": "Nc6",
+              "title": "Develop",
+              "explanation": "The knight develops and pressures d4.",
+              "hint": "Develop a knight that pressures d4."
+            },
+            {
+              "san": "c3",
+              "title": "White supports d4",
+              "explanation": "White protects d4."
+            },
+            {
+              "san": "Nf6",
+              "title": "Develop again",
+              "explanation": "The second knight comes out and guards h7.",
+              "hint": "Develop the other knight."
+            },
+            {
+              "san": "Bf4",
+              "title": "White develops",
+              "explanation": "The bishop takes the b8-h2 diagonal."
+            },
+            {
+              "san": "Bg4",
+              "title": "Active bishop",
+              "explanation": "The bishop attacks the queen on d1 and gets outside the pawn chain.",
+              "hint": "Develop your light-squared bishop with an attack on the queen."
+            }
+          ],
+          "eco": "B13",
+          "ecoName": "Caro-Kann Defense: Exchange Variation"
+        },
+        {
+          "id": "panov",
+          "name": "Panov Attack",
+          "branchPly": 4,
+          "summary": "After the exchange, White plays c4 to attack d5.",
+          "moves": [
+            {
+              "san": "exd5",
+              "title": "What if 3.exd5 and 4.c4?",
+              "explanation": "White trades on d5, planning c4."
+            },
+            {
+              "san": "cxd5",
+              "title": "Recapture",
+              "explanation": "Same recapture as in the Exchange.",
+              "hint": "Recapture toward the center."
+            },
+            {
+              "san": "c4",
+              "title": "The Panov Attack",
+              "explanation": "White attacks d5 again and aims for open lines."
+            },
+            {
+              "san": "Nf6",
+              "title": "Defend d5",
+              "explanation": "The knight develops and defends d5.",
+              "hint": "Defend d5 with a developing move."
+            },
+            {
+              "san": "Nc3",
+              "title": "More pressure",
+              "explanation": "White adds another attacker on d5."
+            },
+            {
+              "san": "e6",
+              "title": "Hold d5",
+              "explanation": "e6 gives d5 solid support and opens your bishop.",
+              "hint": "Support d5 with a pawn."
+            }
+          ],
+          "eco": "B13",
+          "ecoName": "Caro-Kann Defense: Panov Attack"
+        }
+      ],
+      "eco": "B19",
+      "ecoName": "Caro-Kann Defense: Classical Variation, Spassky Variation"
+    }
+  ]
+}

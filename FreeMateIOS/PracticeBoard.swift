@@ -57,6 +57,9 @@ final class PracticeBoard: ObservableObject {
     var onMoveError: ((String, String) -> Void)?
     var onComplete: ((MovePayload) -> Void)?
     var onSquareSelect: ((String) -> Void)?
+    /// When set, the board does not play moves itself. It forwards each attempt so an owner
+    /// (such as an opening tutorial) can decide, then `syncFen` the result back.
+    var onMoveAttempt: ((_ from: String, _ to: String, _ promotion: String?) -> Void)?
 
     private var engine: ChessEngine?
 
@@ -181,6 +184,12 @@ final class PracticeBoard: ObservableObject {
         guard from != to else {
             selectedSquare = nil
             legalDestinations = []
+            return
+        }
+        if let onMoveAttempt {
+            selectedSquare = nil
+            legalDestinations = []
+            onMoveAttempt(from, to, promotionPiece)
             return
         }
         let requested = buildMove(from: from, to: to)

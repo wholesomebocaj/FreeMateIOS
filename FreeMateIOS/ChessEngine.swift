@@ -524,7 +524,7 @@ final class ChessEngine {
         )
     }
 
-    private init(board: [ChessPiece?], turn: ChessColor, castling: Set<String>, epTarget: Int?, halfmove: Int, fullmove: Int) {
+    private init(board: [ChessPiece?], turn: ChessColor, castling: Set<String>, epTarget: Int?, halfmove: Int, fullmove: Int, recordsPosition: Bool = true) {
         self.board = board
         self.turn = turn
         self.castling = castling
@@ -532,7 +532,7 @@ final class ChessEngine {
         self.halfmove = halfmove
         self.fullmove = fullmove
         self.positionCounts = [:]
-        recordPosition()
+        if recordsPosition { recordPosition() }
     }
 
     private struct RawMove {
@@ -715,8 +715,9 @@ final class ChessEngine {
         return !next.isKingInCheck(mover)
     }
 
+    // Recording here would call fen(), which checks en passant legality with another snapshot.
     private func snapshot() -> ChessEngine {
-        ChessEngine(board: board, turn: turn, castling: castling, epTarget: epTarget, halfmove: halfmove, fullmove: fullmove)
+        ChessEngine(board: board, turn: turn, castling: castling, epTarget: epTarget, halfmove: halfmove, fullmove: fullmove, recordsPosition: false)
     }
 
     private func apply(_ move: RawMove) {
