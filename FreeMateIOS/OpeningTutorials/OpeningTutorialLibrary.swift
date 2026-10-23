@@ -149,7 +149,7 @@ enum OpeningTutorialLibrary {
     /// Decodes and validates every opening. Throws on the first line that does not resolve.
     static func decode(_ data: Data) throws -> [OpeningTutorial] {
         let catalog = try JSONDecoder().decode(OpeningTutorialCatalog.self, from: data)
-        return try catalog.openings.map(OpeningTutorial.init(opening:))
+        return try catalog.openings.map { try OpeningTutorial(opening: $0) }
     }
 
     static func loadBundled(from bundle: Bundle = .main) throws -> [OpeningTutorial] {
