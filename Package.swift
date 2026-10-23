@@ -42,6 +42,8 @@ let package = Package(
                 "DesignSystem/Theme.swift",
                 "OpeningTutorials/OpeningTutorialController.swift",
                 "OpeningTutorials/Views",
+                "Puzzles/PuzzleTrainer.swift",
+                "Puzzles/Views",
                 "OpeningTutorials/opening-tutorials.json",
                 "Tabs",
             ],
@@ -55,6 +57,7 @@ let package = Package(
                 "OpeningTutorials/OpeningTutorialLibrary.swift",
                 "OpeningTutorials/OpeningTutorialPresentation.swift",
                 "OpeningTutorials/OpeningTutorialSession.swift",
+                "Puzzles/Puzzle.swift",
             ],
             swiftSettings: appSettings
         ),

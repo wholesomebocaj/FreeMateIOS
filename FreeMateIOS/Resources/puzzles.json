@@ -1,0 +1,249 @@
+{
+  "unlockAfter": 4,
+  "levels": [
+    {
+      "level": 1,
+      "title": "First Steps",
+      "summary": "Free pieces and simple checkmates.",
+      "puzzles": [
+        {
+          "id": "l1-free-rook",
+          "theme": "material",
+          "prompt": "Win the rook.",
+          "fen": "4k3/7p/8/8/r7/8/7P/3BK3 w - - 0 1",
+          "solution": ["d1a4"],
+          "hint": "Nothing defends the rook on a4. Which piece can reach it?",
+          "success": "Bxa4+ wins a free rook, because nothing guarded it."
+        },
+        {
+          "id": "l1-rook-ladder",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "k7/7R/8/8/8/8/8/6RK w - - 0 1",
+          "solution": ["g1g8"],
+          "hint": "One rook already guards the 7th rank. Use the other on the 8th.",
+          "success": "Rg8 is mate. The two rooks cover both ranks."
+        },
+        {
+          "id": "l1-knight-takes-queen",
+          "theme": "material",
+          "prompt": "Win the queen.",
+          "fen": "4k3/8/8/8/5q2/3N4/8/4K3 w - - 0 1",
+          "solution": ["d3f4"],
+          "hint": "Knights jump in an L. Count the squares from d3.",
+          "success": "Nxf4. Always check what your knights can reach."
+        },
+        {
+          "id": "l1-black-back-rank",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "1r4k1/5ppp/8/8/8/8/5PPP/6K1 b - - 0 1",
+          "solution": ["b8b1"],
+          "hint": "White's king is trapped behind its own pawns.",
+          "success": "Rb1 is a back-rank mate."
+        },
+        {
+          "id": "l1-pawn-takes-knight",
+          "theme": "material",
+          "prompt": "Win the knight.",
+          "fen": "4k3/8/8/8/3n4/4P3/8/4K3 w - - 0 1",
+          "solution": ["e3d4"],
+          "hint": "Pawns capture one square diagonally forward.",
+          "success": "exd4. Even a pawn can win a knight."
+        },
+        {
+          "id": "l1-queen-and-king",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "6k1/8/6K1/8/8/8/8/Q7 w - - 0 1",
+          "solution": ["a1a8", "a1g7"],
+          "hint": "Your king covers the 7th rank. The queen can finish from far away.",
+          "success": "Checkmate. The queen and king work together."
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "title": "Double Attacks",
+      "summary": "Forks, and mates on the back rank.",
+      "puzzles": [
+        {
+          "id": "l2-royal-fork",
+          "theme": "material",
+          "prompt": "Win the rook.",
+          "fen": "r3k3/8/8/1N6/8/8/8/4K3 w - - 0 1",
+          "solution": ["b5c7"],
+          "hint": "Find a knight jump that checks the king and hits a8.",
+          "success": "Nc7+ forks the king and the rook."
+        },
+        {
+          "id": "l2-knight-fork-queen",
+          "theme": "material",
+          "prompt": "Win the queen.",
+          "fen": "4k3/1q6/8/5N2/8/8/8/4K3 w - - 0 1",
+          "solution": ["f5d6"],
+          "hint": "From d6, a knight attacks e8 and b7.",
+          "success": "Nd6+ forks the king and the queen."
+        },
+        {
+          "id": "l2-pawn-fork",
+          "theme": "material",
+          "prompt": "Win a knight.",
+          "fen": "4k3/8/8/1n1n4/8/2P5/8/4K3 w - - 0 1",
+          "solution": ["c3c4"],
+          "hint": "A pawn on c4 attacks b5 and d5.",
+          "success": "c4 forks the knights. One of them falls."
+        },
+        {
+          "id": "l2-queen-and-king",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "7k/8/5K2/8/8/8/8/6Q1 w - - 0 1",
+          "solution": ["g1g7"],
+          "hint": "Put the queen next to the king where your king protects her.",
+          "success": "Qg7 is mate. The king on f6 guards the queen."
+        },
+        {
+          "id": "l2-queen-back-rank",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "6k1/5ppp/8/8/8/2q5/5PPP/6K1 b - - 0 1",
+          "solution": ["c3c1", "c3e1"],
+          "hint": "White never made room for the king. Look at the first rank.",
+          "success": "Checkmate on the back rank."
+        },
+        {
+          "id": "l2-bishop-fork",
+          "theme": "material",
+          "prompt": "Win the rook.",
+          "fen": "7k/8/8/8/8/4B2K/8/r7 w - - 0 1",
+          "solution": ["e3d4"],
+          "hint": "One diagonal runs to h8 and another runs to a1. Where do they meet?",
+          "success": "Bd4+ checks the king and attacks the rook."
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "title": "Lines and Pins",
+      "summary": "Skewers, pins, and trapped kings.",
+      "puzzles": [
+        {
+          "id": "l3-bishop-skewer",
+          "theme": "material",
+          "prompt": "Win the queen.",
+          "fen": "q7/8/8/3k4/8/8/8/2K2B2 w - - 0 1",
+          "solution": ["f1g2"],
+          "hint": "The king and the queen stand on the same long diagonal.",
+          "success": "Bg2+ skewers the king. When it moves, the queen falls."
+        },
+        {
+          "id": "l3-pawn-hits-pinned-knight",
+          "theme": "material",
+          "prompt": "Win the knight.",
+          "fen": "4k3/5p2/4n3/8/3P4/8/8/4RK2 w - - 0 1",
+          "solution": ["d4d5"],
+          "hint": "The knight on e6 cannot move. It is pinned to the king.",
+          "success": "d5 attacks the pinned knight, and it cannot run."
+        },
+        {
+          "id": "l3-smothered-mate",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "6rk/6pp/8/6N1/8/8/8/6K1 w - - 0 1",
+          "solution": ["g5f7"],
+          "hint": "Black's own pieces box the king in. Only a knight can reach it.",
+          "success": "Nf7 is smothered mate."
+        },
+        {
+          "id": "l3-rook-and-knight",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "7k/7p/5N2/8/8/8/8/6RK w - - 0 1",
+          "solution": ["g1g8"],
+          "hint": "The knight on f6 guards g8.",
+          "success": "Rg8 is mate. The knight protects the rook."
+        },
+        {
+          "id": "l3-pin-the-queen",
+          "theme": "material",
+          "prompt": "Win the queen for a rook.",
+          "fen": "4k3/4q3/8/8/8/8/3K4/3R4 w - - 0 1",
+          "solution": ["d1e1"],
+          "hint": "Line your rook up with the queen and the king behind it.",
+          "success": "Re1 pins the queen to the king. She can only trade herself for the rook."
+        },
+        {
+          "id": "l3-queen-on-the-rank",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "6k1/8/8/8/3q4/8/6PP/7K b - - 0 1",
+          "solution": ["d4d1", "d4a1"],
+          "hint": "The king on h1 has no room. Check it along the first rank.",
+          "success": "Checkmate. The pawns trap their own king."
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "title": "Sharper Eyes",
+      "summary": "Discovered checks and famous traps.",
+      "puzzles": [
+        {
+          "id": "l4-black-knight-fork",
+          "theme": "material",
+          "prompt": "Win the queen.",
+          "fen": "4k3/8/8/8/3n4/Q7/8/4K3 b - - 0 1",
+          "solution": ["d4c2"],
+          "hint": "A knight on c2 attacks e1 and a3.",
+          "success": "Nc2+ forks the king and the queen."
+        },
+        {
+          "id": "l4-early-queen-mate",
+          "theme": "mate",
+          "prompt": "Black weakened the king. Checkmate in one.",
+          "fen": "rnbqkbnr/ppppp2p/5p2/6p1/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq - 0 3",
+          "solution": ["d1h5"],
+          "hint": "The diagonal from h5 to e8 is wide open.",
+          "success": "Qh5 is mate. Moving the f- and g-pawns early opened the king."
+        },
+        {
+          "id": "l4-discovered-check",
+          "theme": "material",
+          "prompt": "Win the queen.",
+          "fen": "4k3/8/8/8/q7/8/4B3/4R1K1 w - - 0 1",
+          "solution": ["e2b5", "e2d1"],
+          "hint": "If the bishop moves, the rook gives check. Move it where it attacks the queen.",
+          "success": "A discovered check. Black must answer the rook, and the bishop takes the queen."
+        },
+        {
+          "id": "l4-king-and-rook",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "3k4/8/3K4/8/8/8/8/7R w - - 0 1",
+          "solution": ["h1h8"],
+          "hint": "Your king takes away c7, d7, and e7.",
+          "success": "Rh8 is mate. King and rook make the classic edge mate."
+        },
+        {
+          "id": "l4-queen-fork-rook",
+          "theme": "material",
+          "prompt": "Win the rook.",
+          "fen": "r3k3/7Q/8/8/8/8/8/4K3 w - - 0 1",
+          "solution": ["h7e4", "h7h8", "h7g8"],
+          "hint": "Check the king from a square that also sees a8.",
+          "success": "Check first, then the rook falls."
+        },
+        {
+          "id": "l4-fools-mate",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "rnbqkbnr/pppp1ppp/8/4p3/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2",
+          "solution": ["d8h4"],
+          "hint": "White opened the diagonal from h4 to e1.",
+          "success": "Qh4 is Fool's Mate, the fastest checkmate there is."
+        }
+      ]
+    }
+  ]
+}

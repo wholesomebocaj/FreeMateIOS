@@ -1,20 +1,30 @@
 import SwiftUI
 
-/// Whether the Practice tab shows a game against the computer or a free board.
+/// What the Practice tab shows.
 enum PracticeMode: String, CaseIterable, Identifiable {
     case computer
+    case puzzles
     case freeBoard
 
+    static let storageKey = "freemate.practiceMode"
+
     var id: String { rawValue }
-    var label: String { self == .computer ? "Play Computer" : "Free Board" }
+
+    var label: String {
+        switch self {
+        case .computer: return "Computer"
+        case .puzzles: return "Puzzles"
+        case .freeBoard: return "Free Board"
+        }
+    }
 }
 
-/// The Practice tab: a game against the computer, or a free board for both sides, on the same
-/// board as the tutorials.
+/// The Practice tab: a game against the computer, puzzles and drills, or a free board for both
+/// sides, all on the same board as the tutorials.
 struct PracticeView: View {
     @StateObject private var board = PracticeBoard()
     @StateObject private var computer = ComputerGame()
-    @AppStorage("freemate.practiceMode") private var mode = PracticeMode.computer
+    @AppStorage(PracticeMode.storageKey) private var mode = PracticeMode.computer
     @State private var showsPositionLoader = false
 
     private var turnText: String { board.turn == "white" ? "White" : "Black" }
@@ -38,6 +48,8 @@ struct PracticeView: View {
                 switch mode {
                 case .computer:
                     ComputerPlayPanel(game: computer)
+                case .puzzles:
+                    PuzzleHubView()
                 case .freeBoard:
                     freeBoard
                 }
