@@ -90,5 +90,116 @@ final class ComputerGameTests: XCTestCase {
 
         XCTAssertEqual(ComputerGame(defaults: defaults).level, .fair)
     }
+
+    // MARK: - Coaching
+
+    /// White's queen can take a pawn on d5 that c6 defends.
+    private let queenTrap = "4k3/8/2p5/3p4/8/8/8/3QK3 w - - 0 1"
+
+    private func wait(until condition: () -> Bool) async throws {
+        for _ in 0..<300 where !condition() {
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        XCTAssertTrue(condition(), "Timed out.")
+    }
+
+    func testBlunderWarningPausesTheComputerUntilTakenBack() async throws {
+        let game = makeGame()
+        game.newGame(as: .white, from: queenTrap)
+        game.board.select("d1")
+        game.board.select("d5")
+        try await waitForReply(game)
+
+        XCTAssertEqual(game.warning?.kind, .losesPiece(.queen, on: "d5"))
+        XCTAssertEqual(game.board.history.count, 1)
+        XCTAssertFalse(game.canMove)
+        XCTAssertEqual(game.board.highlightSquares, [HighlightMark(square: "d5", className: "danger")])
+
+        game.takeBackWarnedMove()
+
+        XCTAssertNil(game.warning)
+        XCTAssertTrue(game.board.history.isEmpty)
+        XCTAssertEqual(game.board.fen, queenTrap)
+        XCTAssertTrue(game.board.highlightSquares.isEmpty)
+        XCTAssertTrue(game.canMove)
+    }
+
+    func testPlayingOnAfterAWarningLetsTheComputerReply() async throws {
+        let game = makeGame()
+        game.newGame(as: .white, from: queenTrap)
+        game.board.select("d1")
+        game.board.select("d5")
+        try await waitForReply(game)
+
+        game.ignoreWarning()
+        try await waitForReply(game)
+
+        XCTAssertNil(game.warning)
+        XCTAssertEqual(game.board.history.count, 2)
+        XCTAssertEqual(game.board.history.last?.san, "cxd5")
+    }
+
+    func testNoWarningWhenWarningsAreOff() async throws {
+        let game = makeGame()
+        game.warnsAboutBlunders = false
+        game.newGame(as: .white, from: queenTrap)
+        game.board.select("d1")
+        game.board.select("d5")
+        try await waitForReply(game)
+
+        XCTAssertNil(game.warning)
+        XCTAssertEqual(game.board.history.count, 2)
+        XCTAssertFalse(ComputerGame(defaults: defaults).warnsAboutBlunders)
+    }
+
+    func testHintMarksTheBestMove() async throws {
+        let game = makeGame()
+        game.newGame(as: .white, from: "4k3/8/8/3q4/8/2N5/8/4K3 w - - 0 1")
+        game.showHint()
+        try await wait { !game.isFindingHint }
+
+        XCTAssertEqual(game.board.highlightSquares, [
+            HighlightMark(square: "c3", className: "focus"),
+            HighlightMark(square: "d5", className: "target"),
+        ])
+
+        game.board.select("c3")
+        game.board.select("d5")
+
+        XCTAssertTrue(game.board.highlightSquares.isEmpty)
+    }
+
+    func testReviewGradesEachOfTheLearnersMoves() async throws {
+        let game = makeGame()
+        game.warnsAboutBlunders = false
+        game.newGame(as: .white, from: queenTrap)
+        game.board.select("d1")
+        game.board.select("d5")
+        try await waitForReply(game)
+        game.board.select("e1")
+        game.board.select("e2")
+        try await waitForReply(game)
+        game.resign()
+
+        let review = ComputerGameReview(game: game)
+        XCTAssertEqual(review.learnerPlies, [0, 2])
+        XCTAssertEqual(review.selectedPly, 3)
+        review.start()
+        try await wait { review.isFinished }
+
+        XCTAssertEqual(review.reviewed[0]?.quality, .blunder)
+        XCTAssertEqual(review.reviewed[0]?.reason, .hung(.queen, on: "d5"))
+        XCTAssertNotNil(review.reviewed[2])
+        XCTAssertEqual(review.count(.blunder), 1)
+
+        review.selectNextMistake()
+        XCTAssertEqual(review.selectedPly, 0)
+        XCTAssertEqual(review.board.fen, game.positions[1])
+
+        review.toggleBetterMove()
+        XCTAssertTrue(review.showsBetterMove)
+        XCTAssertEqual(review.board.fen, queenTrap)
+        XCTAssertEqual(review.board.highlightSquares.map(\.className), ["focus", "target"])
+    }
 }
 #endif

@@ -20,6 +20,7 @@ let package = Package(
             exclude: [
                 "AuthSession.swift",
                 "ComputerGame.swift",
+                "ComputerGameReview.swift",
                 "DebugLaunchRoute.swift",
                 "ContentView.swift",
                 "Curriculum.swift",
@@ -46,6 +47,7 @@ let package = Package(
             ],
             sources: [
                 "ChessEngine.swift",
+                "ComputerCoach.swift",
                 "ComputerOpponent.swift",
                 "DesignSystem/BoardPieceLayout.swift",
                 "DesignSystem/MoveListFormatter.swift",

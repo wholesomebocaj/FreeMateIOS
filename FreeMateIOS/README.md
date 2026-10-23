@@ -54,9 +54,21 @@ Reusable pieces in `FreeMateIOS/DesignSystem/`:
 
 The Practice tab opens on a game against the same beginner computer as the web app. Easy looks one move ahead with a lot of randomness, so it misses tactics. Fair looks two moves ahead. The learner picks White or Black, can undo a move, and can resign. Wins, draws, and losses are saved on the device. The Free Board side of the tab is the old two-sided board.
 
+Beginner sits below Easy and is iOS only. It looks one move ahead with so much randomness that it grabs a free queen but plays loosely otherwise.
+
+The game also coaches:
+
+* **Blunder warning.** When a move hangs a piece or allows mate, and a safer move exists, the computer waits. The card names what is at risk, the square is marked, and the learner can take the move back or play on. It can be turned off in the Computer card.
+* **Hint.** Marks the coach's best move on the board.
+* **Review.** After a game, each of the learner's moves is graded Best, Good, Mistake, or Blunder, with the better move and a short reason.
+
+Code:
+
 * `ComputerOpponent.swift`: the search, ported from `web/engine.js`. It is UI-free and runs off the main thread.
+* `ComputerCoach.swift`: grades moves for the warning, hint, and review. It looks at the opponent's best reply and then plays out captures, so it sees hanging pieces, bad trades, and mate in one. UI-free.
 * `ComputerGame.swift`: plays a game on a `PracticeBoard` and keeps the record.
-* `Tabs/ComputerPlayPanel.swift`: the screen.
+* `ComputerGameReview.swift`: grades a finished game one move at a time and steps a board through it.
+* `Tabs/ComputerPlayPanel.swift` and `Tabs/ComputerGameReviewView.swift`: the screens.
 
 The tab root screens live in `FreeMateIOS/Tabs/`: Lessons (`CourseLibraryView`), Openings (`OpeningBrowserView`), and Practice (`PracticeView`). Every board in the app, including lessons, the opening trainer, and Practice, uses `ModernBoardView`.
 
