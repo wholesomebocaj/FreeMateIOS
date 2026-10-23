@@ -13,6 +13,9 @@ enum DebugLaunchRoute {
         case "lessons": game.selectedTab = .lessons
         case "openings": game.selectedTab = .openings
         case "practice": game.selectedTab = .practice
+        case "puzzles":
+            UserDefaults.standard.set(PracticeMode.puzzles.rawValue, forKey: PracticeMode.storageKey)
+            game.selectedTab = .practice
         case "review": game.selectedTab = .review
         case "course" where !id.isEmpty: game.openCourse(id)
         case "lesson" where !id.isEmpty: game.openLesson(id)

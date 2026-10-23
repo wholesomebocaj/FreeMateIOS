@@ -95,7 +95,7 @@ jobs:
           xcrun simctl install "$UDID" "$APP"
           xcrun simctl status_bar "$UDID" override --time 9:41 --batteryState charged --batteryLevel 100 || true
           mkdir -p screenshots
-          for screen in home lessons openings practice review course:beginner-fundamentals lesson:piece-movement trainer:italian-game tutorial:ruy-lopez; do
+          for screen in home lessons openings practice puzzles review course:beginner-fundamentals lesson:piece-movement trainer:italian-game tutorial:ruy-lopez; do
             xcrun simctl terminate "$UDID" "$BUNDLE_ID" 2>/dev/null || true
             xcrun simctl launch "$UDID" "$BUNDLE_ID" -FreeMateScreen "$screen"
             sleep 6

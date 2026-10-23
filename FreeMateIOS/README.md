@@ -70,6 +70,26 @@ Code:
 * `ComputerGameReview.swift`: grades a finished game one move at a time and steps a board through it.
 * `Tabs/ComputerPlayPanel.swift` and `Tabs/ComputerGameReviewView.swift`: the screens.
 
+## Puzzles and drills
+
+The Practice tab's Puzzles side has two parts. Each puzzle is one position with one winning move.
+
+* **Puzzles:** 24 curated mate-in-one and win-a-piece puzzles in four levels of six. Solving 4 in a level unlocks the next. They live in `Resources/puzzles.json`.
+* **Drills:** the web app's five drills, on mate in one, forks, pins, hanging pieces, and getting out of check. They live in `Resources/drills.json`, which `web/build_content.py` also reads, so both apps share one copy.
+
+A wrong move springs back and shows the hint. Hint marks the piece to move. After two wrong moves, Show Answer marks the whole move, and the puzzle no longer counts as solved first try. Any checkmate solves a mate puzzle. Progress is saved on the device.
+
+Code in `FreeMateIOS/Puzzles/`: `Puzzle.swift` holds the models, the loader, the progress store, and the UI-free `PuzzleSession`. `PuzzleTrainer.swift` drives the board, and `Views/` has the hub and the trainer screen.
+
+After editing either file, check every position:
+
+```bash
+pip install chess
+python3 tools/check_puzzles.py
+```
+
+It checks that every FEN and solution is legal, and that mate solutions mate. For win-a-piece puzzles, it checks that each solution wins at least 2 pawns' worth and that every other move is clearly worse, so a learner is never marked wrong for an equally good move.
+
 The tab root screens live in `FreeMateIOS/Tabs/`: Lessons (`CourseLibraryView`), Openings (`OpeningBrowserView`), and Practice (`PracticeView`). Every board in the app, including lessons, the opening trainer, and Practice, uses `ModernBoardView`.
 
 To add an opening, edit `opening-tutorials.json`, then check it and fill ECO codes from [eco.json](https://github.com/JeffML/eco.json):
