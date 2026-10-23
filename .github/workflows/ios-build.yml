@@ -21,55 +21,66 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # xcodebuild hides simulators older than the project's deployment target from its
-      # destinations, and a command-line IPHONEOS_DEPLOYMENT_TARGET does not change that.
-      # So the CI checkout gets a lower target in the project file itself.
+      - name: Show Xcode
+        run: xcodebuild -version
+
+      # The project targets iOS 27, which the runner's simulators do not have yet. Lower it
+      # in the CI checkout only so the app installs on an iOS 26 simulator.
       - name: Lower the deployment target for CI
         run: |
           sed -i '' -E "s/_DEPLOYMENT_TARGET = [0-9.]+;/_DEPLOYMENT_TARGET = $CI_DEPLOYMENT_TARGET;/" FreeMateIOS.xcodeproj/project.pbxproj
           grep -c "_DEPLOYMENT_TARGET = $CI_DEPLOYMENT_TARGET;" FreeMateIOS.xcodeproj/project.pbxproj
 
-      # Ask each Xcode, newest first, for its own destinations rather than trusting
-      # `simctl`, which can list iPhones that the selected Xcode will not use.
-      - name: Pick an Xcode with a usable iOS Simulator
-        run: |
-          for XCODE in $(ls -d /Applications/Xcode_*.app | sort -rV); do
-            DEVICE=$(DEVELOPER_DIR="$XCODE/Contents/Developer" xcodebuild -showdestinations \
-                -project FreeMateIOS.xcodeproj -scheme FreeMateIOS 2>/dev/null \
-              | awk '/Ineligible destinations/ { exit } /platform:iOS Simulator/ && /name:iPhone/ && !/placeholder/' \
-              | head -1 | sed -E 's/.*id:([^,]+),.*/\1/')
-            if [ -n "$DEVICE" ]; then
-              echo "DEVELOPER_DIR=$XCODE/Contents/Developer" >> "$GITHUB_ENV"
-              echo "DEVICE=$DEVICE" >> "$GITHUB_ENV"
-              DEVELOPER_DIR="$XCODE/Contents/Developer" xcodebuild -version
-              echo "Simulator: $DEVICE"
-              exit 0
-            fi
-            echo "$XCODE has no usable iOS Simulator"
-          done
-          echo "No installed Xcode can run an iOS Simulator" >&2
-          echo "::group::Diagnostics"
-          xcrun simctl list runtimes
-          xcodebuild -showdestinations -project FreeMateIOS.xcodeproj -scheme FreeMateIOS 2>&1 | tail -40
-          echo "::endgroup::"
-          exit 1
-
+      # A generic destination needs no concrete simulator, so the build does not depend on
+      # simulator discovery.
       - name: Build app and tests
         run: |
           xcodebuild build-for-testing \
             -project FreeMateIOS.xcodeproj \
             -scheme FreeMateIOS \
-            -destination "id=$DEVICE" \
+            -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath DerivedData \
             CODE_SIGNING_ALLOWED=NO \
             -quiet
 
+      - name: Boot an iPhone simulator
+        run: |
+          UDID=$(xcrun simctl list devices available -j | python3 -c '
+          import json, re, sys
+          devices = json.load(sys.stdin)["devices"]
+          def version(runtime):
+              return [int(part) for part in re.findall(r"\d+", runtime.rsplit(".", 1)[-1])]
+          for runtime in sorted((r for r in devices if ".iOS-" in r), key=version, reverse=True):
+              for device in devices[runtime]:
+                  if device["name"].startswith("iPhone"):
+                      print(device["udid"])
+                      sys.exit()
+          ')
+          if [ -z "$UDID" ]; then
+            echo "::error::No iPhone simulator is installed on this runner."
+            exit 1
+          fi
+          echo "UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+
+      # Hosted runners sometimes leave xcodebuild blind to simulators that simctl can see
+      # (actions/runner-images#12948). Refresh CoreSimulator until xcodebuild sees the device.
       - name: Run tests on the simulator
         run: |
+          for attempt in 1 2 3 4 5 6; do
+            if xcodebuild -showdestinations -project FreeMateIOS.xcodeproj -scheme FreeMateIOS 2>/dev/null | grep -q "id:$UDID"; then
+              echo "xcodebuild sees $UDID"
+              break
+            fi
+            echo "xcodebuild cannot see $UDID yet (attempt $attempt)"
+            xcrun simctl list > /dev/null
+            sleep 10
+          done
           xcodebuild test-without-building \
             -project FreeMateIOS.xcodeproj \
             -scheme FreeMateIOS \
-            -destination "id=$DEVICE" \
+            -destination "platform=iOS Simulator,id=$UDID" \
             -derivedDataPath DerivedData \
             CODE_SIGNING_ALLOWED=NO
 
