@@ -8,9 +8,9 @@ struct PracticeView: View {
     private var turnText: String { board.turn == "white" ? "White" : "Black" }
 
     private var status: (text: String, symbol: String, tint: Color) {
-        if board.isCheckmate { return ("Checkmate", "crown.fill", Color(.systemRed)) }
-        if board.isStalemate { return ("Stalemate", "equal.circle.fill", Color(.systemOrange)) }
-        if board.isCheck { return ("\(turnText) is in check", "exclamationmark.triangle.fill", Color(.systemOrange)) }
+        if board.isCheckmate { return ("Checkmate", "crown.fill", Theme.danger) }
+        if board.isStalemate { return ("Stalemate", "equal.circle.fill", Theme.warning) }
+        if board.isCheck { return ("\(turnText) is in check", "exclamationmark.triangle.fill", Theme.warning) }
         return ("\(turnText) to move", board.turn == "white" ? "circle" : "circle.fill", .secondary)
     }
 
@@ -25,7 +25,7 @@ struct PracticeView: View {
                 if !board.feedback.isEmpty {
                     Text(board.feedback)
                         .font(.footnote)
-                        .foregroundStyle(board.feedbackKind == "error" ? Color(.systemOrange) : .secondary)
+                        .foregroundStyle(board.feedbackKind == "error" ? Theme.warning : .secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .contentTransition(.opacity)
                 }
@@ -40,10 +40,9 @@ struct PracticeView: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.immediately)
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .themeBackground()
         .navigationTitle("Practice")
         .accountToolbar()
-        .tint(DesignTokens.accent)
         .animation(DesignMotion.spring, value: board.history.count)
         .animation(DesignMotion.spring, value: board.feedback)
     }
@@ -102,7 +101,7 @@ struct PracticeView: View {
                                     .font(.subheadline.monospaced())
                                     .padding(.horizontal, 10)
                                     .padding(.vertical, 6)
-                                    .background(Color(.tertiarySystemFill), in: Capsule())
+                                    .background(Theme.fill, in: Capsule())
                                     .id(index)
                             }
                         }
@@ -115,7 +114,7 @@ struct PracticeView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
+        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
     }
 
     private var positionCard: some View {
@@ -128,7 +127,7 @@ struct PracticeView: View {
                 .foregroundStyle(.primary)
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
+        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
     }
 }
 
@@ -145,7 +144,7 @@ struct FenForm: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .padding(12)
-                .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .background(Theme.fill, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             Button {
                 do {
                     try board.loadFen(text, setInitial: true, clearHistory: true)
@@ -165,7 +164,7 @@ struct FenForm: View {
             if !message.isEmpty {
                 Text(message)
                     .font(.footnote)
-                    .foregroundStyle(failed ? Color(.systemOrange) : .secondary)
+                    .foregroundStyle(failed ? Theme.warning : .secondary)
             }
         }
         .onChange(of: board.fen) { _, newValue in

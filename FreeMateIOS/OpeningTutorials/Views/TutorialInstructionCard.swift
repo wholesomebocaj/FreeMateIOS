@@ -12,10 +12,10 @@ struct TutorialInstructionCard: View {
 
     private var tint: Color {
         switch content.style {
-        case .guide, .branching: return DesignTokens.accent
+        case .guide, .branching: return Theme.accent
         case .waiting: return .secondary
-        case .hint: return Color(.systemOrange)
-        case .success: return DesignTokens.success
+        case .hint: return Theme.warning
+        case .success: return Theme.success
         }
     }
 
@@ -75,7 +75,7 @@ struct TutorialInstructionCard: View {
                 .buttonStyle(.borderedProminent)
                 .buttonBorderShape(.capsule)
                 .controlSize(.large)
-                .tint(content.style == .success ? DesignTokens.success : DesignTokens.accent)
+                .tint(content.style == .success ? Theme.success : Theme.accent)
                 .padding(.top, 6)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }

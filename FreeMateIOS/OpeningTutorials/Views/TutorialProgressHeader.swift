@@ -19,7 +19,7 @@ struct TutorialProgressHeader: View {
                     .lineLimit(1)
                     .contentTransition(.numericText())
             }
-            CapsuleProgressBar(fraction: summary.fraction, tint: isComplete ? DesignTokens.success : DesignTokens.accent)
+            CapsuleProgressBar(fraction: summary.fraction, tint: isComplete ? Theme.success : Theme.accent)
             if let caption = summary.caption {
                 Text(caption)
                     .font(.caption)

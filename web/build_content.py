@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COURSES = ROOT / "Resources" / "data" / "courses"
-CATALOG = ROOT / "Resources" / "FreeMateCatalog.json"
+CATALOG = ROOT / "FreeMateIOS" / "Resources" / "FreeMateCatalog.json"
 BRACKETS = ROOT / "Resources" / "data" / "brackets.json"
 OPENINGS = ROOT / "Resources" / "data" / "openings"
 OUT = Path(__file__).resolve().parent / "content" / "curriculum.json"

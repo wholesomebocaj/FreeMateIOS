@@ -34,8 +34,8 @@ struct OpeningTutorialCard: View {
                 .foregroundStyle(.tertiary)
         }
         .padding(16)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
+        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
+        .contentShape(RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityHint("Opens the tutorial")
     }
@@ -47,18 +47,12 @@ struct TutorialStatusBadge: View {
     private var tint: Color {
         switch status {
         case .notStarted: return .secondary
-        case .inProgress: return DesignTokens.accent
-        case .mastered: return DesignTokens.success
+        case .inProgress: return Theme.accent
+        case .mastered: return Theme.success
         }
     }
 
     var body: some View {
-        Label(status.label, systemImage: status.symbol)
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(tint)
-            .padding(.horizontal, 9)
-            .padding(.vertical, 4)
-            .background(tint.opacity(0.14), in: Capsule())
-            .contentTransition(.opacity)
+        StatusBadge(text: status.label, systemImage: status.symbol, tint: tint)
     }
 }

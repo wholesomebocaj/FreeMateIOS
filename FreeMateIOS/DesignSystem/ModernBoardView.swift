@@ -10,13 +10,15 @@ nonisolated struct BoardPalette: Equatable, Sendable {
     var correct: Color
     var danger: Color
 
+    /// The FreeMate board. Values match `Theme` (board, accent, success, danger, highlight)
+    /// but stay fixed so the board looks the same in light and dark mode.
     static let sage = BoardPalette(
-        light: Color(red: 0.933, green: 0.914, blue: 0.867),
-        dark: Color(red: 0.561, green: 0.651, blue: 0.549),
-        lastMove: Color(red: 0.980, green: 0.859, blue: 0.471).opacity(0.42),
-        guide: Color(red: 0.243, green: 0.557, blue: 0.871),
-        correct: Color(red: 0.204, green: 0.659, blue: 0.325).opacity(0.38),
-        danger: Color(red: 0.902, green: 0.298, blue: 0.259).opacity(0.34)
+        light: Color(hex: 0xEEE9DD),
+        dark: Color(hex: 0x8FA68C),
+        lastMove: Color(hex: 0xF5D67A, opacity: 0.45),
+        guide: Color(hex: 0x4895EF),
+        correct: Color(hex: 0x2E8B57, opacity: 0.4),
+        danger: Color(hex: 0xE5534B, opacity: 0.36)
     )
 }
 

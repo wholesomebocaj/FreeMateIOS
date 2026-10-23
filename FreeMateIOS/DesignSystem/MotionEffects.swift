@@ -8,12 +8,6 @@ enum DesignMotion {
     static let shake = Animation.easeOut(duration: 0.5)
 }
 
-enum DesignTokens {
-    static let accent = Color(.systemBlue)
-    static let success = Color(.systemGreen)
-    static let cardRadius: CGFloat = 22
-}
-
 /// A gentle side-to-side shake that fades out. Each increment of `animatableData` plays once.
 nonisolated struct ShakeEffect: GeometryEffect {
     var travel: CGFloat
@@ -74,7 +68,7 @@ struct CapsuleProgressBar: View {
         GeometryReader { proxy in
             let clamped = min(max(fraction, 0), 1)
             ZStack(alignment: .leading) {
-                Capsule().fill(Color(.tertiarySystemFill))
+                Capsule().fill(Theme.fill)
                 Capsule()
                     .fill(tint.gradient)
                     .frame(width: max(proxy.size.height, proxy.size.width * clamped))

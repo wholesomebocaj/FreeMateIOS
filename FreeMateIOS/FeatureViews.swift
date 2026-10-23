@@ -4,71 +4,102 @@ struct HomeView: View {
     @EnvironmentObject private var game: GameState
 
     var body: some View {
-        FreeMateScreen(title: "FreeMate") {
+        FreeMateScreen(title: "FreeMate", largeTitle: true) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
-                    Text("Beginner chess coaching")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(FreeMateTheme.accent)
-                    Text("Learn chess the right way.")
-                        .font(.largeTitle.bold())
-                        .foregroundStyle(FreeMateTheme.text)
-                    Text("Free structured lessons, practice, and opening training for beginners who want a calm, clear path forward.")
-                        .foregroundStyle(FreeMateTheme.muted)
-                    HStack {
-                        Button("Start Learning") { game.selectedTab = .lessons }
-                            .buttonStyle(.borderedProminent)
-                            .tint(FreeMateTheme.green)
-                        Button("Explore Openings") { game.selectedTab = .openings }
-                            .buttonStyle(.bordered)
+                VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
+                    hero
+                    HStack(alignment: .top, spacing: Theme.Spacing.s) {
+                        feature("square.grid.3x3.fill", Theme.accent, "Interactive", "Boards and guided lessons")
+                        feature("figure.walk", Theme.success, "Beginner first", "Clear steps, calm pacing")
+                        feature("chart.line.uptrend.xyaxis", Theme.topic("openings").color, "Always growing", "Lessons, openings, review")
                     }
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                        stat("Interactive", "Practice boards and guided lessons")
-                        stat("Beginner first", "Clear steps and calm pacing")
-                        stat("Always progressing", "Lessons, openings, and review")
+                    VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                        SectionHeader(title: "What should I learn next?", subtitle: "Your path through the curriculum")
+                        roadmap
                     }
-                    Text("What should I learn next?")
-                        .font(.title2.bold())
-                    roadmap
                     if let next = game.nextBracket() {
-                        Button("Continue \(next.title)") { game.openBracket(next.slug) }
-                            .buttonStyle(.borderedProminent)
-                            .tint(FreeMateTheme.green)
+                        Button {
+                            game.openBracket(next.slug)
+                        } label: {
+                            Text("Continue \(next.title)")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .primaryButtonStyle()
+                        .controlSize(.large)
                     }
                 }
-                .padding()
+                .padding(Theme.Spacing.l)
+                .frame(maxWidth: 720)
+                .frame(maxWidth: .infinity)
             }
         }
     }
 
+    private var hero: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+            Text("Beginner chess coaching")
+                .eyebrowStyle()
+            Text("Learn chess the right way.")
+                .font(.title.weight(.bold))
+            Text("Free structured lessons, practice, and opening training for beginners who want a calm, clear path forward.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+            ActionButtons(
+                primaryTitle: "Start Learning",
+                secondaryTitle: "Explore Openings",
+                primary: { game.selectedTab = .lessons },
+                secondary: { game.selectedTab = .openings }
+            )
+            .padding(.top, Theme.Spacing.xxs)
+        }
+    }
+
+    private func feature(_ symbol: String, _ color: Color, _ title: String, _ detail: String) -> some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+            IconTile(systemImage: symbol, color: color, size: 36)
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .cardStyle(padding: Theme.Spacing.s)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .accessibilityElement(children: .combine)
+    }
+
     private var roadmap: some View {
         let categories = game.courses.flatMap(\.categories)
-        return VStack(alignment: .leading, spacing: 8) {
-            ForEach(categories) { category in
+        return VStack(spacing: 0) {
+            ForEach(Array(categories.enumerated()), id: \.element.id) { index, category in
                 let lessons = category.skills.flatMap(\.lessons)
                 let complete = !lessons.isEmpty && lessons.allSatisfy { game.completedLessons.contains($0.id) }
                 let unlocked = lessons.contains { lesson in
                     game.lesson(id: lesson.id).map { game.isUnlocked($0) } ?? false
                 }
-                Text(category.title)
-                    .font(.subheadline.weight(.semibold))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(complete ? FreeMateTheme.green.opacity(0.25) : unlocked ? FreeMateTheme.accent.opacity(0.18) : FreeMateTheme.panel, in: Capsule())
-                    .foregroundStyle(complete || unlocked ? FreeMateTheme.text : FreeMateTheme.muted)
+                HStack(spacing: Theme.Spacing.s) {
+                    Image(systemName: complete ? "checkmark.circle.fill" : unlocked ? "circle.lefthalf.filled" : "lock.fill")
+                        .foregroundStyle(complete ? Theme.success : unlocked ? Theme.accent : Color.secondary)
+                        .frame(width: 24)
+                    Text(category.title)
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(complete || unlocked ? Color.primary : Color.secondary)
+                    Spacer()
+                    Text(complete ? "Done" : unlocked ? "Open" : "Locked")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, Theme.Spacing.s)
+                .accessibilityElement(children: .combine)
+                if index < categories.count - 1 {
+                    Divider().padding(.leading, 36)
+                }
             }
         }
-    }
-
-    private func stat(_ title: String, _ detail: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title).font(.caption.bold()).foregroundStyle(FreeMateTheme.text)
-            Text(detail).font(.caption2).foregroundStyle(FreeMateTheme.muted)
-        }
-        .padding(8)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 12))
+        .padding(.vertical, Theme.Spacing.xxs)
+        .cardStyle(padding: Theme.Spacing.m)
     }
 }
 
@@ -81,40 +112,61 @@ struct BracketDetailView: View {
         FreeMateScreen(title: bracket?.title ?? "Bracket") {
             ScrollView {
                 if let bracket {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text(bracket.range).foregroundStyle(FreeMateTheme.accent)
-                        Text(bracket.description).foregroundStyle(FreeMateTheme.muted)
-                        Text(bracket.learn.joined(separator: " · ")).font(.subheadline)
-                        let ids = game.bracketLessonIds(bracket)
-                        Text("\(ids.filter { game.completedLessons.contains($0) }.count) of \(ids.count) complete")
-                        ProgressMeter(value: game.bracketProgress(bracket))
-                        ForEach(bracket.items) { item in
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(item.kind == "preview" ? "Preview" : item.kind == "track" ? "Track" : "Course")
-                                    .font(.caption.bold())
-                                    .foregroundStyle(FreeMateTheme.accent)
-                                Text(item.title).font(.headline)
-                                Text(item.description).font(.subheadline).foregroundStyle(FreeMateTheme.muted)
-                                ProgressMeter(value: game.bracketItemProgress(item))
-                                if let courseId = item.courseId, item.kind != "preview" {
-                                    Button(game.bracketItemProgress(item) > 0 ? "Continue" : "Open") {
-                                        game.openCourse(courseId)
-                                    }
-                                    .buttonStyle(.borderedProminent)
-                                    .tint(FreeMateTheme.green)
-                                } else if item.kind == "preview" {
-                                    Text("Preview").font(.caption).foregroundStyle(FreeMateTheme.muted)
-                                }
+                    let ids = game.bracketLessonIds(bracket)
+                    VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
+                        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                            Text("Rating \(bracket.range)").eyebrowStyle()
+                            Text(bracket.description)
+                                .font(.body)
+                            Text(bracket.learn.joined(separator: " · "))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            Text("\(ids.filter { game.completedLessons.contains($0) }.count) of \(ids.count) lessons complete")
+                                .font(.subheadline.weight(.semibold))
+                                .padding(.top, Theme.Spacing.xxs)
+                            ProgressMeter(value: game.bracketProgress(bracket))
+                        }
+                        .cardStyle()
+                        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                            SectionHeader(title: "In this bracket")
+                            ForEach(bracket.items) { item in
+                                bracketItem(item)
                             }
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
                         }
                     }
-                    .padding()
+                    .padding(Theme.Spacing.l)
+                    .frame(maxWidth: 720)
+                    .frame(maxWidth: .infinity)
                 }
             }
         }
+    }
+
+    private func bracketItem(_ item: BracketItem) -> some View {
+        let isPreview = item.kind == "preview"
+        let progress = game.bracketItemProgress(item)
+        return VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+            StatusBadge(
+                text: isPreview ? "Coming soon" : item.kind == "track" ? "Track" : "Course",
+                systemImage: isPreview ? "clock" : "book.closed.fill",
+                tint: isPreview ? Color.secondary : Theme.accent
+            )
+            Text(item.title)
+                .font(.title3.weight(.bold))
+            Text(item.description)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            if !isPreview {
+                ProgressMeter(value: progress)
+                    .padding(.top, Theme.Spacing.xxs)
+            }
+            if let courseId = item.courseId, !isPreview {
+                Button(progress > 0 ? "Continue" : "Open") { game.openCourse(courseId) }
+                    .primaryButtonStyle()
+                    .padding(.top, Theme.Spacing.xxs)
+            }
+        }
+        .cardStyle()
     }
 }
 
@@ -129,25 +181,34 @@ struct CourseDetailView: View {
                 if let course {
                     let lessons = CurriculumLoader.courseLessons(course)
                     let done = lessons.filter { game.completedLessons.contains($0.id) }.count
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text(course.description).foregroundStyle(FreeMateTheme.muted)
-                        Text("\(done) of \(lessons.count) complete")
-                        ProgressMeter(value: CurriculumLoader.courseProgress(course, completed: game.completedLessons))
+                    VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
+                        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                            Text(course.description)
+                                .font(.body)
+                            Text("\(done) of \(lessons.count) lessons complete")
+                                .font(.subheadline.weight(.semibold))
+                            ProgressMeter(value: CurriculumLoader.courseProgress(course, completed: game.completedLessons))
+                        }
+                        .cardStyle()
                         if course.categories.isEmpty {
                             Text("This course is part of the FreeMate roadmap.")
+                                .foregroundStyle(.secondary)
                         } else {
                             ForEach(course.categories) { category in
-                                Text(category.title).font(.title3.bold())
-                                Text(category.description).foregroundStyle(FreeMateTheme.muted)
-                                ForEach(category.skills) { skill in
-                                    ForEach(skill.lessons) { lesson in
-                                        lessonRow(course: course, lesson: lesson)
+                                VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                                    SectionHeader(title: category.title, subtitle: category.description)
+                                    ForEach(category.skills) { skill in
+                                        ForEach(skill.lessons) { lesson in
+                                            lessonRow(course: course, lesson: lesson)
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    .padding()
+                    .padding(Theme.Spacing.l)
+                    .frame(maxWidth: 720)
+                    .frame(maxWidth: .infinity)
                 }
             }
         }
@@ -155,25 +216,42 @@ struct CourseDetailView: View {
 
     private func lessonRow(course: Course, lesson: Lesson) -> some View {
         let unlocked = CurriculumLoader.isCourseLessonUnlocked(course, lessonId: lesson.id, completed: game.completedLessons)
-        let state = game.completedLessons.contains(lesson.id) ? "Done" : unlocked ? "Open" : "Locked"
-        return VStack(alignment: .leading, spacing: 6) {
-            Text(state).font(.caption.bold()).foregroundStyle(unlocked ? FreeMateTheme.accent : FreeMateTheme.muted)
-            Text(lesson.title).font(.headline)
-            Text(lesson.summary).font(.subheadline).foregroundStyle(FreeMateTheme.muted)
-            Text("\(lesson.difficulty) · \(lesson.timeMinutes) min · \(lesson.ratingRange)")
-                .font(.caption)
-                .foregroundStyle(FreeMateTheme.muted)
-            ProgressMeter(value: game.lessonProgressPercent(lesson))
-            Button(game.completedLessons.contains(lesson.id) ? "Review" : unlocked ? "Open" : "Locked") {
-                if unlocked { game.openLesson(lesson.id) }
+        let done = game.completedLessons.contains(lesson.id)
+        return Button {
+            if unlocked { game.openLesson(lesson.id) }
+        } label: {
+            HStack(alignment: .top, spacing: Theme.Spacing.s) {
+                IconTile(
+                    systemImage: done ? "checkmark" : unlocked ? "play.fill" : "lock.fill",
+                    color: done ? Theme.success : unlocked ? Theme.accent : Color.gray,
+                    size: 40
+                )
+                VStack(alignment: .leading, spacing: Theme.Spacing.xxs) {
+                    Text("\(lesson.timeMinutes) min · \(lesson.ratingRange)")
+                        .eyebrowStyle()
+                    Text(lesson.title)
+                        .font(.headline)
+                        .foregroundStyle(unlocked ? Color.primary : Color.secondary)
+                    Text(lesson.summary)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                    if unlocked && !done {
+                        ProgressMeter(value: game.lessonProgressPercent(lesson))
+                            .padding(.top, Theme.Spacing.xxs)
+                    }
+                }
+                Spacer(minLength: 0)
+                StatusBadge(
+                    text: done ? "Review" : unlocked ? "Open" : "Locked",
+                    tint: done ? Theme.success : unlocked ? Theme.accent : Color.secondary
+                )
             }
-            .disabled(!unlocked)
-            .buttonStyle(.borderedProminent)
-            .tint(FreeMateTheme.green)
+            .cardStyle()
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
+        .buttonStyle(PressableCardStyle())
+        .disabled(!unlocked)
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -185,8 +263,7 @@ struct LessonPlayerView: View {
         if let lesson = game.lesson(id: lessonId) ?? game.allLessons.first {
             LessonPlayerBody(lesson: lesson, game: game)
         } else {
-            Text("Lesson not found")
-                .foregroundStyle(FreeMateTheme.text)
+            ContentUnavailableView("Lesson Not Found", systemImage: "book.closed")
         }
     }
 }
@@ -204,90 +281,167 @@ struct LessonPlayerBody: View {
     var body: some View {
         FreeMateScreen(title: lesson.title) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: Theme.Spacing.l) {
                     if session.scaffold {
-                        Text("Lesson Scaffold").font(.title2.bold())
-                        Text("This lesson is ready for content. Add steps when you are ready to build it out.")
-                            .foregroundStyle(FreeMateTheme.muted)
+                        messageCard(symbol: "hammer.fill", color: Color.secondary, title: "Lesson Scaffold", body: "This lesson is ready for content. Add steps when you are ready to build it out.")
                     } else if session.finished {
-                        Text("Lesson Complete").font(.title2.bold())
-                        Text("Great work. Continue to the next lesson.")
-                            .foregroundStyle(FreeMateTheme.muted)
+                        messageCard(symbol: "checkmark.seal.fill", color: Theme.success, title: "Lesson Complete", body: "Great work. Continue to the next lesson.")
                     } else if let step = session.step {
-                        Text("Step \(session.index + 1) of \(lesson.steps.count)")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(FreeMateTheme.accent)
-                        Text(session.completedSteps.contains(session.index) ? "Completed" : "In progress")
-                            .font(.caption)
-                            .foregroundStyle(session.completedSteps.contains(session.index) ? FreeMateTheme.green : FreeMateTheme.muted)
-                        Text(step.title).font(.title2.bold())
-                        if !step.body.isEmpty {
-                            Text(step.body).foregroundStyle(FreeMateTheme.muted)
-                        }
-                        if step.type == "checklist" {
-                            ForEach(step.tasks, id: \.self) { task in
-                                Text("• \(task)")
-                            }
-                        }
-                        if let board = session.board {
-                            ModernBoardView(board: board)
-                            Text(note(for: step))
-                                .font(.footnote)
-                                .foregroundStyle(FreeMateTheme.muted)
-                            if step.type == "click-all-squares" {
-                                Text("\(session.foundSquares.count)/\(step.targetSquares.count) squares found")
-                                    .font(.footnote)
-                            }
-                        }
-                        if step.type == "multiple-choice" {
-                            Text(step.question ?? "Choose the best response.")
-                                .font(.headline)
-                            ForEach(step.choices) { choice in
-                                Button(choice.label) { session.choose(choice) }
-                                    .buttonStyle(.bordered)
-                            }
-                        }
-                        if !session.feedback.isEmpty {
-                            Text(session.feedback)
-                                .foregroundStyle(session.feedbackKind == "error" ? FreeMateTheme.red : FreeMateTheme.accent)
-                        }
-                        HStack {
-                            if session.index > 0 {
-                                Button("Back") { session.goBack() }
-                                    .buttonStyle(.bordered)
-                            }
-                            Button(session.nextTitle) { session.goForward() }
-                                .buttonStyle(.borderedProminent)
-                                .tint(FreeMateTheme.green)
-                                .disabled(!session.canAdvance)
-                        }
+                        stepView(step)
                     }
                     sidebar
                 }
-                .padding()
+                .padding(Theme.Spacing.l)
+                .frame(maxWidth: 720)
+                .frame(maxWidth: .infinity)
+            }
+            .animation(DesignMotion.spring, value: session.index)
+        }
+    }
+
+    @ViewBuilder
+    private func stepView(_ step: LessonStep) -> some View {
+        let isDone = session.completedSteps.contains(session.index)
+        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+            HStack {
+                Text("Step \(session.index + 1) of \(lesson.steps.count)")
+                    .eyebrowStyle()
+                Spacer()
+                StatusBadge(
+                    text: isDone ? "Completed" : "In Progress",
+                    systemImage: isDone ? "checkmark" : nil,
+                    tint: isDone ? Theme.success : Color.secondary
+                )
+            }
+            CapsuleProgressBar(fraction: Double(session.index + 1) / Double(max(lesson.steps.count, 1)), tint: Theme.accent)
+        }
+        Text(step.title)
+            .font(.title2.weight(.bold))
+        if !step.body.isEmpty {
+            Text(step.body)
+                .font(.body)
+                .foregroundStyle(.secondary)
+        }
+        if step.type == "checklist" {
+            VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                ForEach(step.tasks, id: \.self) { task in
+                    Label(task, systemImage: "checkmark.circle")
+                        .font(.body)
+                }
+            }
+            .cardStyle()
+        }
+        if let board = session.board {
+            ModernBoardView(board: board)
+                .frame(maxWidth: 560)
+                .frame(maxWidth: .infinity)
+            Text(note(for: step))
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+            if step.type == "click-all-squares" {
+                Text("\(session.foundSquares.count) of \(step.targetSquares.count) squares found")
+                    .font(.footnote.weight(.semibold).monospacedDigit())
             }
         }
+        if step.type == "multiple-choice" {
+            Text(step.question ?? "Choose the best response.")
+                .font(.headline)
+            VStack(spacing: Theme.Spacing.xs) {
+                ForEach(step.choices) { choice in
+                    Button {
+                        session.choose(choice)
+                    } label: {
+                        Text(choice.label)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .secondaryButtonStyle()
+                    .controlSize(.large)
+                }
+            }
+        }
+        if !session.feedback.isEmpty {
+            let isError = session.feedbackKind == "error"
+            Label(session.feedback, systemImage: isError ? "lightbulb.fill" : "checkmark.circle.fill")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(isError ? Theme.warning : Theme.success)
+                .padding(Theme.Spacing.s)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background((isError ? Theme.warning : Theme.success).opacity(0.12), in: RoundedRectangle(cornerRadius: Theme.Radius.small, style: .continuous))
+                .transition(.opacity)
+        }
+        HStack(spacing: Theme.Spacing.s) {
+            if session.index > 0 {
+                Button {
+                    session.goBack()
+                } label: {
+                    Text("Back").frame(maxWidth: .infinity)
+                }
+                .secondaryButtonStyle()
+            }
+            Button {
+                session.goForward()
+            } label: {
+                Text(session.nextTitle).frame(maxWidth: .infinity)
+            }
+            .primaryButtonStyle()
+            .disabled(!session.canAdvance)
+        }
+        .font(.headline)
+        .controlSize(.large)
+    }
+
+    private func messageCard(symbol: String, color: Color, title: String, body: String) -> some View {
+        HStack(alignment: .top, spacing: Theme.Spacing.s) {
+            IconTile(systemImage: symbol, color: color, size: 44)
+            VStack(alignment: .leading, spacing: Theme.Spacing.xxs) {
+                Text(title)
+                    .font(.title3.weight(.bold))
+                Text(body)
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .cardStyle()
     }
 
     private var sidebar: some View {
         let course = game.courses.first { CurriculumLoader.courseLessons($0).contains { $0.id == lesson.id } }
-        return VStack(alignment: .leading, spacing: 8) {
+        return VStack(alignment: .leading, spacing: Theme.Spacing.s) {
             if let course {
-                Text(course.title).font(.headline)
-                ForEach(CurriculumLoader.courseLessons(course)) { item in
-                    let unlocked = CurriculumLoader.isCourseLessonUnlocked(course, lessonId: item.id, completed: game.completedLessons)
-                    let label = game.completedLessons.contains(item.id) ? "Done" : item.id == lesson.id ? "Current" : unlocked ? "Open" : "Locked"
-                    Button {
-                        if unlocked || item.id == lesson.id { game.openLesson(item.id) }
-                    } label: {
-                        HStack {
-                            Text(label).font(.caption).foregroundStyle(FreeMateTheme.accent)
-                            Text(item.title).foregroundStyle(unlocked ? FreeMateTheme.text : FreeMateTheme.muted)
+                SectionHeader(title: course.title)
+                    .padding(.top, Theme.Spacing.s)
+                VStack(spacing: 0) {
+                    let lessons = CurriculumLoader.courseLessons(course)
+                    ForEach(Array(lessons.enumerated()), id: \.element.id) { index, item in
+                        let unlocked = CurriculumLoader.isCourseLessonUnlocked(course, lessonId: item.id, completed: game.completedLessons)
+                        let done = game.completedLessons.contains(item.id)
+                        let isCurrent = item.id == lesson.id
+                        Button {
+                            if unlocked || isCurrent { game.openLesson(item.id) }
+                        } label: {
+                            HStack(spacing: Theme.Spacing.s) {
+                                Image(systemName: done ? "checkmark.circle.fill" : isCurrent ? "play.circle.fill" : unlocked ? "circle" : "lock.fill")
+                                    .foregroundStyle(done ? Theme.success : isCurrent ? Theme.accent : Color.secondary)
+                                    .frame(width: 24)
+                                Text(item.title)
+                                    .font(.body.weight(isCurrent ? .semibold : .regular))
+                                    .foregroundStyle(unlocked || isCurrent ? Color.primary : Color.secondary)
+                                Spacer()
+                                Text(done ? "Done" : isCurrent ? "Current" : unlocked ? "Open" : "Locked")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                            }
+                            .padding(.vertical, Theme.Spacing.s)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!unlocked && !isCurrent)
+                        if index < lessons.count - 1 {
+                            Divider().padding(.leading, 36)
                         }
                     }
-                    .buttonStyle(.plain)
-                    .disabled(!unlocked && item.id != lesson.id)
                 }
+                .cardStyle(padding: Theme.Spacing.m)
             }
         }
     }
@@ -295,7 +449,7 @@ struct LessonPlayerBody: View {
     private func note(for step: LessonStep) -> String {
         switch step.type {
         case "click-all-squares": return "Complete every highlighted square to unlock the next step."
-        case "square-click": return "Click the target square to continue."
+        case "square-click": return "Tap the target square to continue."
         case "board-task", "move-task", "capture-task", "tactic-task": return "Make the correct board action to continue."
         case "board-demo": return "Study the board, then continue when you are ready."
         default: return "Complete the interaction to continue."
@@ -312,30 +466,74 @@ struct OpeningOverviewView: View {
         FreeMateScreen(title: opening?.name ?? "Opening") {
             ScrollView {
                 if let opening {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("\(opening.eco) · \(opening.difficulty) · \(opening.side)")
-                            .foregroundStyle(FreeMateTheme.accent)
-                        Text(opening.description).foregroundStyle(FreeMateTheme.muted)
-                        Button("Train this repertoire") { game.openTrainer(id: opening.id, line: nil) }
-                            .buttonStyle(.borderedProminent)
-                            .tint(FreeMateTheme.green)
-                        Text("Ideas to remember").font(.headline)
-                        ForEach(opening.ideas, id: \.self) { idea in Text("• \(idea)") }
-                        Text("Common mistakes").font(.headline)
-                        ForEach(opening.commonMistakes, id: \.self) { idea in Text("• \(idea)") }
-                        Text("Main training path").font(.headline)
-                        ForEach(Array(opening.mainMoves.enumerated()), id: \.offset) { index, move in
-                            VStack(alignment: .leading) {
-                                Text("\(index + 1). \(move.san)").font(.headline)
-                                Text(move.explanation).font(.subheadline).foregroundStyle(FreeMateTheme.muted)
+                    VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
+                        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                            HStack(spacing: Theme.Spacing.s) {
+                                SideTile(isWhite: opening.side == "White")
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("\(opening.eco) · \(opening.difficulty) · \(opening.side)").eyebrowStyle()
+                                    Text(opening.name).font(.title2.weight(.bold))
+                                }
                             }
+                            Text(opening.description)
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                            Button {
+                                game.openTrainer(id: opening.id, line: nil)
+                            } label: {
+                                Label("Train This Repertoire", systemImage: "play.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .primaryButtonStyle()
+                            .controlSize(.large)
+                            .padding(.top, Theme.Spacing.xxs)
+                        }
+                        bulletSection("Ideas to Remember", items: opening.ideas, symbol: "lightbulb.fill", color: Theme.accent)
+                        bulletSection("Common Mistakes", items: opening.commonMistakes, symbol: "exclamationmark.triangle.fill", color: Theme.warning)
+                        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                            SectionHeader(title: "Main Training Path")
+                            VStack(alignment: .leading, spacing: Theme.Spacing.m) {
+                                ForEach(Array(opening.mainMoves.enumerated()), id: \.offset) { index, move in
+                                    HStack(alignment: .firstTextBaseline, spacing: Theme.Spacing.s) {
+                                        Text("\(index + 1). \(move.san)")
+                                            .font(.headline.monospaced())
+                                            .frame(minWidth: 72, alignment: .leading)
+                                        Text(move.explanation)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                            .cardStyle()
                         }
                         Text("Lichess explorer stats stay on the web service. This build trains from the local FreeMate lines.")
                             .font(.footnote)
-                            .foregroundStyle(FreeMateTheme.muted)
+                            .foregroundStyle(.secondary)
                     }
-                    .padding()
+                    .padding(Theme.Spacing.l)
+                    .frame(maxWidth: 720)
+                    .frame(maxWidth: .infinity)
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func bulletSection(_ title: String, items: [String], symbol: String, color: Color) -> some View {
+        if !items.isEmpty {
+            VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                SectionHeader(title: title)
+                VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                    ForEach(items, id: \.self) { item in
+                        Label {
+                            Text(item).font(.subheadline)
+                        } icon: {
+                            Image(systemName: symbol).foregroundStyle(color)
+                        }
+                    }
+                }
+                .cardStyle()
             }
         }
     }
@@ -350,7 +548,7 @@ struct OpeningTrainerView: View {
         if let opening = game.opening(id: openingId) {
             OpeningTrainerBody(opening: opening, game: game, lineId: lineId)
         } else {
-            Text("Opening not found")
+            ContentUnavailableView("Opening Not Found", systemImage: "questionmark.square.dashed")
         }
     }
 }
@@ -365,72 +563,123 @@ struct OpeningTrainerBody: View {
     var body: some View {
         FreeMateScreen(title: trainer.opening.name) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(trainer.kicker).font(.caption.bold()).foregroundStyle(FreeMateTheme.accent)
-                    Text(trainer.prompt).font(.title3.bold())
-                    Text(trainer.status)
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(trainer.statusDone ? FreeMateTheme.green : FreeMateTheme.muted)
-                    ModernBoardView(board: trainer.board)
-                    Text(trainer.noteTitle).font(.headline)
-                    Text(trainer.explanation).foregroundStyle(FreeMateTheme.muted)
-                    if !trainer.feedback.isEmpty {
-                        Text(trainer.feedback)
-                            .foregroundStyle(trainer.feedbackKind == "error" ? FreeMateTheme.red : trainer.feedbackKind == "success" ? FreeMateTheme.accent : FreeMateTheme.muted)
-                    }
-                    HStack {
-                        Button("Previous") { trainer.jump(to: trainer.moveIndex - 1) }
-                            .buttonStyle(.bordered)
-                        Button("Next") { trainer.jump(to: trainer.moveIndex + 1) }
-                            .buttonStyle(.bordered)
-                    }
-                    Text("Lines").font(.headline)
-                    ForEach(trainer.lines) { line in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Button {
-                                trainer.loadBranch(line)
-                            } label: {
-                                HStack {
-                                    Text(trainer.completions[line.id]?.completed == true ? "✓ \(line.title)" : line.title)
-                                        .font(.subheadline.weight(.semibold))
-                                    Spacer()
-                                    Text("\(trainer.lineProgress(line))%")
-                                        .font(.caption)
-                                }
-                                .foregroundStyle(line.id == trainer.activeLine.id ? FreeMateTheme.accent : FreeMateTheme.text)
-                            }
-                            .buttonStyle(.plain)
-                            ProgressMeter(value: trainer.lineProgress(line))
-                            ForEach(Array(line.moves.enumerated()), id: \.offset) { index, move in
-                                Button {
-                                    if line.id != trainer.activeLine.id { trainer.loadBranch(line) }
-                                    trainer.jump(to: index)
-                                } label: {
-                                    Text("\(stateIcon(trainer.moveState(line: line, index: index))) \(trainer.moveLabel(move, index: index))")
-                                        .font(.caption)
-                                        .foregroundStyle(FreeMateTheme.muted)
-                                }
-                                .buttonStyle(.plain)
-                            }
+                VStack(alignment: .leading, spacing: Theme.Spacing.l) {
+                    VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+                        HStack {
+                            Text(trainer.kicker).eyebrowStyle()
+                            Spacer()
+                            StatusBadge(text: trainer.status, tint: trainer.statusDone ? Theme.success : Color.secondary)
                         }
-                        .padding(8)
-                        .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 12))
+                        Text(trainer.prompt)
+                            .font(.title3.weight(.bold))
                     }
-                    Text("Ideas").font(.headline)
-                    ForEach(trainer.opening.ideas, id: \.self) { idea in Text("• \(idea)").font(.subheadline) }
-                    Text("Common mistakes").font(.headline)
-                    ForEach(trainer.opening.commonMistakes, id: \.self) { idea in Text("• \(idea)").font(.subheadline) }
+                    ModernBoardView(board: trainer.board)
+                        .frame(maxWidth: 560)
+                        .frame(maxWidth: .infinity)
+                    VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+                        Text(trainer.noteTitle)
+                            .font(.headline)
+                        Text(trainer.explanation)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        if !trainer.feedback.isEmpty {
+                            Text(trainer.feedback)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(trainer.feedbackKind == "error" ? Theme.warning : trainer.feedbackKind == "success" ? Theme.success : Color.secondary)
+                        }
+                    }
+                    .cardStyle()
+                    HStack(spacing: Theme.Spacing.s) {
+                        Button {
+                            trainer.jump(to: trainer.moveIndex - 1)
+                        } label: {
+                            Label("Previous", systemImage: "chevron.left").frame(maxWidth: .infinity)
+                        }
+                        Button {
+                            trainer.jump(to: trainer.moveIndex + 1)
+                        } label: {
+                            Label("Next", systemImage: "chevron.right").frame(maxWidth: .infinity)
+                        }
+                    }
+                    .secondaryButtonStyle()
+                    .controlSize(.large)
+                    VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                        SectionHeader(title: "Lines")
+                        ForEach(trainer.lines) { line in
+                            lineCard(line)
+                        }
+                    }
+                    ideaList("Ideas", items: trainer.opening.ideas, symbol: "lightbulb.fill", color: Theme.accent)
+                    ideaList("Common Mistakes", items: trainer.opening.commonMistakes, symbol: "exclamationmark.triangle.fill", color: Theme.warning)
                 }
-                .padding()
+                .padding(Theme.Spacing.l)
+                .frame(maxWidth: 720)
+                .frame(maxWidth: .infinity)
             }
         }
     }
 
-    private func stateIcon(_ state: String) -> String {
-        switch state {
-        case "done": return "✓"
-        case "active": return "→"
-        default: return "•"
+    private func lineCard(_ line: TrainingLine) -> some View {
+        let isActive = line.id == trainer.activeLine.id
+        let isComplete = trainer.completions[line.id]?.completed == true
+        return VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+            Button {
+                trainer.loadBranch(line)
+            } label: {
+                HStack {
+                    Image(systemName: isComplete ? "checkmark.circle.fill" : isActive ? "play.circle.fill" : "circle")
+                        .foregroundStyle(isComplete ? Theme.success : isActive ? Theme.accent : Color.secondary)
+                    Text(line.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(isActive ? Theme.accent : Color.primary)
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                }
+            }
+            .buttonStyle(.plain)
+            ProgressMeter(value: trainer.lineProgress(line))
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(Array(line.moves.enumerated()), id: \.offset) { index, move in
+                        let state = trainer.moveState(line: line, index: index)
+                        Button {
+                            if line.id != trainer.activeLine.id { trainer.loadBranch(line) }
+                            trainer.jump(to: index)
+                        } label: {
+                            Text(trainer.moveLabel(move, index: index))
+                                .font(.caption.monospaced())
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 5)
+                                .foregroundStyle(state == "active" ? Color.white : Color.primary)
+                                .background(
+                                    state == "active" ? Theme.accent : state == "done" ? Theme.success.opacity(0.18) : Theme.fill,
+                                    in: Capsule()
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+        .cardStyle()
+    }
+
+    @ViewBuilder
+    private func ideaList(_ title: String, items: [String], symbol: String, color: Color) -> some View {
+        if !items.isEmpty {
+            VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                SectionHeader(title: title)
+                VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                    ForEach(items, id: \.self) { item in
+                        Label {
+                            Text(item).font(.subheadline)
+                        } icon: {
+                            Image(systemName: symbol).foregroundStyle(color)
+                        }
+                    }
+                }
+                .cardStyle()
+            }
         }
     }
 }
@@ -440,46 +689,78 @@ struct ReviewView: View {
 
     var body: some View {
         let queue = game.hydratedQueue()
-        FreeMateScreen(title: "Review") {
+        FreeMateScreen(title: "Review", largeTitle: true) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    Text(queue.isEmpty ? "Nothing due" : "\(queue.count) item\(queue.count == 1 ? "" : "s") ready")
-                        .font(.headline)
-                    ProgressMeter(value: queue.isEmpty ? 100 : min(100, queue.count * 18))
+                VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
                     if queue.isEmpty {
-                        Text("No shaky items right now.")
-                            .font(.title3.bold())
-                        Text("Missed lesson tasks and opening branches will appear here automatically.")
-                            .foregroundStyle(FreeMateTheme.muted)
-                        Button("Continue lessons") { game.selectedTab = .lessons }
-                            .buttonStyle(.borderedProminent)
-                            .tint(FreeMateTheme.green)
-                        Button("Train openings") { game.selectedTab = .openings }
-                            .buttonStyle(.bordered)
+                        VStack(spacing: Theme.Spacing.m) {
+                            IconTile(systemImage: "checkmark", color: Theme.success, size: 56)
+                            Text("Nothing due")
+                                .font(.title2.weight(.bold))
+                            Text("Missed lesson tasks and opening branches appear here automatically.")
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                            ActionButtons(
+                                primaryTitle: "Continue Lessons",
+                                secondaryTitle: "Train Openings",
+                                primary: { game.selectedTab = .lessons },
+                                secondary: { game.selectedTab = .openings }
+                            )
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, Theme.Spacing.l)
+                        .cardStyle()
                     } else {
-                        ForEach(Array(queue.enumerated()), id: \.element.key) { index, item in
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("\(index + 1). \(item.type == "opening" ? "Opening branch" : "Lesson") · \(game.reviewLabel(item))")
-                                    .font(.caption.bold())
-                                    .foregroundStyle(FreeMateTheme.accent)
-                                Text(item.title).font(.headline)
-                                Text(item.subtitle.isEmpty ? "Practice this once, then move on." : item.subtitle)
-                                    .foregroundStyle(FreeMateTheme.muted)
-                                Text("\(item.state) · \(item.failures) miss\(item.failures == 1 ? "" : "es") · \(item.successStreak) correct in a row")
-                                    .font(.caption)
-                                Button("Review") { open(item) }
-                                    .buttonStyle(.borderedProminent)
-                                    .tint(FreeMateTheme.green)
+                        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+                            Text("\(queue.count) item\(queue.count == 1 ? "" : "s") ready")
+                                .font(.headline)
+                            ProgressMeter(value: min(100, queue.count * 18), tint: Theme.warning)
+                        }
+                        .cardStyle()
+                        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+                            SectionHeader(title: "Due Now")
+                            ForEach(queue, id: \.key) { item in
+                                reviewCard(item)
                             }
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(FreeMateTheme.panel, in: RoundedRectangle(cornerRadius: 16))
                         }
                     }
                 }
-                .padding()
+                .padding(Theme.Spacing.l)
+                .frame(maxWidth: 720)
+                .frame(maxWidth: .infinity)
             }
         }
+    }
+
+    private func reviewCard(_ item: ReviewItem) -> some View {
+        let isOpening = item.type == "opening"
+        return HStack(alignment: .top, spacing: Theme.Spacing.s) {
+            IconTile(
+                systemImage: isOpening ? "arrow.triangle.branch" : "book.fill",
+                color: isOpening ? Theme.topic("openings").color : Theme.accent,
+                size: 44
+            )
+            VStack(alignment: .leading, spacing: Theme.Spacing.xxs) {
+                Text("\(isOpening ? "Opening branch" : "Lesson") · \(game.reviewLabel(item))")
+                    .eyebrowStyle()
+                Text(item.title)
+                    .font(.headline)
+                Text(item.subtitle.isEmpty ? "Practice this once, then move on." : item.subtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Text("\(item.failures) miss\(item.failures == 1 ? "" : "es") · \(item.successStreak) correct in a row")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Review") { open(item) }
+                    .primaryButtonStyle()
+                    .controlSize(.small)
+                    .padding(.top, Theme.Spacing.xxs)
+            }
+            Spacer(minLength: 0)
+            StatusBadge(text: item.state.capitalized, tint: Theme.warning)
+        }
+        .cardStyle()
     }
 
     private func open(_ item: ReviewItem) {
@@ -502,48 +783,74 @@ struct AuthView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                FreeMateTheme.bg.ignoresSafeArea()
-                VStack(alignment: .leading, spacing: 14) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: Theme.Spacing.m) {
                     if let user = game.currentUser {
-                        Text("Signed in as \(user.displayName)")
-                            .font(.title3.bold())
-                        Button("Log out") {
+                        HStack(spacing: Theme.Spacing.s) {
+                            IconTile(systemImage: "person.fill", color: Theme.accent, size: 44)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Signed in as").eyebrowStyle()
+                                Text(user.displayName).font(.title3.weight(.bold))
+                            }
+                        }
+                        .cardStyle()
+                        Button(role: .destructive) {
                             game.logOut()
                             dismiss()
+                        } label: {
+                            Text("Log Out").frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(FreeMateTheme.green)
+                        .secondaryButtonStyle(tint: Theme.danger)
+                        .controlSize(.large)
                     } else {
+                        Text("Learning never needs an account. Sign in only to keep a named profile on this device.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                         Picker("Account", selection: $mode) {
-                            Text("Sign in").tag("login")
-                            Text("Create account").tag("signup")
+                            Text("Sign In").tag("login")
+                            Text("Create Account").tag("signup")
                         }
                         .pickerStyle(.segmented)
-                        TextField("Username", text: $username)
-                            .textFieldStyle(.roundedBorder)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                        SecureField("Password", text: $password)
-                            .textFieldStyle(.roundedBorder)
-                        Button(mode == "login" ? "Sign in" : "Create account") { submit() }
-                            .buttonStyle(.borderedProminent)
-                            .tint(FreeMateTheme.green)
+                        VStack(spacing: Theme.Spacing.xs) {
+                            TextField("Username", text: $username)
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled()
+                                .textContentType(.username)
+                                .padding(Theme.Spacing.s)
+                                .background(Theme.fill, in: RoundedRectangle(cornerRadius: Theme.Radius.small, style: .continuous))
+                            SecureField("Password", text: $password)
+                                .textContentType(mode == "login" ? .password : .newPassword)
+                                .padding(Theme.Spacing.s)
+                                .background(Theme.fill, in: RoundedRectangle(cornerRadius: Theme.Radius.small, style: .continuous))
+                        }
+                        Button {
+                            submit()
+                        } label: {
+                            Text(mode == "login" ? "Sign In" : "Create Account")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .primaryButtonStyle()
+                        .controlSize(.large)
                         if !message.isEmpty {
-                            Text(message).foregroundStyle(failed ? FreeMateTheme.red : FreeMateTheme.accent)
+                            Text(message)
+                                .font(.subheadline)
+                                .foregroundStyle(failed ? Theme.danger : Color.secondary)
                         }
                     }
-                    Spacer()
                 }
-                .padding()
+                .padding(Theme.Spacing.l)
             }
+            .themeBackground()
             .navigationTitle("Account")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }
                 }
             }
         }
+        .tint(Theme.accent)
     }
 
     private func submit() {
@@ -553,15 +860,7 @@ struct AuthView: View {
             ? game.logIn(username: username, password: password)
             : game.signUp(username: username, password: password)
         if let error {
-            if mode == "signup" && error == "That username is already taken." {
-                message = error
-            } else if mode == "signup" && (error.contains("Username") || error.contains("Password") || error.contains("Choose")) {
-                message = error
-            } else if mode == "signup" {
-                message = error == "Something went wrong creating your account." ? error : error
-            } else {
-                message = error
-            }
+            message = error
             failed = true
         } else {
             dismiss()
