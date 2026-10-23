@@ -4,7 +4,7 @@ import Foundation
 // python-chess checks in /api/validate-move, /api/legal-moves, /api/rook-move,
 // and /api/openings/validate-move.
 
-enum ChessColor: String, Codable, Equatable {
+nonisolated enum ChessColor: String, Codable, Equatable {
     case white
     case black
 
@@ -17,7 +17,7 @@ enum ChessColor: String, Codable, Equatable {
     }
 }
 
-enum PieceKind: String, Equatable {
+nonisolated enum PieceKind: String, Equatable {
     case pawn, knight, bishop, rook, queen, king
 
     var fen: Character {
@@ -55,7 +55,7 @@ enum PieceKind: String, Equatable {
     }
 }
 
-struct ChessPiece: Equatable {
+nonisolated struct ChessPiece: Equatable {
     var color: ChessColor
     var kind: PieceKind
 
@@ -92,7 +92,7 @@ struct ChessPiece: Equatable {
     }
 }
 
-struct VerboseMove: Equatable {
+nonisolated struct VerboseMove: Equatable {
     var from: String
     var to: String
     var promotion: String?
@@ -103,7 +103,7 @@ struct VerboseMove: Equatable {
     var uci: String { "\(from)\(to)\(promotion ?? "")" }
 }
 
-struct EngineMoveResult: Equatable {
+nonisolated struct EngineMoveResult: Equatable {
     var isValid: Bool
     var message: String
     var san: String?
@@ -114,7 +114,7 @@ struct EngineMoveResult: Equatable {
     var promotionChoices: [String] = []
 }
 
-enum FenError: LocalizedError {
+nonisolated enum FenError: LocalizedError {
     case empty
     case rankCount
     case rankWidth
@@ -134,7 +134,7 @@ enum FenError: LocalizedError {
     }
 }
 
-enum ChessSquare {
+nonisolated enum ChessSquare {
     static let files = Array("abcdefgh")
 
     static func index(file: Int, rank: Int) -> Int { rank * 8 + file }
@@ -159,7 +159,7 @@ enum ChessSquare {
     }
 }
 
-final class ChessEngine {
+nonisolated final class ChessEngine {
     static let startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     static let emptyFen = "8/8/8/8/8/8/8/8 w - - 0 1"
 
@@ -170,6 +170,8 @@ final class ChessEngine {
     private var halfmove: Int
     private var fullmove: Int
     private var positionCounts: [String: Int]
+    /// Snapshots skip repetition tracking, which builds a FEN string on every move.
+    private var recordsPositions = true
 
     init(fen: String) throws {
         let parts = try ChessEngine.normalize(fen)
@@ -279,7 +281,7 @@ final class ChessEngine {
 
     func legalMoves(from square: String? = nil) -> [VerboseMove] {
         let raws = pseudoLegalMoves(from: square).filter { isLegal($0) }
-        return raws.map { verbose($0, among: raws.filter { isLegal($0) }) }
+        return raws.map { verbose($0, among: raws) }
     }
 
     @discardableResult
@@ -532,10 +534,11 @@ final class ChessEngine {
         self.halfmove = halfmove
         self.fullmove = fullmove
         self.positionCounts = [:]
+        recordsPositions = recordsPosition
         if recordsPosition { recordPosition() }
     }
 
-    private struct RawMove {
+    fileprivate struct RawMove {
         var from: Int
         var to: Int
         var promotion: PieceKind?
@@ -776,7 +779,7 @@ final class ChessEngine {
         turn = opponent
         sanitizeCastling()
         sanitizeEnPassant()
-        recordPosition()
+        if recordsPositions { recordPosition() }
     }
 
     private func isKingInCheck(_ color: ChessColor) -> Bool {
@@ -971,7 +974,38 @@ final class ChessEngine {
     }
 }
 
-struct OpeningLineMove: Equatable {
+/// A legal move for `ComputerOpponent`. Unlike `legalMoves()`, it skips SAN, which plays every
+/// move out a second time to look for check and checkmate.
+nonisolated struct SearchMove {
+    fileprivate let raw: ChessEngine.RawMove
+    let piece: PieceKind
+    let captured: PieceKind?
+
+    var uci: String {
+        ChessSquare.name(raw.from) + ChessSquare.name(raw.to) + (raw.promotion.map { String($0.fen) } ?? "")
+    }
+}
+
+nonisolated extension ChessEngine {
+    /// The pieces by square index, a1 first and h8 last.
+    var squares: [ChessPiece?] { board }
+
+    func searchMoves() -> [SearchMove] {
+        pseudoLegalMoves(from: nil).filter { isLegal($0) }.map { move in
+            let captured = move.enPassant ? .pawn : move.captured ? board[move.to]?.kind : nil
+            return SearchMove(raw: move, piece: board[move.from]!.kind, captured: captured)
+        }
+    }
+
+    /// The position after `move`, leaving this one unchanged.
+    func playing(_ move: SearchMove) -> ChessEngine {
+        let next = snapshot()
+        next.apply(move.raw)
+        return next
+    }
+}
+
+nonisolated struct OpeningLineMove: Equatable {
     var uci: String
     var san: String
     var title: String
