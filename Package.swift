@@ -19,6 +19,7 @@ let package = Package(
             path: "FreeMateIOS",
             exclude: [
                 "AuthSession.swift",
+                "ComputerGame.swift",
                 "DebugLaunchRoute.swift",
                 "ContentView.swift",
                 "Curriculum.swift",
@@ -45,6 +46,7 @@ let package = Package(
             ],
             sources: [
                 "ChessEngine.swift",
+                "ComputerOpponent.swift",
                 "DesignSystem/BoardPieceLayout.swift",
                 "DesignSystem/MoveListFormatter.swift",
                 "OpeningTutorials/ChessOpening.swift",

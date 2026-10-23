@@ -1,8 +1,20 @@
 import SwiftUI
 
-/// The Practice tab: a free board for both sides, on the same board as the tutorials.
+/// Whether the Practice tab shows a game against the computer or a free board.
+enum PracticeMode: String, CaseIterable, Identifiable {
+    case computer
+    case freeBoard
+
+    var id: String { rawValue }
+    var label: String { self == .computer ? "Play Computer" : "Free Board" }
+}
+
+/// The Practice tab: a game against the computer, or a free board for both sides, on the same
+/// board as the tutorials.
 struct PracticeView: View {
     @StateObject private var board = PracticeBoard()
+    @StateObject private var computer = ComputerGame()
+    @AppStorage("freemate.practiceMode") private var mode = PracticeMode.computer
     @State private var showsPositionLoader = false
 
     private var turnText: String { board.turn == "white" ? "White" : "Black" }
@@ -15,22 +27,20 @@ struct PracticeView: View {
     }
 
     var body: some View {
-        let moves = MoveListFormatter.rows(board.history.map(\.san), startingFen: board.initialFen)
         ScrollView {
             VStack(spacing: 20) {
-                statusRow
-                ModernBoardView(board: board)
-                    .frame(maxWidth: 560)
-                controls
-                if !board.feedback.isEmpty {
-                    Text(board.feedback)
-                        .font(.footnote)
-                        .foregroundStyle(board.feedbackKind == "error" ? Theme.warning : .secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .contentTransition(.opacity)
+                Picker("Mode", selection: $mode.animation(DesignMotion.spring)) {
+                    ForEach(PracticeMode.allCases) { mode in
+                        Text(mode.label).tag(mode)
+                    }
                 }
-                movesCard(moves)
-                positionCard
+                .pickerStyle(.segmented)
+                switch mode {
+                case .computer:
+                    ComputerPlayPanel(game: computer)
+                case .freeBoard:
+                    freeBoard
+                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 4)
@@ -45,6 +55,26 @@ struct PracticeView: View {
         .accountToolbar()
         .animation(DesignMotion.spring, value: board.history.count)
         .animation(DesignMotion.spring, value: board.feedback)
+    }
+
+    @ViewBuilder
+    private var freeBoard: some View {
+        statusRow
+        ModernBoardView(board: board)
+            .frame(maxWidth: 560)
+        controls
+        if !board.feedback.isEmpty {
+            Text(board.feedback)
+                .font(.footnote)
+                .foregroundStyle(board.feedbackKind == "error" ? Theme.warning : .secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentTransition(.opacity)
+        }
+        MoveListCard(
+            moves: MoveListFormatter.rows(board.history.map(\.san), startingFen: board.initialFen),
+            emptyText: "Moves you play appear here."
+        )
+        positionCard
     }
 
     private var statusRow: some View {
@@ -67,29 +97,56 @@ struct PracticeView: View {
 
     private var controls: some View {
         HStack(spacing: 10) {
-            controlButton("Reset", systemImage: "arrow.counterclockwise") { board.reset() }
-            controlButton("Flip", systemImage: "arrow.up.arrow.down") { board.flip() }
-            controlButton("Clear", systemImage: "xmark.square") { board.clear() }
+            PracticeControlButton(title: "Reset", systemImage: "arrow.counterclockwise") { board.reset() }
+            PracticeControlButton(title: "Flip", systemImage: "arrow.up.arrow.down") { board.flip() }
+            PracticeControlButton(title: "Clear", systemImage: "xmark.square") { board.clear() }
         }
     }
 
-    private func controlButton(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
+    private var positionCard: some View {
+        DisclosureGroup(isExpanded: $showsPositionLoader) {
+            FenForm(board: board)
+                .padding(.top, 10)
+        } label: {
+            Label("Load a Position", systemImage: "square.and.arrow.down")
+                .font(.headline)
+                .foregroundStyle(.primary)
+        }
+        .padding(16)
+        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
+    }
+}
+
+/// A full-width capsule button for the row of board controls.
+struct PracticeControlButton: View {
+    var title: String
+    var systemImage: String
+    var action: () -> Void
+
+    var body: some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
                 .font(.subheadline.weight(.semibold))
+                .lineLimit(1)
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.bordered)
         .buttonBorderShape(.capsule)
         .controlSize(.large)
     }
+}
 
-    private func movesCard(_ moves: [String]) -> some View {
+/// The moves played so far, scrolled to the latest.
+struct MoveListCard: View {
+    var moves: [String]
+    var emptyText: String
+
+    var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Moves")
                 .font(.headline)
             if moves.isEmpty {
-                Text("Moves you play appear here.")
+                Text(emptyText)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
@@ -114,19 +171,6 @@ struct PracticeView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
-    }
-
-    private var positionCard: some View {
-        DisclosureGroup(isExpanded: $showsPositionLoader) {
-            FenForm(board: board)
-                .padding(.top, 10)
-        } label: {
-            Label("Load a Position", systemImage: "square.and.arrow.down")
-                .font(.headline)
-                .foregroundStyle(.primary)
-        }
-        .padding(16)
         .background(Theme.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
     }
 }

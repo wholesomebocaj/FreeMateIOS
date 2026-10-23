@@ -50,6 +50,14 @@ Reusable pieces in `FreeMateIOS/DesignSystem/`:
 * `MotionEffects.swift` and `Haptics.swift`: the shared spring, shake, glow, pressable cards, and light, error, and success haptics.
 * `FilterChips.swift`: the search-and-filter chip row used by the Lessons and Openings tabs.
 
+## Play the computer
+
+The Practice tab opens on a game against the same beginner computer as the web app. Easy looks one move ahead with a lot of randomness, so it misses tactics. Fair looks two moves ahead. The learner picks White or Black, can undo a move, and can resign. Wins, draws, and losses are saved on the device. The Free Board side of the tab is the old two-sided board.
+
+* `ComputerOpponent.swift`: the search, ported from `web/engine.js`. It is UI-free and runs off the main thread.
+* `ComputerGame.swift`: plays a game on a `PracticeBoard` and keeps the record.
+* `Tabs/ComputerPlayPanel.swift`: the screen.
+
 The tab root screens live in `FreeMateIOS/Tabs/`: Lessons (`CourseLibraryView`), Openings (`OpeningBrowserView`), and Practice (`PracticeView`). Every board in the app, including lessons, the opening trainer, and Practice, uses `ModernBoardView`.
 
 To add an opening, edit `opening-tutorials.json`, then check it and fill ECO codes from [eco.json](https://github.com/JeffML/eco.json):
