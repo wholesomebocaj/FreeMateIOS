@@ -45,14 +45,12 @@ struct HomeView: View {
             Text("Free structured lessons, practice, and opening training for beginners who want a calm, clear path forward.")
                 .font(.body)
                 .foregroundStyle(.secondary)
-            HStack(spacing: Theme.Spacing.s) {
-                Button("Start Learning") { game.selectedTab = .lessons }
-                    .primaryButtonStyle()
-                Button("Explore Openings") { game.selectedTab = .openings }
-                    .secondaryButtonStyle()
-            }
-            .font(.headline)
-            .controlSize(.large)
+            ActionButtons(
+                primaryTitle: "Start Learning",
+                secondaryTitle: "Explore Openings",
+                primary: { game.selectedTab = .lessons },
+                secondary: { game.selectedTab = .openings }
+            )
             .padding(.top, Theme.Spacing.xxs)
         }
     }
@@ -703,14 +701,12 @@ struct ReviewView: View {
                                 .font(.body)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
-                            HStack(spacing: Theme.Spacing.s) {
-                                Button("Continue Lessons") { game.selectedTab = .lessons }
-                                    .primaryButtonStyle()
-                                Button("Train Openings") { game.selectedTab = .openings }
-                                    .secondaryButtonStyle()
-                            }
-                            .font(.headline)
-                            .controlSize(.large)
+                            ActionButtons(
+                                primaryTitle: "Continue Lessons",
+                                secondaryTitle: "Train Openings",
+                                primary: { game.selectedTab = .lessons },
+                                secondary: { game.selectedTab = .openings }
+                            )
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, Theme.Spacing.l)

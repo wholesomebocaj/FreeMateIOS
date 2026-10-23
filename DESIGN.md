@@ -57,6 +57,7 @@ All text uses San Francisco through Dynamic Type styles, so it scales with the u
 | A screen | `FreeMateScreen(title:largeTitle:)` gives the themed background, navigation title, and account button. Custom roots add `.themeBackground()` and `.accountToolbar()`. |
 | A card | `.cardStyle()` |
 | Main and secondary actions | `.primaryButtonStyle()` and `.secondaryButtonStyle()`. Use `.controlSize(.large)` for full-width actions. |
+| A pair of actions | `ActionButtons`, which sits side by side when there is room and stacks full width when there is not |
 | A section | `SectionHeader(title:subtitle:)` |
 | Progress | `ProgressMeter(value:)` (bar and percentage), `CapsuleProgressBar`, or `ProgressRing` |
 | A state | `StatusBadge(text:systemImage:tint:)` |

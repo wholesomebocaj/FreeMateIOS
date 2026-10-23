@@ -166,6 +166,43 @@ struct StatusBadge: View {
     }
 }
 
+/// A main and a secondary action side by side, stacked full width when they do not fit.
+struct ActionButtons: View {
+    var primaryTitle: String
+    var secondaryTitle: String
+    var primary: () -> Void
+    var secondary: () -> Void
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: Theme.Spacing.s) {
+                buttons(fillWidth: false)
+            }
+            VStack(spacing: Theme.Spacing.xs) {
+                buttons(fillWidth: true)
+            }
+        }
+        .font(.headline)
+        .controlSize(.large)
+    }
+
+    @ViewBuilder
+    private func buttons(fillWidth: Bool) -> some View {
+        Button(action: primary) {
+            Text(primaryTitle)
+                .lineLimit(1)
+                .frame(maxWidth: fillWidth ? .infinity : nil)
+        }
+        .primaryButtonStyle()
+        Button(action: secondary) {
+            Text(secondaryTitle)
+                .lineLimit(1)
+                .frame(maxWidth: fillWidth ? .infinity : nil)
+        }
+        .secondaryButtonStyle()
+    }
+}
+
 /// A rounded tile with a symbol, for list rows and cards.
 struct IconTile: View {
     var systemImage: String
