@@ -8,6 +8,11 @@ concurrency:
   group: ios-build-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Hosted runners do not always have the newest iOS runtime installed. The app needs
+  # iOS 17 APIs, so any iOS 26 simulator is a fair test of the code.
+  CI_DEPLOYMENT_TARGET: "26.0"
+
 jobs:
   build:
     name: Build and test
@@ -16,44 +21,48 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select the newest Xcode
+      # `simctl` can list iPhones that the selected Xcode will not run on, for example when
+      # an Xcode release expects a simulator runtime the image does not ship. Ask each
+      # Xcode, newest first, for its own destinations and keep the first with a real iPhone.
+      - name: Pick an Xcode with a usable iOS Simulator
         run: |
-          XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
-          sudo xcode-select -s "$XCODE/Contents/Developer"
-          xcodebuild -version
-          echo "SIM_SDK=$(xcrun --sdk iphonesimulator --show-sdk-version)" >> "$GITHUB_ENV"
+          for XCODE in $(ls -d /Applications/Xcode_*.app | sort -rV); do
+            DEVICE=$(DEVELOPER_DIR="$XCODE/Contents/Developer" xcodebuild -showdestinations \
+                -project FreeMateIOS.xcodeproj -scheme FreeMateIOS \
+                IPHONEOS_DEPLOYMENT_TARGET="$CI_DEPLOYMENT_TARGET" 2>/dev/null \
+              | awk '/Ineligible destinations/ { exit } /platform:iOS Simulator/ && /name:iPhone/ && !/placeholder/' \
+              | head -1 | sed -E 's/.*id:([^,]+),.*/\1/')
+            if [ -n "$DEVICE" ]; then
+              echo "DEVELOPER_DIR=$XCODE/Contents/Developer" >> "$GITHUB_ENV"
+              echo "DEVICE=$DEVICE" >> "$GITHUB_ENV"
+              DEVELOPER_DIR="$XCODE/Contents/Developer" xcodebuild -version
+              echo "Simulator: $DEVICE"
+              exit 0
+            fi
+            echo "$XCODE has no usable iOS Simulator"
+          done
+          echo "No installed Xcode can run an iOS Simulator" >&2
+          exit 1
 
-      # The deployment target follows the runner's SDK so the build does not depend on
-      # the newest iOS release being installed. The code itself needs iOS 17 APIs.
       - name: Build app and tests
         run: |
           xcodebuild build-for-testing \
             -project FreeMateIOS.xcodeproj \
             -scheme FreeMateIOS \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination "id=$DEVICE" \
             -derivedDataPath DerivedData \
-            IPHONEOS_DEPLOYMENT_TARGET="$SIM_SDK" \
+            IPHONEOS_DEPLOYMENT_TARGET="$CI_DEPLOYMENT_TARGET" \
             CODE_SIGNING_ALLOWED=NO \
             -quiet
 
-      - name: Run tests on a simulator
+      - name: Run tests on the simulator
         run: |
-          DEVICE=$(xcrun simctl list devices available -j | python3 -c '
-          import json, sys
-          devices = json.load(sys.stdin)["devices"]
-          for runtime in sorted(devices, reverse=True):
-              if "iOS" in runtime:
-                  for device in devices[runtime]:
-                      if device["name"].startswith("iPhone"):
-                          print(device["udid"])
-                          sys.exit()
-          ')
           xcodebuild test-without-building \
             -project FreeMateIOS.xcodeproj \
             -scheme FreeMateIOS \
             -destination "id=$DEVICE" \
             -derivedDataPath DerivedData \
-            IPHONEOS_DEPLOYMENT_TARGET="$SIM_SDK" \
+            IPHONEOS_DEPLOYMENT_TARGET="$CI_DEPLOYMENT_TARGET" \
             CODE_SIGNING_ALLOWED=NO
 
       - name: Swift package tests
