@@ -17,6 +17,8 @@ nonisolated enum SyncMerge {
         SyncedKey(key: PuzzleProgressStore.storageKey, merge: puzzles),
         SyncedKey(key: OpeningTutorialProgressStore.storageKey, merge: tutorials),
         SyncedKey(key: ActivityStore.storageKey, merge: activity),
+        SyncedKey(key: RushStore.storageKey, merge: rushBest),
+        SyncedKey(key: BlunderProgressStore.storageKey, merge: activity),
     ]
 
     /// Merges a local and a cloud value. A missing side takes the other one as is.
@@ -57,6 +59,14 @@ nonisolated enum SyncMerge {
         return try? JSONEncoder.progress.encode(merged)
     }
 
+    /// The best Puzzle Rush score on either device.
+    @Sendable static func rushBest(_ a: Data, _ b: Data) -> Data? {
+        guard let left = try? JSONDecoder().decode(Int.self, from: a),
+              let right = try? JSONDecoder().decode(Int.self, from: b) else { return nil }
+        return try? JSONEncoder().encode(max(left, right))
+    }
+
+    /// A union of sorted string lists: practice days, or blunder checks answered correctly.
     @Sendable static func activity(_ a: Data, _ b: Data) -> Data? {
         guard let left = try? JSONDecoder().decode([String].self, from: a),
               let right = try? JSONDecoder().decode([String].self, from: b) else { return nil }

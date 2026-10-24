@@ -5,6 +5,10 @@ For every puzzle: the FEN is legal and each solution move is legal.
 Mate puzzles: every solution mates. Any other mate is also accepted in the app.
 Material puzzles: each solution wins at least WIN centipawns, and every move that is not a
 solution is at least MARGIN worse, so a learner is never marked wrong for an equal move.
+Mate in 2 ("mateIn": 2): there is no mate in 1, and the solution lists exactly the first moves
+that force mate next move against every defense.
+Blunder checks: a "blunder" move loses at least WIN (or allows mate) and its refutation is the
+best reply; a "safe" move loses at most SAFE.
 
     pip install chess
     python3 tools/check_puzzles.py
@@ -22,6 +26,7 @@ VALUES = {chess.PAWN: 100, chess.KNIGHT: 320, chess.BISHOP: 330, chess.ROOK: 500
 MATE = 100_000
 WIN = 200
 MARGIN = 150
+SAFE = 60
 
 
 def material(board):
@@ -74,6 +79,74 @@ def scores(board):
     return result
 
 
+def mates_in_one(board):
+    for move in board.legal_moves:
+        board.push(move)
+        mate = board.is_checkmate()
+        board.pop()
+        if mate:
+            return True
+    return False
+
+
+def forces_mate_in_two(board, move):
+    """After `move`, every reply allows mate in one."""
+    board.push(move)
+    try:
+        if board.is_checkmate() or not any(True for _ in board.legal_moves):
+            return False
+        for reply in list(board.legal_moves):
+            board.push(reply)
+            ok = mates_in_one(board)
+            board.pop()
+            if not ok:
+                return False
+        return True
+    finally:
+        board.pop()
+
+
+def check_mate_in_two(puzzle, board, where):
+    if mates_in_one(board):
+        return [f"{where}: there is a mate in 1"]
+    keys = sorted(m.uci() for m in board.legal_moves if forces_mate_in_two(board, m))
+    if not keys:
+        return [f"{where}: no first move forces mate in 2"]
+    if sorted(puzzle["solution"]) != keys:
+        return [f"{where}: forcing first moves are {keys}, solution lists {sorted(puzzle['solution'])}"]
+    return []
+
+
+def check_blunder(item, where):
+    board = chess.Board(item["fen"])
+    if not board.is_valid():
+        return [f"{where}: invalid FEN ({board.status()})"]
+    move = chess.Move.from_uci(item["move"])
+    if move not in board.legal_moves:
+        return [f"{where}: {item['move']} is not legal"]
+    now = material(board)
+    board.push(move)
+    replies = {}
+    for reply in board.legal_moves:
+        board.push(reply)
+        replies[reply.uci()] = negamax(board, 0, -10**9, 10**9)
+        board.pop()
+    after = min(replies.values()) if replies else now
+    loss = now - after
+    problems = []
+    if item["isBlunder"]:
+        if loss < WIN:
+            problems.append(f"{where}: called a blunder but only loses {loss}")
+        best = min(replies, key=replies.get)
+        if item.get("refutation") not in replies:
+            problems.append(f"{where}: refutation {item.get('refutation')} is not legal (best is {best})")
+        elif replies[item["refutation"]] > after + 30:
+            problems.append(f"{where}: refutation {item['refutation']} is not the best reply (best is {best})")
+    elif loss > SAFE:
+        problems.append(f"{where}: called safe but loses {loss}")
+    return problems
+
+
 def check(puzzle, where):
     problems = []
     board = chess.Board(puzzle["fen"])
@@ -84,6 +157,8 @@ def check(puzzle, where):
             problems.append(f"{where}: {uci} is not legal")
     if problems:
         return problems
+    if puzzle.get("mateIn") == 2:
+        return check_mate_in_two(puzzle, board, where)
     if puzzle.get("mate") or puzzle.get("theme") == "mate":
         for uci in puzzle["solution"]:
             board.push_uci(uci)
@@ -121,10 +196,20 @@ def main():
             if puzzle.get("theme") not in ("mate", "material"):
                 problems.append(f"{puzzle['id']}: theme must be mate or material")
             problems += check(puzzle, f"level {level['level']}/{puzzle['id']}")
+    for collection in puzzles.get("collections", []):
+        for puzzle in collection["puzzles"]:
+            if puzzle["id"] in ids:
+                problems.append(f"duplicate id {puzzle['id']}")
+            ids.add(puzzle["id"])
+            problems += check(puzzle, f"{collection['id']}/{puzzle['id']}")
+    blunders = json.loads((RESOURCES / "blunders.json").read_text())
+    for item in blunders:
+        problems += check_blunder(item, f"blunder/{item['id']}")
     for problem in problems:
         print(problem)
     count = sum(len(level["puzzles"]) for level in puzzles["levels"])
-    print(f"{len(problems)} problems in {sum(len(d['puzzles']) for d in drills)} drill puzzles and {count} puzzles")
+    count += sum(len(c["puzzles"]) for c in puzzles.get("collections", []))
+    print(f"{len(problems)} problems in {sum(len(d['puzzles']) for d in drills)} drill puzzles, {count} puzzles, and {len(blunders)} blunder checks")
     return 1 if problems else 0
 
 

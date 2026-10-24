@@ -65,6 +65,7 @@ let package = Package(
                 "Progress/LegacyProgressMigration.swift",
                 "Progress/SyncMerge.swift",
                 "Puzzles/Puzzle.swift",
+                "Puzzles/PuzzleModes.swift",
             ],
             swiftSettings: appSettings
         ),

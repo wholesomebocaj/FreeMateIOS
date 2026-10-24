@@ -51,7 +51,7 @@ Reusable pieces in `FreeMateIOS/DesignSystem/`:
 
 ## Play the computer
 
-The Practice tab opens on a game against the same beginner computer as the web app. Easy looks one move ahead with a lot of randomness, so it misses tactics. Fair looks two moves ahead. The learner picks White or Black, can undo a move, and can resign. Wins, draws, and losses are saved on the device. The Free Board side of the tab is the old two-sided board.
+The Play tab opens a game against the same beginner computer as the web app. Easy looks one move ahead with a lot of randomness, so it misses tactics. Fair looks two moves ahead. The learner picks White or Black, can undo a move, and can resign. Wins, draws, and losses are saved on the device. Play also has a free board for both sides.
 
 Beginner sits below Easy and is iOS only. It looks one move ahead with so much randomness that it grabs a free queen but plays loosely otherwise.
 
@@ -69,16 +69,25 @@ Code:
 * `ComputerGameReview.swift`: grades a finished game one move at a time and steps a board through it.
 * `Tabs/ComputerGameView.swift` and `Tabs/ComputerGameReviewView.swift`: the screens.
 
-## Puzzles and drills
+## Puzzles
 
-The Practice tab's Puzzles side has two parts. Each puzzle is one position with one winning move.
+The Puzzles tab (`Puzzles/Views/PuzzlesView.swift`) has:
 
-* **Puzzles:** 24 curated mate-in-one and win-a-piece puzzles in four levels of six. Solving 4 in a level unlocks the next. They live in `Resources/puzzles.json`.
-* **Drills:** the web app's five drills, on mate in one, forks, pins, hanging pieces, and getting out of check. They live in `Resources/drills.json`, which `web/build_content.py` also reads, so both apps share one copy.
+* **Daily Puzzle:** one a day, the same for everyone, with its own streak. `DailyPuzzle` steps through every bundled puzzle with a stride that visits each one before any repeats.
+* **Puzzle Rush:** as many one-move puzzles as you can in 3 minutes, with one try each and three misses allowed. The best score is saved.
+* **Blunder Check:** "Is this move safe?" Answer Safe or Blunder, then watch the move and its punishment. Content is in `Resources/blunders.json`.
+* **Endgames** and **Mate in Two:** collections in `Resources/puzzles.json`. In a mate in two, the learner's first move must be one of the listed keys. The computer then defends with its most natural reply, and any checkmate finishes the puzzle.
+* **Path:** 24 mate-in-one and win-a-piece puzzles in four levels of six. Solving 4 in a level unlocks the next.
+* **Themes:** the web app's five drills (`Resources/drills.json`, shared with `web/build_content.py`), plus Skewers and Discovered Attacks.
 
-A wrong move springs back and shows the hint. Hint marks the piece to move. After two wrong moves, Show Answer marks the whole move, and the puzzle no longer counts as solved first try. Any checkmate solves a mate puzzle. Progress is saved on the device.
+A wrong move springs back and shows the hint. Hint marks the piece to move. After two wrong moves, Show Answer marks the whole move, and the puzzle no longer counts as solved first try. Any checkmate solves a one-move mate puzzle. Progress, the Rush best, and Blunder Check results sync through iCloud.
 
-Code in `FreeMateIOS/Puzzles/`: `Puzzle.swift` holds the models, the loader, the progress store, and the UI-free `PuzzleSession`. `PuzzleTrainer.swift` drives the board, and `Views/` has the hub and the trainer screen.
+Code in `FreeMateIOS/Puzzles/`:
+
+* `Puzzle.swift`: the models, the loader, the progress store, and the UI-free `PuzzleSession`, including mate in two.
+* `PuzzleModes.swift`: the daily puzzle, `RushSession`, and Blunder Check.
+* `PuzzleTrainer.swift`: drives the board.
+* `Views/`: the Puzzles page, the trainer, Rush, and Blunder Check.
 
 After editing either file, check every position:
 
@@ -87,9 +96,9 @@ pip install chess
 python3 tools/check_puzzles.py
 ```
 
-It checks that every FEN and solution is legal, and that mate solutions mate. For win-a-piece puzzles, it checks that each solution wins at least 2 pawns' worth and that every other move is clearly worse, so a learner is never marked wrong for an equally good move.
+It checks that every FEN and solution is legal, and that mate solutions mate. For win-a-piece puzzles, it checks that each solution wins at least 2 pawns' worth and that every other move is clearly worse, so a learner is never marked wrong for an equally good move. For a mate in two, it checks that there is no mate in one and that the listed keys are exactly the moves that force mate. For Blunder Check, it checks that each blunder really loses material (with the listed refutation as the best reply) and that each safe move does not.
 
-The tabs are Today (`TodayView`), Learn (`CourseLibraryView`), Openings (`OpeningBrowserView`), Practice (`PracticeView`), and Review, in `FreeMateIOS/Tabs/` and `FeatureViews.swift`. Practice is a list that opens the computer, the free board, puzzle levels, and drills as focused screens. Settings opens from Today. Every board in the app uses `ModernBoardView`.
+The tabs are Today (`TodayView`), Learn (`CourseLibraryView`), Openings (`OpeningBrowserView`), Puzzles (`PuzzlesView`), and Play (`PracticeView`: the computer and the free board). Review opens from Today, which shows what is due and carries the badge. Settings opens from Today. Every board in the app uses `ModernBoardView`.
 
 To add an opening, edit `opening-tutorials.json`, then check it and fill ECO codes from [eco.json](https://github.com/JeffML/eco.json):
 

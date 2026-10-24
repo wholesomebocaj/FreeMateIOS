@@ -18,18 +18,21 @@ struct PuzzleTrainerView: View {
                 if session.isFinished {
                     completion
                 } else {
-                    progressDots
+                    if session.puzzleSet.puzzles.count > 1 {
+                        progressDots
+                    }
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("\(trainer.puzzle.sideToMove.label) to move · \(session.index + 1) of \(session.puzzleSet.puzzles.count)")
+                        Text(caption)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        Text(trainer.puzzle.prompt)
+                        Text(session.step > 0 && !session.isSolved ? "Now checkmate." : trainer.puzzle.prompt)
                             .font(.title2.weight(.bold))
                             .fixedSize(horizontal: false, vertical: true)
+                            .contentTransition(.opacity)
                     }
                     ModernBoardView(
                         board: trainer.board,
-                        isInteractive: !session.isSolved,
+                        isInteractive: !session.isSolved && !trainer.isReplying,
                         shakeSquare: trainer.rejectedSquare,
                         shakeTrigger: trainer.rejectionCount
                     )
@@ -67,6 +70,14 @@ struct PuzzleTrainerView: View {
         }
     }
 
+    private var caption: String {
+        let side = "\(trainer.puzzle.sideToMove.label) to move"
+        if session.puzzleSet.isDaily {
+            return "\(side) · \(Date().formatted(.dateTime.weekday(.wide).month().day()))"
+        }
+        return "\(side) · \(session.index + 1) of \(session.puzzleSet.puzzles.count)"
+    }
+
     private var progressDots: some View {
         HStack(spacing: 6) {
             ForEach(Array(session.puzzleSet.puzzles.enumerated()), id: \.element.id) { index, puzzle in
@@ -83,6 +94,8 @@ struct PuzzleTrainerView: View {
     private var feedback: some View {
         if session.isSolved {
             message(trainer.puzzle.success, systemImage: "checkmark.circle.fill", tint: Theme.success)
+        } else if session.step > 0 && session.mistakes == 0 && !session.hintShown {
+            message(trainer.isReplying ? "Good. Now watch the reply." : "Good. Every reply loses now. Finish it.", systemImage: "checkmark.circle", tint: Theme.success)
         } else if session.mistakes > 0 {
             message("Not quite. \(trainer.puzzle.hint)", systemImage: "lightbulb.fill", tint: Theme.warning)
         } else if session.hintShown {
@@ -108,7 +121,7 @@ struct PuzzleTrainerView: View {
             Button {
                 trainer.next()
             } label: {
-                Text(session.isLast ? "Finish" : "Next Puzzle")
+                Text(session.puzzleSet.isDaily ? "Done" : session.isLast ? "Finish" : "Next Puzzle")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -135,6 +148,48 @@ struct PuzzleTrainerView: View {
     }
 
     private var completion: some View {
+        VStack(spacing: Theme.Spacing.m) {
+            if session.puzzleSet.isDaily {
+                dailyCompletion
+            } else {
+                setCompletion
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 80)
+        .transition(.opacity.combined(with: .scale(scale: 0.96)))
+    }
+
+    @ViewBuilder
+    private var dailyCompletion: some View {
+        let streak = DailyPuzzle.streak(solved: trainer.solved, today: Date())
+        Image(systemName: "checkmark.seal.fill")
+            .font(.system(size: 64))
+            .foregroundStyle(Theme.success)
+            .symbolEffect(.bounce, value: session.isFinished)
+        Text("Daily Puzzle Solved")
+            .font(.title.weight(.bold))
+        if streak > 1 {
+            Label("\(streak) days in a row", systemImage: "flame.fill")
+                .font(.headline)
+                .foregroundStyle(Theme.warning)
+        }
+        Text("A new puzzle arrives tomorrow.")
+            .foregroundStyle(.secondary)
+        Button {
+            dismiss()
+        } label: {
+            Text("Done").frame(maxWidth: .infinity)
+        }
+        .font(.headline)
+        .buttonStyle(.borderedProminent)
+        .buttonBorderShape(.capsule)
+        .controlSize(.large)
+        .padding(.top, Theme.Spacing.s)
+    }
+
+    @ViewBuilder
+    private var setCompletion: some View {
         VStack(spacing: Theme.Spacing.m) {
             Image(systemName: "checkmark.seal.fill")
                 .font(.system(size: 64))
@@ -164,8 +219,5 @@ struct PuzzleTrainerView: View {
             .controlSize(.large)
             .padding(.top, Theme.Spacing.s)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 80)
-        .transition(.opacity.combined(with: .scale(scale: 0.96)))
     }
 }

@@ -245,5 +245,206 @@
         }
       ]
     }
+  ],
+  "collections": [
+    {
+      "id": "endgames",
+      "title": "Endgames",
+      "summary": "Finish the game when only a few pieces are left.",
+      "symbol": "flag.checkered",
+      "puzzles": [
+        {
+          "id": "e-queen-mate",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "7k/8/6K1/8/8/8/8/1Q6 w - - 0 1",
+          "solution": ["b1b8"],
+          "hint": "Your king covers the seventh rank. Use the queen on the eighth.",
+          "success": "Qb8 is mate. King and queen together."
+        },
+        {
+          "id": "e-rook-edge",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "k7/8/1K6/8/8/8/8/7R w - - 0 1",
+          "solution": ["h1h8"],
+          "hint": "The king on b6 covers a7 and b7.",
+          "success": "Rh8 is mate on the edge of the board."
+        },
+        {
+          "id": "e-back-rank",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "6k1/5ppp/8/8/8/8/8/3R2K1 w - - 0 1",
+          "solution": ["d1d8"],
+          "hint": "Black's pawns trap their own king.",
+          "success": "Rd8 is a back-rank mate."
+        },
+        {
+          "id": "e-rook-king",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "4k3/R7/4K3/8/8/8/8/8 w - - 0 1",
+          "solution": ["a7a8"],
+          "hint": "Your king takes d7, e7, and f7 away.",
+          "success": "Ra8 is mate. This is how a rook and king finish."
+        },
+        {
+          "id": "e-two-rooks",
+          "theme": "mate",
+          "prompt": "Checkmate in one.",
+          "fen": "8/k7/8/8/8/8/1R6/2R4K w - - 0 1",
+          "solution": ["c1a1"],
+          "hint": "One rook already guards the b-file.",
+          "success": "Ra1 is mate. The rooks work as a team."
+        },
+        {
+          "id": "e-promote",
+          "theme": "material",
+          "prompt": "Make a new queen.",
+          "fen": "8/5P2/8/8/8/1k6/8/6K1 w - - 0 1",
+          "solution": ["f7f8q"],
+          "hint": "Nothing can stop the pawn on f7.",
+          "success": "f8=Q. A new queen wins the game."
+        },
+        {
+          "id": "e-skewer",
+          "theme": "material",
+          "prompt": "Win the rook.",
+          "fen": "8/8/8/8/8/1k5r/1P6/R5K1 w - - 0 1",
+          "solution": ["a1a3"],
+          "hint": "Check the king along the third rank. The pawn guards a3.",
+          "success": "Ra3+ skewers the king, then the rook on h3 falls."
+        },
+        {
+          "id": "e-queen-fork",
+          "theme": "material",
+          "prompt": "Win the rook.",
+          "fen": "8/8/2k5/8/8/8/6r1/K3Q3 w - - 0 1",
+          "solution": ["e1e4", "e1h1"],
+          "hint": "Check the king from a square that also hits g2.",
+          "success": "A queen check that also attacks the rook wins it."
+        }
+      ]
+    },
+    {
+      "id": "mate-in-two",
+      "title": "Mate in Two",
+      "summary": "Two moves to checkmate. The computer defends.",
+      "symbol": "crown.fill",
+      "puzzles": [
+        {
+          "id": "m2-smothered",
+          "theme": "mate",
+          "prompt": "Mate in two.",
+          "fen": "r6k/6pp/7N/8/8/1Q6/8/7K w - - 0 1",
+          "solution": ["b3g8"],
+          "hint": "Give up the queen on g8. The knight finishes.",
+          "success": "Smothered mate. The king is boxed in by its own pieces.",
+          "mateIn": 2
+        },
+        {
+          "id": "m2-two-rooks",
+          "theme": "mate",
+          "prompt": "Mate in two.",
+          "fen": "7k/8/8/8/8/8/R7/1R4K1 w - - 0 1",
+          "solution": ["a2a7", "b1b7"],
+          "hint": "Take away the seventh rank first.",
+          "success": "The rooks climb like a ladder.",
+          "mateIn": 2
+        },
+        {
+          "id": "m2-morphy",
+          "theme": "mate",
+          "prompt": "Mate in two.",
+          "fen": "kbK5/pp6/1P6/8/8/8/8/R7 w - - 0 1",
+          "solution": ["a1a6"],
+          "hint": "Offer the rook. If the pawn takes, your pawn has a path.",
+          "success": "Ra6, then b7 is mate. A puzzle Paul Morphy loved.",
+          "mateIn": 2
+        },
+        {
+          "id": "m2-queen-king",
+          "theme": "mate",
+          "prompt": "Mate in two.",
+          "fen": "7k/8/5K2/8/8/8/8/5Q2 w - - 0 1",
+          "solution": ["f1g1", "f1g2", "f6f7"],
+          "hint": "Trap the king in the corner first.",
+          "success": "Quiet moves can be the strongest.",
+          "mateIn": 2
+        },
+        {
+          "id": "m2-king-walk",
+          "theme": "mate",
+          "prompt": "Mate in two.",
+          "fen": "k7/8/2K5/8/8/8/8/7R w - - 0 1",
+          "solution": ["c6b6", "c6c7"],
+          "hint": "Bring your king closer before the rook checks.",
+          "success": "The king helps, then the rook mates.",
+          "mateIn": 2
+        }
+      ]
+    },
+    {
+      "id": "skewers",
+      "title": "Skewers",
+      "summary": "Attack a piece through another one.",
+      "symbol": "line.diagonal.arrow",
+      "puzzles": [
+        {
+          "id": "s-rank",
+          "theme": "material",
+          "prompt": "Win the rook.",
+          "fen": "8/8/8/r2k4/8/8/8/1K5R w - - 0 1",
+          "solution": ["h1h5"],
+          "hint": "The king and rook share the fifth rank.",
+          "success": "Rh5+ skewers the king. The rook on a5 falls."
+        },
+        {
+          "id": "s-diagonal",
+          "theme": "material",
+          "prompt": "Win the queen.",
+          "fen": "4q3/8/2k5/8/8/8/8/3Q3K w - - 0 1",
+          "solution": ["d1a4"],
+          "hint": "The king and queen share a diagonal.",
+          "success": "Qa4+ skewers the king to the queen."
+        },
+        {
+          "id": "s-file",
+          "theme": "material",
+          "prompt": "Win the queen.",
+          "fen": "4q3/8/8/4k3/8/8/8/R5K1 w - - 0 1",
+          "solution": ["a1e1"],
+          "hint": "Line up on the e-file.",
+          "success": "Re1+ skewers the king to the queen."
+        }
+      ]
+    },
+    {
+      "id": "discovered-attacks",
+      "title": "Discovered Attacks",
+      "summary": "Move one piece to unleash another.",
+      "symbol": "rays",
+      "puzzles": [
+        {
+          "id": "d-knight",
+          "theme": "material",
+          "prompt": "Win the queen.",
+          "fen": "3q3k/7p/8/8/3N4/8/8/B5K1 w - - 0 1",
+          "solution": ["d4c6", "d4e6"],
+          "hint": "Move the knight to uncover the bishop, and attack the queen at the same time.",
+          "success": "Discovered check. The king must move, and the queen falls."
+        },
+        {
+          "id": "d-bishop",
+          "theme": "material",
+          "prompt": "Win the queen.",
+          "fen": "4k3/8/8/8/4B3/8/q7/4R1K1 w - - 0 1",
+          "solution": ["e4d5", "e4b1"],
+          "hint": "Move the bishop off the e-file to a square that hits a2.",
+          "success": "Discovered check from the rook. The bishop takes the queen next."
+        }
+      ]
+    }
   ]
 }

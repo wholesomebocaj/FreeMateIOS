@@ -25,8 +25,7 @@ struct ProgressSummary: Equatable {
         summary.openingsMastered = game.openingTutorials.filter {
             tutorials.progress(for: $0.id).status(for: $0.opening) == .mastered
         }.count
-        summary.puzzlesTotal = PuzzleContent.levels.reduce(0) { $0 + $1.puzzles.count }
-            + PuzzleContent.drills.reduce(0) { $0 + $1.puzzles.count }
+        summary.puzzlesTotal = PuzzleContent.allPuzzles.count
         summary.puzzlesSolved = PuzzleProgressStore(defaults: defaults).solved.count
         let decode = { (key: String) in
             defaults.data(forKey: key).flatMap { try? JSONDecoder().decode(ComputerGameRecord.self, from: $0) } ?? ComputerGameRecord()
@@ -159,7 +158,7 @@ struct HomeView: View {
 
     private var reviewCard: some View {
         Button {
-            game.selectedTab = .review
+            game.openReview()
         } label: {
             HStack(spacing: Theme.Spacing.m) {
                 IconTile(systemImage: "clock.arrow.circlepath", color: Theme.accent, size: 40)
@@ -226,11 +225,20 @@ struct HomeView: View {
             shortcut("Play", detail: "vs Computer", systemImage: "desktopcomputer", color: Theme.success) {
                 game.openPractice(.computer)
             }
-            shortcut("Puzzles", detail: "One move wins", systemImage: "puzzlepiece.fill", color: Theme.warning) {
-                game.selectedTab = .practice
-                game.practicePath = []
+            shortcut("Daily Puzzle", detail: dailyDetail, systemImage: "calendar", color: Theme.warning) {
+                if let daily = PuzzleContent.dailySet(on: Date()) {
+                    game.openPuzzles(.set(daily.id))
+                } else {
+                    game.openPuzzles()
+                }
             }
         }
+    }
+
+    private var dailyDetail: String {
+        guard let daily = PuzzleContent.dailySet(on: Date()) else { return "One move wins" }
+        let key = daily.key(for: daily.puzzles[0])
+        return PuzzleProgressStore().solved.contains(key) ? "Solved today" : "A new one every day"
     }
 
     private func shortcut(_ title: String, detail: String, systemImage: String, color: Color, action: @escaping () -> Void) -> some View {

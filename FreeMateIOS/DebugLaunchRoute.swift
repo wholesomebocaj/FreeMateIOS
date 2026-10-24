@@ -16,8 +16,12 @@ enum DebugLaunchRoute {
         case "practice": game.selectedTab = .practice
         case "computer": game.openPractice(.computer)
         case "board": game.openPractice(.freeBoard)
-        case "puzzles" where !id.isEmpty: game.openPractice(.puzzles(id))
-        case "review": game.selectedTab = .review
+        case "puzzles" where id.isEmpty: game.openPuzzles()
+        case "puzzles": game.openPuzzles(.set(id))
+        case "daily": game.openPuzzles(.set(PuzzleContent.dailySet(on: Date())?.id ?? ""))
+        case "rush": game.openPuzzles(.rush)
+        case "blunders": game.openPuzzles(.blunderCheck)
+        case "review": game.openReview()
         case "course" where !id.isEmpty: game.openCourse(id)
         case "lesson" where !id.isEmpty: game.openLesson(id)
         case "opening" where !id.isEmpty: game.openOpening(id)

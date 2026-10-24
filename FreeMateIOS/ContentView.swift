@@ -6,10 +6,16 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $game.selectedTab) {
             Tab("Today", systemImage: "sun.max", value: AppTab.home) {
-                NavigationStack {
+                NavigationStack(path: $game.homePath) {
                     HomeView()
+                        .navigationDestination(for: HomeRoute.self) { route in
+                            switch route {
+                            case .review: ReviewView()
+                            }
+                        }
                 }
             }
+            .badge(game.reviewQueue().count)
 
             Tab("Learn", systemImage: "book", value: AppTab.lessons) {
                 NavigationStack(path: $game.lessonPath) {
@@ -37,16 +43,13 @@ struct ContentView: View {
                 }
             }
 
-            Tab("Practice", systemImage: "checkerboard.rectangle", value: AppTab.practice) {
-                PracticeView()
+            Tab("Puzzles", systemImage: "puzzlepiece", value: AppTab.puzzles) {
+                PuzzlesView()
             }
 
-            Tab("Review", systemImage: "clock.arrow.circlepath", value: AppTab.review) {
-                NavigationStack {
-                    ReviewView()
-                }
+            Tab("Play", systemImage: "checkerboard.rectangle", value: AppTab.practice) {
+                PracticeView()
             }
-            .badge(game.reviewQueue().count)
         }
     }
 }

@@ -17,6 +17,8 @@ final class GameState: ObservableObject {
     @Published var lessonPath = [LessonRoute]()
     @Published var openingPath = [OpeningRoute]()
     @Published var practicePath = [PracticeRoute]()
+    @Published var puzzlePath = [PuzzleRoute]()
+    @Published var homePath = [HomeRoute]()
 
     private let store: LearnerProgressStore
     private let activity: ActivityStore
@@ -239,7 +241,7 @@ final class GameState: ObservableObject {
     func open(_ url: URL) {
         guard url.scheme == "freemate" else { return }
         switch url.host() {
-        case "review": selectedTab = .review
+        case "review": openReview()
         case "lessons": selectedTab = .lessons
         case "lesson":
             let id = url.pathComponents.dropFirst().first ?? ""
@@ -278,6 +280,17 @@ final class GameState: ObservableObject {
         openingPath.append(.train(id: id, line: line))
     }
 
+    /// Review lives on Today, next to what is due.
+    func openReview() {
+        selectedTab = .home
+        homePath = [.review]
+    }
+
+    func openPuzzles(_ route: PuzzleRoute? = nil) {
+        selectedTab = .puzzles
+        puzzlePath = route.map { [$0] } ?? []
+    }
+
     func openPractice(_ route: PracticeRoute) {
         selectedTab = .practice
         practicePath = [route]
@@ -291,7 +304,18 @@ final class GameState: ObservableObject {
 }
 
 enum AppTab: Hashable {
-    case home, lessons, openings, practice, review
+    case home, lessons, openings, puzzles, practice
+}
+
+enum HomeRoute: Hashable {
+    case review
+}
+
+enum PuzzleRoute: Hashable {
+    /// A level, collection, drill, or daily puzzle, by `PuzzleSet.id`.
+    case set(String)
+    case rush
+    case blunderCheck
 }
 
 enum LessonRoute: Hashable {
@@ -303,8 +327,6 @@ enum LessonRoute: Hashable {
 enum PracticeRoute: Hashable {
     case computer
     case freeBoard
-    /// A puzzle level ("level/1") or a drill ("drill/forks"), by `PuzzleSet.id`.
-    case puzzles(String)
 }
 
 enum OpeningRoute: Hashable {

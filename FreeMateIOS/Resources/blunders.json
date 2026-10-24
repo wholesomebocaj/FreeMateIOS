@@ -1,0 +1,77 @@
+[
+  {
+    "id": "queen-grabs-pawn",
+    "fen": "4k3/8/2p5/3p4/8/8/8/3QK3 w - - 0 1",
+    "move": "d1d5",
+    "isBlunder": true,
+    "refutation": "c6d5",
+    "explanation": "The pawn on c6 guards d5. Qxd5 wins a pawn and loses the queen."
+  },
+  {
+    "id": "pawn-takes-pawn",
+    "fen": "4k3/8/8/3p4/4P3/8/8/4K3 w - - 0 1",
+    "move": "e4d5",
+    "isBlunder": false,
+    "explanation": "Nothing guards d5, so exd5 simply wins a pawn."
+  },
+  {
+    "id": "knight-into-pawn",
+    "fen": "4k3/8/4p3/8/8/2N5/8/4K3 w - - 0 1",
+    "move": "c3d5",
+    "isBlunder": true,
+    "refutation": "e6d5",
+    "explanation": "The pawn on e6 attacks d5. Check pawn attacks before you land."
+  },
+  {
+    "id": "knight-safe-square",
+    "fen": "4k3/8/4p3/8/8/2N5/8/4K3 w - - 0 1",
+    "move": "c3b5",
+    "isBlunder": false,
+    "explanation": "No black piece attacks b5, so the knight is safe there."
+  },
+  {
+    "id": "rook-into-guard",
+    "fen": "r5k1/5ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1",
+    "move": "c1c8",
+    "isBlunder": true,
+    "refutation": "a8c8",
+    "explanation": "The rook on a8 guards c8. Rc8+ only gives your rook away."
+  },
+  {
+    "id": "make-luft",
+    "fen": "r5k1/5ppp/8/8/8/8/5PPP/2R3K1 w - - 0 1",
+    "move": "h2h3",
+    "isBlunder": false,
+    "explanation": "h3 gives your king an escape square, so the back rank stays safe."
+  },
+  {
+    "id": "scholars-trap",
+    "fen": "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3",
+    "move": "g8f6",
+    "isBlunder": true,
+    "refutation": "h5f7",
+    "explanation": "Nf6 attacks the queen but leaves f7 to the queen and bishop: Qxf7 is checkmate."
+  },
+  {
+    "id": "scholars-defense",
+    "fen": "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3",
+    "move": "g7g6",
+    "isBlunder": false,
+    "explanation": "g6 kicks the queen away and keeps f7 safe."
+  },
+  {
+    "id": "rook-to-bishop",
+    "fen": "4k3/7p/8/8/1b6/8/7P/R5K1 w - - 0 1",
+    "move": "a1a5",
+    "isBlunder": true,
+    "refutation": "b4a5",
+    "explanation": "The bishop on b4 covers a5. Look along the diagonals."
+  },
+  {
+    "id": "rook-attacks-bishop",
+    "fen": "4k3/7p/8/8/1b6/8/7P/R5K1 w - - 0 1",
+    "move": "a1a4",
+    "isBlunder": false,
+    "explanation": "Ra4 attacks the bishop from a square it cannot reach."
+  }
+]

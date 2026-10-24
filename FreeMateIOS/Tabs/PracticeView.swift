@@ -1,24 +1,10 @@
 import SwiftUI
 
-/// The bundled puzzles and drills, loaded once.
-enum PuzzleContent {
-    static let catalog = try? PuzzleLibrary.loadCatalog()
-    static let drills = (try? PuzzleLibrary.loadDrills()) ?? []
-    static var levels: [PuzzleLevel] { catalog?.levels ?? [] }
-
-    static func set(id: String) -> PuzzleSet? {
-        if let level = levels.first(where: { PuzzleSet(level: $0).id == id }) { return PuzzleSet(level: level) }
-        if let drill = drills.first(where: { PuzzleSet(drill: $0).id == id }) { return PuzzleSet(drill: drill) }
-        return nil
-    }
-}
-
-/// The Practice tab: the computer, a free board, puzzles by level, and drills.
+/// The Play tab: a game against the computer, or a free board.
 struct PracticeView: View {
     @EnvironmentObject private var game: GameState
     @StateObject private var computer = ComputerGame()
     @StateObject private var freeBoard = PracticeBoard()
-    @State private var solved: Set<String> = []
 
     var body: some View {
         NavigationStack(path: $game.practicePath) {
@@ -40,46 +26,19 @@ struct PracticeView: View {
                             color: Theme.accent
                         )
                     }
-                }
-                if let catalog = PuzzleContent.catalog {
-                    Section {
-                        ForEach(catalog.levels) { level in
-                            levelRow(level, in: catalog)
-                        }
-                    } header: {
-                        Text("Puzzles")
-                    } footer: {
-                        Text("Solve \(catalog.unlockAfter) in a level to unlock the next.")
-                    }
-                }
-                if !PuzzleContent.drills.isEmpty {
-                    Section("Drills") {
-                        ForEach(PuzzleContent.drills) { drill in
-                            drillRow(drill)
-                        }
-                    }
+                } footer: {
+                    Text("The computer can warn you before a blunder and review your game when it ends.")
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Practice")
+            .navigationTitle("Play")
             .navigationDestination(for: PracticeRoute.self) { route in
                 switch route {
-                case .computer:
-                    ComputerGameView(game: computer)
-                case .freeBoard:
-                    FreeBoardView(board: freeBoard)
-                case .puzzles(let id):
-                    if let set = PuzzleContent.set(id: id) {
-                        PuzzleTrainerView(set: set)
-                    } else {
-                        ContentUnavailableView("Puzzles Not Found", systemImage: "puzzlepiece")
-                    }
+                case .computer: ComputerGameView(game: computer)
+                case .freeBoard: FreeBoardView(board: freeBoard)
                 }
             }
-            .onAppear {
-                solved = PuzzleProgressStore().solved
-                computer.reloadOtherDevices()
-            }
+            .onAppear { computer.reloadOtherDevices() }
         }
     }
 
@@ -87,66 +46,6 @@ struct PracticeView: View {
         let record = computer.totalRecord
         guard record.played > 0 else { return "\(computer.level.label) · Beginner friendly" }
         return "\(computer.level.label) · \(record.wins) won, \(record.losses) lost"
-    }
-
-    private static let levelStyles: [(symbol: String, color: Color)] = [
-        ("shoeprints.fill", Theme.accent),
-        ("arrow.up.left.and.arrow.down.right", Theme.success),
-        ("line.diagonal.arrow", Theme.warning),
-        ("eye.fill", .purple),
-    ]
-
-    @ViewBuilder
-    private func levelRow(_ level: PuzzleLevel, in catalog: PuzzleCatalog) -> some View {
-        let set = PuzzleSet(level: level)
-        let done = level.puzzles.filter { solved.contains(set.key(for: $0)) }.count
-        let style = Self.levelStyles[(level.level - 1) % Self.levelStyles.count]
-        if catalog.isUnlocked(level, solved: solved) {
-            NavigationLink(value: PracticeRoute.puzzles(set.id)) {
-                IconRow(title: level.title, subtitle: "Level \(level.level)", systemImage: style.symbol, color: style.color) {
-                    progress(done: done, total: level.puzzles.count)
-                }
-            }
-        } else {
-            IconRow(title: level.title, subtitle: "Level \(level.level)", systemImage: "lock.fill", color: Color(.systemGray3)) {
-                Image(systemName: "lock")
-                    .accessibilityLabel("Locked")
-            }
-            .opacity(0.6)
-        }
-    }
-
-    private func drillRow(_ drill: Drill) -> some View {
-        let set = PuzzleSet(drill: drill)
-        let done = drill.puzzles.filter { solved.contains(set.key(for: $0)) }.count
-        let style = Self.drillStyle(drill.id)
-        return NavigationLink(value: PracticeRoute.puzzles(set.id)) {
-            IconRow(title: drill.title, subtitle: drill.summary, systemImage: style.symbol, color: style.color) {
-                progress(done: done, total: drill.puzzles.count)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func progress(done: Int, total: Int) -> some View {
-        if done == total && total > 0 {
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(Theme.success)
-                .accessibilityLabel("Complete")
-        } else if done > 0 {
-            Text("\(done)/\(total)")
-        }
-    }
-
-    static func drillStyle(_ id: String) -> (symbol: String, color: Color) {
-        switch id {
-        case "mate-in-one": return ("crown.fill", Theme.highlight)
-        case "forks": return ("arrow.triangle.branch", Theme.warning)
-        case "pins": return ("pin.fill", .purple)
-        case "hanging": return ("hand.raised.fill", Theme.success)
-        case "out-of-check": return ("shield.lefthalf.filled", Theme.accent)
-        default: return ("target", .gray)
-        }
     }
 }
 

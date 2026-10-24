@@ -20,8 +20,28 @@ nonisolated struct Puzzle: Codable, Identifiable, Equatable, Sendable {
     var theme: Theme?
     /// The drills mark mate puzzles this way, as the web app does.
     var mate: Bool?
+    /// 2 for a mate in two: the learner's first move is listed in `solution`, the computer
+    /// defends, and any checkmate finishes it. Nil for one-move puzzles.
+    var mateIn: Int?
 
     var isMate: Bool { theme == .mate || mate == true }
+    /// How many moves the learner plays.
+    var moveCount: Int { max(mateIn ?? 1, 1) }
+
+    init(
+        id: String, prompt: String, fen: String, solution: [String], hint: String, success: String,
+        theme: Theme? = nil, mate: Bool? = nil, mateIn: Int? = nil
+    ) {
+        self.id = id
+        self.prompt = prompt
+        self.fen = fen
+        self.solution = solution
+        self.hint = hint
+        self.success = success
+        self.theme = theme
+        self.mate = mate
+        self.mateIn = mateIn
+    }
 
     var sideToMove: ChessColor {
         ChessColor.from(fen: String(fen.split(separator: " ").dropFirst().first ?? "w"))
@@ -32,16 +52,41 @@ nonisolated struct Puzzle: Codable, Identifiable, Equatable, Sendable {
     func accepts(_ uci: String) -> Bool {
         let move = uci.lowercased()
         if solution.contains(where: { $0 == move || (move.count == 4 && $0.hasPrefix(move)) }) { return true }
-        guard isMate, let engine = try? ChessEngine(fen: fen) else { return false }
+        // A mate in two only takes its listed first moves; any mate counts only on the last move.
+        guard isMate, moveCount == 1 else { return false }
+        return Self.mates(move, from: fen)
+    }
+
+    /// Whether `uci` checkmates from `fen`. With no piece named, a promotion is a queen.
+    static func mates(_ uci: String, from fen: String) -> Bool {
+        guard let after = play(uci, from: fen), let engine = try? ChessEngine(fen: after) else { return false }
+        return engine.isCheckmate()
+    }
+
+    /// The position after `uci`, or nil when the move is not legal.
+    static func play(_ uci: String, from fen: String) -> String? {
+        let move = uci.lowercased()
+        guard let engine = try? ChessEngine(fen: fen) else { return nil }
         let from = String(move.prefix(2))
         let to = String(move.dropFirst(2).prefix(2))
         // With no piece named, a promotion is a queen, as the trainer plays it.
         let promotes = engine.legalMoves(from: from).contains { $0.to == to && $0.promotion != nil }
         let promotion = move.count > 4 ? String(move.suffix(1)) : promotes ? "q" : nil
-        guard engine.move(from: from, to: to, promotion: promotion) != nil else {
-            return false
-        }
-        return engine.isCheckmate()
+        guard engine.move(from: from, to: to, promotion: promotion) != nil else { return nil }
+        return engine.fen()
+    }
+
+    /// A checkmating move from `fen`, for the answer on a mate in two's last move.
+    static func matingMove(from fen: String) -> String? {
+        guard let engine = try? ChessEngine(fen: fen) else { return nil }
+        return engine.searchMoves().map(\.uci).first { mates($0, from: fen) }
+    }
+
+    /// The computer's defense in a mate in two. Every reply loses, so it takes the most natural
+    /// one, a capture before a quiet move, the same way every time.
+    static func defense(from fen: String) -> String? {
+        guard let engine = try? ChessEngine(fen: fen) else { return nil }
+        return ComputerOpponent.ordered(engine.searchMoves()).first?.uci
     }
 }
 
@@ -62,10 +107,33 @@ nonisolated struct PuzzleLevel: Codable, Identifiable, Equatable, Sendable {
     var id: Int { level }
 }
 
+/// A themed set outside the level path, such as Endgames or Mate in Two.
+nonisolated struct PuzzleCollection: Codable, Identifiable, Equatable, Sendable {
+    var id: String
+    var title: String
+    var summary: String
+    var symbol: String
+    var puzzles: [Puzzle]
+}
+
 nonisolated struct PuzzleCatalog: Codable, Equatable, Sendable {
     /// Puzzles to solve in a level before the next one opens.
     var unlockAfter: Int
     var levels: [PuzzleLevel]
+    var collections: [PuzzleCollection]
+
+    init(unlockAfter: Int, levels: [PuzzleLevel], collections: [PuzzleCollection] = []) {
+        self.unlockAfter = unlockAfter
+        self.levels = levels
+        self.collections = collections
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        unlockAfter = try container.decode(Int.self, forKey: .unlockAfter)
+        levels = try container.decode([PuzzleLevel].self, forKey: .levels)
+        collections = try container.decodeIfPresent([PuzzleCollection].self, forKey: .collections) ?? []
+    }
 
     func isUnlocked(_ level: PuzzleLevel, solved: Set<String>) -> Bool {
         guard let index = levels.firstIndex(where: { $0.level == level.level }), index > 0 else { return true }
@@ -87,6 +155,23 @@ nonisolated struct PuzzleSet: Identifiable, Equatable, Sendable {
         summary = drill.summary
         puzzles = drill.puzzles
     }
+
+    init(collection: PuzzleCollection) {
+        id = "collection/\(collection.id)"
+        title = collection.title
+        summary = collection.summary
+        puzzles = collection.puzzles
+    }
+
+    /// The daily puzzle, keyed by its day so each day's solve is saved separately.
+    init(day: String, puzzle: Puzzle) {
+        id = "daily/\(day)"
+        title = "Daily Puzzle"
+        summary = "A new puzzle every day."
+        puzzles = [puzzle]
+    }
+
+    var isDaily: Bool { id.hasPrefix("daily/") }
 
     init(level: PuzzleLevel) {
         id = "level/\(level.level)"
@@ -172,6 +257,8 @@ nonisolated struct PuzzleProgressStore {
 nonisolated struct PuzzleSession: Equatable, Sendable {
     enum Outcome: Equatable, Sendable {
         case solved
+        /// Right so far. The computer answers with `reply`, then the learner moves again.
+        case correct(reply: String)
         case wrong
         /// The puzzle is already solved, or the set is finished.
         case ignored
@@ -179,6 +266,10 @@ nonisolated struct PuzzleSession: Equatable, Sendable {
 
     let puzzleSet: PuzzleSet
     private(set) var index = 0
+    /// Which of the learner's moves comes next in the current puzzle, from 0.
+    private(set) var step = 0
+    /// The position the learner is solving from now.
+    private(set) var fen: String
     private(set) var isSolved = false
     private(set) var mistakes = 0
     private(set) var hintShown = false
@@ -189,7 +280,9 @@ nonisolated struct PuzzleSession: Equatable, Sendable {
 
     init(set: PuzzleSet, startingAt index: Int = 0) {
         puzzleSet = set
-        self.index = max(0, min(index, set.puzzles.count - 1))
+        let start = max(0, min(index, set.puzzles.count - 1))
+        self.index = start
+        fen = set.puzzles[start].fen
     }
 
     var puzzle: Puzzle { puzzleSet.puzzles[index] }
@@ -199,15 +292,34 @@ nonisolated struct PuzzleSession: Equatable, Sendable {
     /// After two wrong moves, offer the answer instead of more guessing.
     var offersAnswer: Bool { !isSolved && mistakes >= 2 && !answerShown }
 
+    /// The move the hint and the answer point to.
+    var answerMove: String? {
+        step == 0 ? puzzle.solution.first : Puzzle.matingMove(from: fen)
+    }
+
     mutating func submit(_ uci: String) -> Outcome {
         guard !isSolved, !isFinished else { return .ignored }
-        if puzzle.accepts(uci) {
+        let isLastMove = step == puzzle.moveCount - 1
+        let accepted = step == 0 ? puzzle.accepts(uci) : isLastMove && Puzzle.mates(uci, from: fen)
+        guard accepted, let after = Puzzle.play(uci, from: fen) else {
+            mistakes += 1
+            return .wrong
+        }
+        if isLastMove {
+            fen = after
             isSolved = true
             if isFirstTry { firstTryCount += 1 }
             return .solved
         }
-        mistakes += 1
-        return .wrong
+        guard let reply = Puzzle.defense(from: after), let answered = Puzzle.play(reply, from: after) else {
+            fen = after
+            isSolved = true
+            return .solved
+        }
+        fen = answered
+        step += 1
+        hintShown = false
+        return .correct(reply: reply)
     }
 
     mutating func showHint() { hintShown = true }
@@ -225,6 +337,8 @@ nonisolated struct PuzzleSession: Equatable, Sendable {
             return
         }
         index += 1
+        step = 0
+        fen = puzzle.fen
         isSolved = false
         mistakes = 0
         hintShown = false

@@ -88,6 +88,81 @@ final class PuzzleTrainerTests: XCTestCase {
         XCTAssertEqual(trainer.session.firstTryCount, 2)
     }
 
+    private func wait(until condition: () -> Bool) async throws {
+        for _ in 0..<150 where !condition() {
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        XCTAssertTrue(condition(), "Timed out.")
+    }
+
+    func testMateInTwoPlaysTheDefenseOnTheBoard() async throws {
+        let puzzle = Puzzle(
+            id: "m2", prompt: "Mate in two.", fen: "r6k/6pp/7N/8/8/1Q6/8/7K w - - 0 1",
+            solution: ["b3g8"], hint: "", success: "", theme: .mate, mateIn: 2
+        )
+        let trainer = PuzzleTrainer(
+            set: PuzzleSet(drill: Drill(id: "m2", title: "M2", summary: "", puzzles: [puzzle])),
+            store: PuzzleProgressStore(defaults: defaults),
+            activity: ActivityStore(defaults: defaults)
+        )
+        trainer.board.select("b3")
+        trainer.board.select("g8")
+
+        XCTAssertTrue(trainer.isReplying)
+        XCTAssertEqual(trainer.board.position["g8"], "wQ")
+        try await wait { !trainer.isReplying }
+        XCTAssertEqual(trainer.board.position["g8"], "bR", "Rxg8")
+        XCTAssertEqual(trainer.board.lastMove, ["a8", "g8"])
+        XCTAssertFalse(trainer.session.isSolved)
+
+        trainer.showHint()
+        XCTAssertEqual(trainer.board.highlightSquares, [HighlightMark(square: "h6", className: "focus")])
+        trainer.board.select("h6")
+        trainer.board.select("f7")
+        XCTAssertTrue(trainer.session.isSolved)
+        XCTAssertTrue(trainer.board.isCheckmate)
+        XCTAssertTrue(trainer.isSolved(puzzle))
+    }
+
+    func testRushCountsAnswersAndEndsAfterThreeMisses() async throws {
+        let mate = Puzzle(id: "m1", prompt: "Mate.", fen: "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1", solution: ["a1a8"], hint: "", success: "", theme: .mate)
+        let rush = RushController(pool: Array(repeating: mate, count: 6), store: RushStore(defaults: defaults), activity: ActivityStore(defaults: defaults))
+        rush.start()
+        XCTAssertEqual(rush.phase, .playing)
+
+        rush.board.select("a1")
+        rush.board.select("a8")
+        XCTAssertEqual(rush.session.score, 1)
+        XCTAssertEqual(rush.lastAnswer, true)
+        for _ in 0..<3 {
+            try await wait { !rush.isAdvancing }
+            rush.board.select("a1")
+            rush.board.select("a7")
+        }
+        try await wait { rush.phase == .over }
+        XCTAssertEqual(rush.session.strikes, 3)
+        XCTAssertTrue(rush.isNewBest)
+        XCTAssertEqual(RushStore(defaults: defaults).best, 1)
+    }
+
+    func testBlunderCheckRevealsTheRefutation() async throws {
+        let check = BlunderCheck(
+            id: "q", fen: "4k3/8/2p5/3p4/8/8/8/3QK3 w - - 0 1", move: "d1d5", isBlunder: true,
+            refutation: "c6d5", explanation: "The pawn guards d5."
+        )
+        let controller = BlunderCheckController(checks: [check], store: BlunderProgressStore(defaults: defaults), activity: ActivityStore(defaults: defaults))
+        XCTAssertEqual(controller.board.highlightSquares.map(\.square), ["d1", "d5"])
+
+        controller.answer(isBlunder: true)
+        XCTAssertTrue(controller.session.wasCorrect)
+        XCTAssertEqual(controller.board.position["d5"], "wQ")
+        try await wait { controller.board.position["d5"] == "bP" }
+        XCTAssertEqual(BlunderProgressStore(defaults: defaults).correct, ["q"])
+
+        controller.next()
+        XCTAssertTrue(controller.session.isFinished)
+    }
+
     func testResumesAtTheFirstUnsolvedPuzzle() {
         PuzzleProgressStore(defaults: defaults).markSolved("drill/test/fork", firstTry: true)
         let trainer = makeTrainer()

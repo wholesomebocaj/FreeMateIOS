@@ -13,10 +13,13 @@ final class PuzzleTrainer: ObservableObject {
     @Published private(set) var rejectedSquare: String?
     /// Puzzle keys solved at any time, for the progress dots.
     @Published private(set) var solved: Set<String>
+    /// The computer is answering in a mate in two.
+    @Published private(set) var isReplying = false
 
     let board = PracticeBoard()
     private let store: PuzzleProgressStore
     private let activity: ActivityStore
+    private var replyTask: Task<Void, Never>?
 
     init(set: PuzzleSet, store: PuzzleProgressStore = PuzzleProgressStore(), activity: ActivityStore = ActivityStore()) {
         self.store = store
@@ -37,25 +40,27 @@ final class PuzzleTrainer: ObservableObject {
     func isSolved(_ puzzle: Puzzle) -> Bool { solved.contains(session.puzzleSet.key(for: puzzle)) }
 
     func attempt(_ uci: String) {
+        let before = board.fen
         switch session.submit(uci) {
         case .solved:
             rejectedSquare = nil
-            // The board sends no promotion piece, so take the listed one, or a queen.
-            let move = uci.count == 4 ? (puzzle.solution.first { $0.hasPrefix(uci) } ?? uci) : uci
-            let from = String(move.prefix(2))
-            let to = String(move.dropFirst(2).prefix(2))
-            if let engine = try? ChessEngine(fen: board.fen) {
-                let promotes = engine.legalMoves(from: from).contains { $0.to == to && $0.promotion != nil }
-                let promotion = move.count > 4 ? String(move.suffix(1)) : promotes ? "q" : nil
-                if engine.move(from: from, to: to, promotion: promotion) != nil {
-                    try? board.syncFen(engine.fen(), lastMove: [from, to])
-                }
-            }
-            board.setConfig(highlightSquares: [])
+            show(uci, from: before)
             let key = session.puzzleSet.key(for: puzzle)
             store.markSolved(key, firstTry: session.isFirstTry)
             solved.insert(key)
             activity.record()
+        case .correct(let reply):
+            rejectedSquare = nil
+            show(uci, from: before)
+            isReplying = true
+            let afterMove = board.fen
+            replyTask?.cancel()
+            replyTask = Task { [weak self] in
+                try? await Task.sleep(for: .milliseconds(600))
+                guard let self, !Task.isCancelled else { return }
+                self.show(reply, from: afterMove)
+                self.isReplying = false
+            }
         case .wrong:
             rejectedSquare = String(uci.prefix(2))
             rejectionCount += 1
@@ -64,17 +69,26 @@ final class PuzzleTrainer: ObservableObject {
         }
     }
 
+    /// Plays `uci` from `fen` on the board. The board sends no promotion piece, so a promotion
+    /// becomes the listed one or a queen.
+    private func show(_ uci: String, from fen: String) {
+        let move = uci.count == 4 ? (puzzle.solution.first { $0.hasPrefix(uci) } ?? uci) : uci
+        guard let after = Puzzle.play(move, from: fen) else { return }
+        try? board.syncFen(after, lastMove: [String(move.prefix(2)), String(move.dropFirst(2).prefix(2))])
+        board.setConfig(highlightSquares: [])
+    }
+
     /// Marks the piece to move.
     func showHint() {
         session.showHint()
-        guard let move = puzzle.solution.first else { return }
+        guard let move = session.answerMove else { return }
         board.setConfig(highlightSquares: [HighlightMark(square: String(move.prefix(2)), className: "focus")])
     }
 
     /// Marks the whole move. The puzzle no longer counts as solved first try.
     func showAnswer() {
         session.showAnswer()
-        guard let move = puzzle.solution.first else { return }
+        guard let move = session.answerMove else { return }
         board.setConfig(highlightSquares: [
             HighlightMark(square: String(move.prefix(2)), className: "focus"),
             HighlightMark(square: String(move.dropFirst(2).prefix(2)), className: "target"),
@@ -92,6 +106,8 @@ final class PuzzleTrainer: ObservableObject {
     }
 
     private func loadPuzzle() {
+        replyTask?.cancel()
+        isReplying = false
         rejectedSquare = nil
         try? board.loadFen(puzzle.fen, setInitial: true, clearHistory: true)
         board.orientation = puzzle.sideToMove.rawValue

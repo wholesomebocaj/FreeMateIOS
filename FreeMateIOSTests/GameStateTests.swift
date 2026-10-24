@@ -47,7 +47,8 @@ final class GameStateTests: XCTestCase {
         let lesson = try XCTUnwrap(game.allLessons.dropFirst().first)
 
         game.open(URL(string: "freemate://review")!)
-        XCTAssertEqual(game.selectedTab, .review)
+        XCTAssertEqual(game.selectedTab, .home)
+        XCTAssertEqual(game.homePath, [.review])
 
         game.open(URL(string: "freemate://lesson/\(lesson.id)")!)
         XCTAssertEqual(game.selectedTab, .lessons)
@@ -94,7 +95,7 @@ final class GameStateTests: XCTestCase {
         XCTAssertEqual(summary.lessonsDone, 1)
         XCTAssertEqual(summary.lessonsTotal, game.allLessons.count)
         XCTAssertEqual(summary.puzzlesSolved, 1)
-        XCTAssertEqual(summary.puzzlesTotal, 37)
+        XCTAssertEqual(summary.puzzlesTotal, 55, "Levels, collections, and drills")
         XCTAssertEqual(summary.openingsTotal, game.openingTutorials.count)
         XCTAssertEqual(summary.record, ComputerGameRecord(wins: 3, draws: 1, losses: 3), "This device plus the others")
         XCTAssertEqual(summary.streak, 1)
