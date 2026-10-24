@@ -13,12 +13,15 @@ let appSettings: [SwiftSetting] = [
 
 let package = Package(
     name: "FreeMateIOS",
+    // Without this, SwiftPM assumes an old macOS minimum, and toolchains that mark the
+    // ISO 8601 date-format APIs as macOS 12+ reject the progress code.
+    platforms: [.iOS(.v17), .macOS(.v14)],
     targets: [
         .target(
             name: "FreeMateIOS",
             path: "FreeMateIOS",
             exclude: [
-                "AuthSession.swift",
+                "Assets.xcassets",
                 "ComputerGame.swift",
                 "ComputerGameReview.swift",
                 "DebugLaunchRoute.swift",
@@ -30,20 +33,22 @@ let package = Package(
                 "LessonSession.swift",
                 "OpeningTrainer.swift",
                 "PracticeBoard.swift",
+                "Progress/CloudSync.swift",
                 "README.md",
                 "Resources",
                 "DesignSystem/BoardThumbnail.swift",
                 "DesignSystem/ChessPieceShape.swift",
-                "DesignSystem/FilterChips.swift",
-                "DesignSystem/FreeMateScreen.swift",
                 "DesignSystem/Haptics.swift",
                 "DesignSystem/ModernBoardView.swift",
                 "DesignSystem/MotionEffects.swift",
                 "DesignSystem/Theme.swift",
                 "OpeningTutorials/OpeningTutorialController.swift",
                 "OpeningTutorials/Views",
+                "Puzzles/PuzzleTrainer.swift",
+                "Puzzles/Views",
                 "OpeningTutorials/opening-tutorials.json",
                 "Tabs",
+                "WidgetSnapshotWriter.swift",
             ],
             sources: [
                 "ChessEngine.swift",
@@ -55,6 +60,12 @@ let package = Package(
                 "OpeningTutorials/OpeningTutorialLibrary.swift",
                 "OpeningTutorials/OpeningTutorialPresentation.swift",
                 "OpeningTutorials/OpeningTutorialSession.swift",
+                "Progress/ActivityStore.swift",
+                "Progress/LearnerProgress.swift",
+                "Progress/LegacyProgressMigration.swift",
+                "Progress/SyncMerge.swift",
+                "Puzzles/Puzzle.swift",
+                "Puzzles/PuzzleModes.swift",
             ],
             swiftSettings: appSettings
         ),

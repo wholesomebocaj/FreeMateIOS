@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Fill beginner lesson steps and bundle them for the web app."""
+"""Fill beginner lesson steps, bundle them for the web app, and build the iOS catalog.
+
+Resources/data is the one source. Run this after editing it, and both apps update.
+"""
 
 import json
 from pathlib import Path
@@ -694,150 +697,8 @@ MINUTES = {
     "simple-blunder-check": 5,
 }
 
-DRILLS = [
-    {
-        "id": "mate-in-one",
-        "title": "Mate in one",
-        "summary": "Find the move that ends the game.",
-        "puzzles": [
-            {
-                "id": "back-rank",
-                "prompt": "White to move. Find checkmate.",
-                "fen": "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1",
-                "solution": ["a1a8"],
-                "mate": True,
-                "hint": "The rook can reach the 8th rank. Black's pawns block the king.",
-                "success": "Back-rank mate. The king has no flight square.",
-            },
-            {
-                "id": "queen-mate",
-                "prompt": "White to move. Checkmate the king on h8.",
-                "fen": "7k/Q7/6K1/8/8/8/8/8 w - - 0 1",
-                "solution": ["a7g7"],
-                "mate": True,
-                "hint": "Slide the queen along the 7th rank, next to the king. Your king protects her.",
-                "success": "Qg7 is mate. The queen is protected by the king.",
-            },
-            {
-                "id": "scholars",
-                "prompt": "White to move. The bishop on c4 eyes f7.",
-                "fen": "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
-                "solution": ["h5f7"],
-                "mate": True,
-                "hint": "The queen captures on f7, and the bishop protects her.",
-                "success": "Qxf7 is checkmate. This is the idea behind Scholar's Mate.",
-            },
-        ],
-    },
-    {
-        "id": "forks",
-        "title": "Forks",
-        "summary": "Attack two pieces with one move.",
-        "puzzles": [
-            {
-                "id": "knight-fork",
-                "prompt": "Fork the king and the queen.",
-                "fen": "8/6k1/8/8/3N4/4q3/8/K7 w - - 0 1",
-                "solution": ["d4f5"],
-                "hint": "The knight on d4 has a jump that hits g7 and e3.",
-                "success": "Nf5 checks the king and attacks the queen.",
-            },
-            {
-                "id": "royal-fork",
-                "prompt": "Fork the king on e8 and the rook on a8.",
-                "fen": "r3k3/8/8/3N4/8/8/8/4K3 w - - 0 1",
-                "solution": ["d5c7"],
-                "hint": "Look for a knight jump to c7.",
-                "success": "Nc7 attacks the king and the rook.",
-            },
-            {
-                "id": "pawn-fork",
-                "prompt": "Push a pawn so it attacks both knights.",
-                "fen": "4k3/8/8/2n1n3/8/8/3P4/4K3 w - - 0 1",
-                "solution": ["d2d4"],
-                "hint": "A pawn on d4 attacks c5 and e5.",
-                "success": "d4 forks the two knights.",
-            },
-        ],
-    },
-    {
-        "id": "pins",
-        "title": "Pins",
-        "summary": "Line up an attacker, a piece, and the king.",
-        "puzzles": [
-            {
-                "id": "bishop-pin",
-                "prompt": "Pin the knight on c6 to the king.",
-                "fen": "4k3/8/2n5/8/8/8/8/5BK1 w - - 0 1",
-                "solution": ["f1b5"],
-                "hint": "The bishop wants the diagonal that runs through c6.",
-                "success": "Bb5 pins the knight. It cannot move without exposing the king.",
-            },
-            {
-                "id": "rook-pin",
-                "prompt": "Pin the knight on e5 to the king on e8.",
-                "fen": "4k3/8/8/4n3/8/8/8/R5K1 w - - 0 1",
-                "solution": ["a1e1"],
-                "hint": "Use the e-file.",
-                "success": "The rook pins the knight. Moving it would expose the king.",
-            },
-        ],
-    },
-    {
-        "id": "hanging",
-        "title": "Hanging pieces",
-        "summary": "Take the piece that nobody defends.",
-        "puzzles": [
-            {
-                "id": "loose-queen",
-                "prompt": "Win the undefended queen.",
-                "fen": "4k3/8/8/3q4/8/8/8/3R2K1 w - - 0 1",
-                "solution": ["d1d5"],
-                "hint": "The rook and the queen share the d-file.",
-                "success": "Rxd5 wins the queen.",
-            },
-            {
-                "id": "loose-knight",
-                "prompt": "The knight on d5 is undefended. Capture it.",
-                "fen": "4k3/8/8/3n4/8/8/B7/4K3 w - - 0 1",
-                "solution": ["a2d5"],
-                "hint": "The bishop on a2 has a clear diagonal.",
-                "success": "Bxd5 picks up the knight for free.",
-            },
-        ],
-    },
-    {
-        "id": "out-of-check",
-        "title": "Get out of check",
-        "summary": "Move the king, capture the checker, or block.",
-        "puzzles": [
-            {
-                "id": "capture-checker",
-                "prompt": "You are in check. Capture the unprotected queen.",
-                "fen": "4k3/8/8/8/8/8/4q3/4K3 w - - 0 1",
-                "solution": ["e1e2"],
-                "hint": "The checking queen is next to your king and has no defender.",
-                "success": "Kxe2 captures the checker.",
-            },
-            {
-                "id": "step-aside",
-                "prompt": "Step the king off the e-file. Either safe square works.",
-                "fen": "4k3/8/8/8/8/4q3/8/4K3 w - - 0 1",
-                "solution": ["e1d1", "e1f1"],
-                "hint": "d1 and f1 are not on the queen's line.",
-                "success": "The king left the file, so the check is over.",
-            },
-            {
-                "id": "block",
-                "prompt": "Block the rook check by putting the queen on e2.",
-                "fen": "4r1k1/8/8/8/8/8/8/3QK3 w - - 0 1",
-                "solution": ["d1e2"],
-                "hint": "The check runs down the e-file. Stand on e2.",
-                "success": "Qe2 blocks the check.",
-            },
-        ],
-    },
-]
+# Shared with the iOS app, which bundles the same file.
+DRILLS = json.loads((ROOT / "FreeMateIOS" / "Resources" / "drills.json").read_text())
 
 
 def main_line(opening):
@@ -872,15 +733,29 @@ def load_lessons():
     return lessons
 
 
-def patch_catalog(by_id):
-    catalog = json.loads(CATALOG.read_text())
-    for folder in catalog.get("courseFolders", []):
-        for entry in folder.get("files", []):
-            lesson = entry.get("lesson") or {}
-            updated = by_id.get(lesson.get("id"))
-            if updated:
-                lesson["steps"] = updated["steps"]
-                lesson["timeMinutes"] = updated["timeMinutes"]
+def write_catalog():
+    """Build the iOS catalog from Resources/data, so every lesson, bracket, and opening edit
+    reaches the app, not only lesson steps."""
+    order = {course_id: info["order"] for course_id, info in COURSE_INFO.items()}
+    folders = sorted((path for path in COURSES.iterdir() if path.is_dir()), key=lambda path: (order.get(path.name, 999), path.name))
+    index = json.loads((OPENINGS / "index.json").read_text())
+    catalog = {
+        "brackets": json.loads(BRACKETS.read_text()),
+        "courseFolders": [
+            {
+                "name": folder.name,
+                "files": [
+                    {"name": path.name, "lesson": json.loads(path.read_text())}
+                    for path in sorted(folder.glob("*.json"))
+                ],
+            }
+            for folder in folders
+        ],
+        "openings": [
+            {"index": entry, "opening": json.loads((OPENINGS / entry["path"]).read_text())}
+            for entry in index
+        ],
+    }
     CATALOG.write_text(json.dumps(catalog, separators=(",", ":"), ensure_ascii=True) + "\n")
 
 
@@ -924,7 +799,7 @@ def main():
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(bundle, indent=2) + "\n")
-    patch_catalog(by_id)
+    write_catalog()
     print(f"lessons {len(by_id)} openings {len(openings)} drills {sum(len(d['puzzles']) for d in DRILLS)}")
 
 

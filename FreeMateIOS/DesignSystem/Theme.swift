@@ -211,10 +211,53 @@ struct IconTile: View {
 
     var body: some View {
         Image(systemName: systemImage)
-            .font(size > 44 ? .title3.weight(.semibold) : .body.weight(.semibold))
+            .font(.system(size: size * 0.46, weight: .semibold))
             .foregroundStyle(.white)
             .frame(width: size, height: size)
-            .background(color.gradient, in: RoundedRectangle(cornerRadius: Theme.Radius.tile, style: .continuous))
+            .background(color.gradient, in: RoundedRectangle(cornerRadius: size * 0.27, style: .continuous))
             .accessibilityHidden(true)
+    }
+}
+
+/// A list row in the style of the Settings app: a small colored icon, a title, an optional
+/// subtitle, and an optional trailing value.
+struct IconRow<Trailing: View>: View {
+    var title: String
+    var subtitle: String?
+    var systemImage: String
+    var color: Color
+    @ViewBuilder var trailing: () -> Trailing
+
+    var body: some View {
+        HStack(spacing: Theme.Spacing.s) {
+            IconTile(systemImage: systemImage, color: color, size: 32)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .foregroundStyle(.primary)
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer(minLength: Theme.Spacing.xs)
+            trailing()
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.secondary)
+        }
+        .padding(.vertical, 2)
+    }
+}
+
+extension IconRow where Trailing == EmptyView {
+    init(title: String, subtitle: String? = nil, systemImage: String, color: Color) {
+        self.init(title: title, subtitle: subtitle, systemImage: systemImage, color: color) { EmptyView() }
+    }
+}
+
+extension View {
+    /// Hides the tab bar so a lesson, trainer, game, or puzzle has the whole screen.
+    func focusedScreen() -> some View {
+        toolbar(.hidden, for: .tabBar)
     }
 }

@@ -5,55 +5,51 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $game.selectedTab) {
-            NavigationStack {
-                HomeView()
-            }
-            .tabItem { Label("Home", systemImage: "house") }
-            .tag(AppTab.home)
-
-            NavigationStack(path: $game.lessonPath) {
-                CourseLibraryView()
-                    .navigationDestination(for: LessonRoute.self) { route in
-                        switch route {
-                        case .bracket(let id):
-                            BracketDetailView(bracketId: id)
-                        case .course(let id):
-                            CourseDetailView(courseId: id)
-                        case .lesson(let id):
-                            LessonPlayerView(lessonId: id)
+            Tab("Today", systemImage: "sun.max", value: AppTab.home) {
+                NavigationStack(path: $game.homePath) {
+                    HomeView()
+                        .navigationDestination(for: HomeRoute.self) { route in
+                            switch route {
+                            case .review: ReviewView()
+                            }
                         }
-                    }
+                }
             }
-            .tabItem { Label("Lessons", systemImage: "book") }
-            .tag(AppTab.lessons)
+            .badge(game.reviewQueue().count)
 
-            NavigationStack(path: $game.openingPath) {
-                OpeningBrowserView()
-                    .navigationDestination(for: OpeningRoute.self) { route in
-                        switch route {
-                        case .overview(let id):
-                            OpeningOverviewView(openingId: id)
-                        case .train(let id, let line):
-                            OpeningTrainerView(openingId: id, lineId: line)
-                        case .tutorial(let id):
-                            OpeningTutorialView(tutorialId: id)
+            Tab("Learn", systemImage: "book", value: AppTab.lessons) {
+                NavigationStack(path: $game.lessonPath) {
+                    CourseLibraryView()
+                        .navigationDestination(for: LessonRoute.self) { route in
+                            switch route {
+                            case .bracket(let id): BracketDetailView(bracketId: id)
+                            case .course(let id): CourseDetailView(courseId: id)
+                            case .lesson(let id): LessonPlayerView(lessonId: id)
+                            }
                         }
-                    }
+                }
             }
-            .tabItem { Label("Openings", systemImage: "arrow.triangle.branch") }
-            .tag(AppTab.openings)
 
-            NavigationStack {
+            Tab("Openings", systemImage: "arrow.triangle.branch", value: AppTab.openings) {
+                NavigationStack(path: $game.openingPath) {
+                    OpeningBrowserView()
+                        .navigationDestination(for: OpeningRoute.self) { route in
+                            switch route {
+                            case .overview(let id): OpeningOverviewView(openingId: id)
+                            case .train(let id, let line): OpeningTrainerView(openingId: id, lineId: line)
+                            case .tutorial(let id): OpeningTutorialView(tutorialId: id)
+                            }
+                        }
+                }
+            }
+
+            Tab("Puzzles", systemImage: "puzzlepiece", value: AppTab.puzzles) {
+                PuzzlesView()
+            }
+
+            Tab("Play", systemImage: "checkerboard.rectangle", value: AppTab.practice) {
                 PracticeView()
             }
-            .tabItem { Label("Practice", systemImage: "square.grid.3x3") }
-            .tag(AppTab.practice)
-
-            NavigationStack {
-                ReviewView()
-            }
-            .tabItem { Label("Review", systemImage: "arrow.clockwise") }
-            .tag(AppTab.review)
         }
     }
 }

@@ -266,20 +266,19 @@ final class OpeningTrainer: ObservableObject {
 
     private func markComplete() {
         var map = completions
-        map[activeLine.id] = BranchCompletion(completed: true, completedAt: GameState.isoNow())
+        map[activeLine.id] = BranchCompletion(completed: true, completedAt: Date())
         completions = map
         game.markBranchComplete(opening: opening, line: activeLine)
         progress = game.openingProgressRecord(for: opening.id)
     }
 
     private func queueReview() {
-        _ = game.recordReviewFailure(ReviewSeed(
-            type: "opening",
-            id: opening.id,
+        game.recordReviewFailure(ReviewSeed(
+            kind: .opening,
+            itemId: opening.id,
             branchId: activeLine.id,
             title: "\(opening.name): \(activeLine.title)",
-            subtitle: activeLine.description.isEmpty ? opening.name : activeLine.description,
-            href: "/openings/\(opening.id)/train?line=\(activeLine.id)"
+            subtitle: activeLine.description.isEmpty ? opening.name : activeLine.description
         ))
     }
 

@@ -2,7 +2,8 @@
 import Foundation
 
 /// Opens a screen from a launch argument so CI can screenshot it, for example
-/// `-FreeMateScreen openings` or `-FreeMateScreen tutorial:ruy-lopez`.
+/// `-FreeMateScreen openings`, `-FreeMateScreen tutorial:ruy-lopez`, or
+/// `-FreeMateScreen puzzles:level/1`.
 enum DebugLaunchRoute {
     static func apply(to game: GameState) {
         guard let value = UserDefaults.standard.string(forKey: "FreeMateScreen") else { return }
@@ -13,7 +14,14 @@ enum DebugLaunchRoute {
         case "lessons": game.selectedTab = .lessons
         case "openings": game.selectedTab = .openings
         case "practice": game.selectedTab = .practice
-        case "review": game.selectedTab = .review
+        case "computer": game.openPractice(.computer)
+        case "board": game.openPractice(.freeBoard)
+        case "puzzles" where id.isEmpty: game.openPuzzles()
+        case "puzzles": game.openPuzzles(.set(id))
+        case "daily": game.openPuzzles(.set(PuzzleContent.dailySet(on: Date())?.id ?? ""))
+        case "rush": game.openPuzzles(.rush)
+        case "blunders": game.openPuzzles(.blunderCheck)
+        case "review": game.openReview()
         case "course" where !id.isEmpty: game.openCourse(id)
         case "lesson" where !id.isEmpty: game.openLesson(id)
         case "opening" where !id.isEmpty: game.openOpening(id)

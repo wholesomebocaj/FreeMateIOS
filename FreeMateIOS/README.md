@@ -10,7 +10,7 @@ This repository houses the native iOS version of the platform, built to help new
 
 * **Engine Core:** Native Swift implementation porting modular game loops and state evaluation logic.
 * **User Interface:** Rebuilt completely using modern Apple SwiftUI rendering patterns.
-* **Data Layer:** Local storage for tracking puzzle completion rates, lesson checkpoints, and rating progression.
+* **Data Layer:** Typed, Codable progress saved on the device and synced through the learner's own iCloud. There are no accounts.
 
 ## Roadmap & Features
 
@@ -39,7 +39,7 @@ Code in `FreeMateIOS/OpeningTutorials/`:
 * `OpeningTutorialSession.swift`: the tutorial state machine. It owns the position and is UI-free.
 * `OpeningTutorialPresentation.swift`: what the card, progress bar, and completion screen say. UI-free and unit tested.
 * `OpeningTutorialController.swift`: drives the shared `PracticeBoard` through its `onMoveAttempt` hook.
-* `Views/`: the tutorial card, the tutorial screen, the progress header, the floating instruction card, and the completion overlay.
+* `Views/`: the tutorial screen, the progress header, the floating instruction card, and the completion overlay. The Openings list row is `TutorialRow` in `Tabs/OpeningBrowserView.swift`.
 
 Reusable pieces in `FreeMateIOS/DesignSystem/`:
 
@@ -48,11 +48,10 @@ Reusable pieces in `FreeMateIOS/DesignSystem/`:
 * `BoardPieceLayout.swift`: keeps piece identities across moves so pieces glide instead of jumping.
 * `BoardThumbnail.swift`: a single-pass `Canvas` preview board.
 * `MotionEffects.swift` and `Haptics.swift`: the shared spring, shake, glow, pressable cards, and light, error, and success haptics.
-* `FilterChips.swift`: the search-and-filter chip row used by the Lessons and Openings tabs.
 
 ## Play the computer
 
-The Practice tab opens on a game against the same beginner computer as the web app. Easy looks one move ahead with a lot of randomness, so it misses tactics. Fair looks two moves ahead. The learner picks White or Black, can undo a move, and can resign. Wins, draws, and losses are saved on the device. The Free Board side of the tab is the old two-sided board.
+The Play tab opens a game against the same beginner computer as the web app. Easy looks one move ahead with a lot of randomness, so it misses tactics. Fair looks two moves ahead. The learner picks White or Black, can undo a move, and can resign. Wins, draws, and losses are saved on the device. Play also has a free board for both sides.
 
 Beginner sits below Easy and is iOS only. It looks one move ahead with so much randomness that it grabs a free queen but plays loosely otherwise.
 
@@ -68,15 +67,65 @@ Code:
 * `ComputerCoach.swift`: grades moves for the warning, hint, and review. It looks at the opponent's best reply and then plays out captures, so it sees hanging pieces, bad trades, and mate in one. UI-free.
 * `ComputerGame.swift`: plays a game on a `PracticeBoard` and keeps the record.
 * `ComputerGameReview.swift`: grades a finished game one move at a time and steps a board through it.
-* `Tabs/ComputerPlayPanel.swift` and `Tabs/ComputerGameReviewView.swift`: the screens.
+* `Tabs/ComputerGameView.swift` and `Tabs/ComputerGameReviewView.swift`: the screens.
 
-The tab root screens live in `FreeMateIOS/Tabs/`: Lessons (`CourseLibraryView`), Openings (`OpeningBrowserView`), and Practice (`PracticeView`). Every board in the app, including lessons, the opening trainer, and Practice, uses `ModernBoardView`.
+## Puzzles
+
+The Puzzles tab (`Puzzles/Views/PuzzlesView.swift`) has:
+
+* **Daily Puzzle:** one a day, the same for everyone, with its own streak. `DailyPuzzle` steps through every bundled puzzle with a stride that visits each one before any repeats.
+* **Puzzle Rush:** as many one-move puzzles as you can in 3 minutes, with one try each and three misses allowed. The best score is saved.
+* **Blunder Check:** "Is this move safe?" Answer Safe or Blunder, then watch the move and its punishment. Content is in `Resources/blunders.json`.
+* **Endgames** and **Mate in Two:** collections in `Resources/puzzles.json`. In a mate in two, the learner's first move must be one of the listed keys. The computer then defends with its most natural reply, and any checkmate finishes the puzzle.
+* **Path:** 24 mate-in-one and win-a-piece puzzles in four levels of six. Solving 4 in a level unlocks the next.
+* **Themes:** the web app's five drills (`Resources/drills.json`, shared with `web/build_content.py`), plus Skewers and Discovered Attacks.
+
+A wrong move springs back and shows the hint. Hint marks the piece to move. After two wrong moves, Show Answer marks the whole move, and the puzzle no longer counts as solved first try. Any checkmate solves a one-move mate puzzle. Progress, the Rush best, and Blunder Check results sync through iCloud.
+
+Code in `FreeMateIOS/Puzzles/`:
+
+* `Puzzle.swift`: the models, the loader, the progress store, and the UI-free `PuzzleSession`, including mate in two.
+* `PuzzleModes.swift`: the daily puzzle, `RushSession`, and Blunder Check.
+* `PuzzleTrainer.swift`: drives the board.
+* `Views/`: the Puzzles page, the trainer, Rush, and Blunder Check.
+
+After editing either file, check every position:
+
+```bash
+pip install chess
+python3 tools/check_puzzles.py
+```
+
+It checks that every FEN and solution is legal, and that mate solutions mate. For win-a-piece puzzles, it checks that each solution wins at least 2 pawns' worth and that every other move is clearly worse, so a learner is never marked wrong for an equally good move. For a mate in two, it checks that there is no mate in one and that the listed keys are exactly the moves that force mate. For Blunder Check, it checks that each blunder really loses material (with the listed refutation as the best reply) and that each safe move does not.
+
+The tabs are Today (`TodayView`), Learn (`CourseLibraryView`), Openings (`OpeningBrowserView`), Puzzles (`PuzzlesView`), and Play (`PracticeView`: the computer and the free board). Review opens from Today, which shows what is due and carries the badge. Settings opens from Today. Every board in the app uses `ModernBoardView`.
 
 To add an opening, edit `opening-tutorials.json`, then check it and fill ECO codes from [eco.json](https://github.com/JeffML/eco.json):
 
 ```bash
 pip install chess
 python3 tools/opening_tutorials.py --eco-dir /path/to/eco-json
+```
+
+## Progress, sync, and the widget
+
+Code in `FreeMateIOS/Progress/`:
+
+* `LearnerProgress.swift`: lessons, lesson steps, opening lines, and the review queue as one Codable value, saved under `freemate.progress.v2`. Reviews use spaced repetition: an item comes back after 1, 3, 7, and 14 days, and a miss sends it back to the start, due at once. Practicing before an item is due does not move it up.
+* `LegacyProgressMigration.swift`: on first launch, reads the old loose keys, then deletes them. That includes the old local accounts and their password hashes.
+* `ActivityStore.swift`: the days the learner practiced anything, for the streak.
+* `SyncMerge.swift` and `CloudSync.swift`: iCloud sync through the key-value store. Each store is merged without losing work on either device: completions are unions, steps keep the furthest point, and reviews keep the newer copy. Games against the computer are counted per device and added up.
+
+Home shows a progress dashboard: the streak, reviews due, lessons, mastered openings, puzzles, and the record against the computer.
+
+The Home Screen widget is in `FreeMateWidget/`. It shows the next lesson, reviews due today, and the streak. It reads a `WidgetSnapshot` (in `Shared/`) that the app writes to the App Group `group.com.jacobbakerpersonalteam.FreeMateIOS`. Tapping it opens `freemate://lesson/<id>` or `freemate://review`.
+
+Both targets need their capabilities on the Apple Developer account: App Groups for the app and the widget, and iCloud (key-value storage) for the app. The entitlements are in `Config/`. Simulator builds without signing still run, but they do not sync, and the widget shows its placeholder.
+
+The app icon is drawn from the app's own vector knight. To redraw it:
+
+```bash
+tools/render_app_icon.sh
 ```
 
 ## Tests
